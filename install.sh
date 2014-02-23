@@ -9,7 +9,6 @@ stow vim
 stow zsh
 stow powerline
 
-
 install_powerline
 install_gdiff
 install_vim_vundle
