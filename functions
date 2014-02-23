@@ -1,0 +1,20 @@
+function install_powerline(){
+	powerline_dir=$(pip show Powerline | grep Location | cut -d":" -f2)/powerline/bindings/
+	if ! test -d $powerline_dir; then
+		pip install --user git+git://github.com/Lokaltog/powerline
+	fi
+	if ! test -h $HOME/.powerline.tmux.conf; then
+		ln -s $powerline_dir/tmux/powerline.conf $HOME/.powerline.tmux.conf
+	fi
+	if ! test -h $HOME/.config/zsh/powerline.zsh; then
+		ln -s $powerline_dir/zsh/powerline.zsh $HOME/.config/zsh/powerline.zsh
+	fi
+}
+function install_vim_vundle(){
+	vim -c ":BundleInstall" -c "qa"
+}
+function install_gdiff(){
+	pip install diff-match-patch > /dev/null 2>&1
+}
+#vim: syntax=zsh
+
