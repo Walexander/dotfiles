@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+"""
+Command line tool for google-diff-match-patch
+"""
+
+from diff_match_patch import diff_match_patch
+import re
+import sys
+class bcolors:
+    REMOVED = '\033[9;97;41m'
+    ADDED = '\033[97;42m'
+    ENDC = '\033[0m'
+
+def main():
+    args = sys.argv
+    path1 = args[1]
+    path2 = args[2]
+
+    dmp = diff_match_patch()
+    diffs = dmp.diff_main(file(path1).read(), file(path2).read())
+    dmp.diff_cleanupSemantic(diffs)
+
+    sb = []
+    for match in diffs:
+    	if match[0] == 0:
+		sb.append(match[1])
+		continue
+
+    	if match[0] < 0:
+		color = bcolors.REMOVED
+	elif match[0] > 0:
+		color = bcolors.ADDED
+
+	s = ('\\n' + bcolors.ENDC + "\n" + color).join(match[1].split("\n"))
+	s = ('\\t\t').join(s.split('\t'))
+	sb.append(color)
+	sb.append(s)
+	sb.append(bcolors.ENDC)
+
+    output = ''.join(sb)
+    print output
+	
+if __name__ == '__main__':
+    main()

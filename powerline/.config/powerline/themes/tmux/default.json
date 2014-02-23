@@ -1,0 +1,49 @@
+{
+	"default_module": "powerline.segments.common",
+	"segment_data": {
+		"uptime": {
+			"before": "⇑  "
+		},
+		"date": {
+			"before": "⌚ "
+		}
+	},
+	"segments": {
+		"right": [
+			{
+				"name": "uptime"
+			},
+			{
+				"name": "system_load",
+				"priority": 50
+			},
+			{
+				"name": "date",
+				"args" : {
+					"format" : "%b %d"
+				}
+			},
+			{
+				"name": "date",
+				"args": {
+					"format": "%H:%M",
+					"istime": true
+				}
+			},
+			{
+				"name": "weather",
+				"args" : {
+					"unit" : "F"
+				}
+			},
+			{
+				"name": "battery",
+				"args": {
+					"gamify" : false,
+					"full_heart" : "♥",
+					"steps" : 5
+				}
+			}
+		]
+	}
+}

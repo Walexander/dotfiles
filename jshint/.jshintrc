@@ -1,0 +1,10 @@
+{
+	"laxcomma" : true,
+	"sub" : true,
+	"asi" : true,
+	"eqnull" : true,
+	"smarttabs" : true,
+	"evil" : true,
+	"indent" : false,
+	"-W099" : true
+}
