@@ -1,5 +1,4 @@
 dircolors_file=$(mktemp -t dircolors)
-echo $dircolors_file
 cat << EOM > $dircolors_file
 # Dark 256 color solarized theme for the color GNU ls utility.
 # Used and tested with dircolors (GNU coreutils) 8.5

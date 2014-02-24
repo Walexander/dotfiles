@@ -1,3 +1,0 @@
-unsetopt menucomplete
-unsetopt automenu
-setopt interactivecomments

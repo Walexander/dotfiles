@@ -3,4 +3,7 @@ alias sed=gsed
 alias vi="gvim -v"
 alias gpg=gpg2
 alias ls="/usr/local/bin/gls  --color"
-
+alias ll='ls -l'
+alias la='ls -a'
+alias ..='cd ..'
+alias ..='cd ...'

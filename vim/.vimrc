@@ -46,7 +46,6 @@ set ofu=syntaxcomplete#Complete
 :au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 :au InsertLeave * match ExtraWhitespace /\s\+$/
 
-colorscheme solarized
 
 set guioptions+=LlRrb
 set guioptions-=LlRrb
@@ -66,3 +65,4 @@ let g:syntastic_loc_list_height = 5
 python from powerline.vim import setup as powerline_setup
 python powerline_setup()
 python del powerline_setup
+colorscheme solarized
