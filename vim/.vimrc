@@ -3,7 +3,6 @@ set nocompatible              " be iMproved
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 Bundle 'gmarik/vundle'
-
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'
@@ -12,6 +11,9 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'tpope/vim-fugitive'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'sjl/gundo.vim'
+Bundle 'jelera/vim-javascript-syntax'
+Bundle 'pangloss/vim-javascript'
+Bundle 'nanotech/jellybeans.vim'
 
 filetype plugin indent on     " required!
 
@@ -65,4 +67,5 @@ let g:syntastic_loc_list_height = 5
 python from powerline.vim import setup as powerline_setup
 python powerline_setup()
 python del powerline_setup
-colorscheme solarized
+let g:solarized_termcolors=16
+colorscheme jellybeans 
