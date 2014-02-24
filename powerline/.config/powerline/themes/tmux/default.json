@@ -29,17 +29,6 @@
 					"format": "%H:%M",
 					"istime": true
 				}
-			},
-			{
-				"name": "weather",
-				"args" : {
-					"unit" : "F"
-				}
-			},
-			{
-				"name": "battery",
-				"args": {
-				}
 			}
 		]
 	}
