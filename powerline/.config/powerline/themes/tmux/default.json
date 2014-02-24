@@ -39,9 +39,6 @@
 			{
 				"name": "battery",
 				"args": {
-					"gamify" : false,
-					"full_heart" : "♥",
-					"steps" : 5
 				}
 			}
 		]

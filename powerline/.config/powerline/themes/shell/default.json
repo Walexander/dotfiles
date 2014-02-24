@@ -12,22 +12,18 @@
 		},
 		"branch": {
 			"before": " "
+		},
+		"time": {
+			"before": "⌚ ",
+			"divider": "> "
 		}
+
 	},
 	"segments": {
 		"left": [
 			{
 				"module": "powerline.segments.shell",
 				"name": "mode"
-			},
-			{
-				"name": "hostname"
-			},
-			{
-				"name": "user"
-			},
-			{
-				"name": "virtualenv"
 			},
 			{
 				"name": "cwd",
