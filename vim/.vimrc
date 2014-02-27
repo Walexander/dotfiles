@@ -53,8 +53,11 @@ set guioptions+=LlRrb
 set guioptions-=LlRrb
 
 set background=dark
-
+set splitright
+nnoremap <c-w>\| :vnew <cr>
 map <C-G> :!grunt <CR>
+let mapleader=","
+map <leader><space> :noh <cr>
 
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_enable_signs = 1

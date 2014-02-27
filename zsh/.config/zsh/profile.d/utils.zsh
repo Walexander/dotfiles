@@ -13,4 +13,25 @@ function get_url {
 		sleep 5;
 	done
 }
+function check_update {
+	url=$1
+	minutes=$2
+	while true; do
+		last_modified=$(curl -v -o /dev/null $url 2>&1 | egrep 'Last-Modified')
+		last_modified=$(echo $last_modified | gsed -r 's/[^:]+://')
+		last_modified_epoch=$(gdate --date "$last_modified" +%s)
 
+		delta=$(expr $(date +%s) - $last_modified_epoch)
+		delta_minutes=$(expr $delta / 60)
+		echo url updated $delta_minutes minutes ago
+
+		if test $delta_minutes -lt $minutes; then
+			echo url is up-to-date within $minutes minutes
+			break;
+		fi
+		sleep 10
+	done
+
+}
+
+function get_dfp_response() { url=$1; if test -z "$2" ; then keys="keys" ; else keys="$2" fi ; echo $keys; curl -v "$url"  | sed 's/window.parent.googletag.impl.pubads.setAdContentsBySlotForAsync/console.log(JSON.stringify/'  | sed 's/);$/));/' | node | jq -r ".[] | to_entries | .[] | .key, (.value | $keys) "  }

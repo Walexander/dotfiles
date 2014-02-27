@@ -1,6 +1,7 @@
 [user]
 	name = Will Alexander
 	email = will@beanstockmedia.com
+	signingkey=510691EE
 [push]
 	default = current
 [filter "media"]
