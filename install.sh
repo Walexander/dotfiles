@@ -9,6 +9,7 @@ stow tmux
 stow vim
 stow zsh
 stow powerline
+stow slate
 
 install_powerline
 install_gdiff
