@@ -6,5 +6,6 @@
 	"smarttabs" : true,
 	"evil" : true,
 	"indent" : false,
+	"multistr" : true,
 	"-W099" : true
 }
