@@ -1,6 +1,6 @@
 function get_helix_boxes() {
 	aws ec2 describe-instances\
-		--filter Name=tag:Name,Values=\*helix\*\
+		--filter Name=tag:Name,Values=helix3 \
 		"Name=instance-state-code,Values=16" \
 		| jq -r '.Reservations[].Instances[] | .PublicDnsName'
 }
@@ -35,9 +35,5 @@ function check_update {
 }
 
 function get_dfp_response() {
-	url=$1;
-	if test -z "$2" ; then keys="keys" ;
-	else keys="$2" fi ;
-	echo $keys
-	curl -v "$url"  | sed 's/window.parent.googletag.impl.pubads.setAdContentsBySlotForAsync/console.log(JSON.stringify/'  | sed 's/);$/));/' | node | jq -r ".[] | to_entries | .[] | .key, (.value|$keys) "
+	sed 's/callbackProxy/console.log(JSON.stringify/'  | sed 's/);$/));/' | node | jq -r '.'
 }
