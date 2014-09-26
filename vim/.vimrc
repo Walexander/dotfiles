@@ -23,6 +23,11 @@ Bundle 'michalliu/jsruntime.vim'
 Bundle 'michalliu/jsoncodecs.vim'
 Bundle 'marijnh/tern_for_vim'
 Bundle 'Valloric/YouCompleteMe'
+Bundle 'geekjuice/vim-spec'
+Bundle 'Shougo/vimproc'
+Bundle 'Shougo/vimshell'
+Bundle 'Shougo/neocomplcache'
+Bundle 'Shougo/unite'
 
 " Custom syntastic settings:
 function! s:find_jshintrc(dir)
@@ -95,10 +100,10 @@ map <leader>t :Make test <cr>
 map <leader>c :cclose <cr>
 
 map <leader>r :TernRename <cr>
-map <leader>d :TernDefTab <cr>
+map <leader>d :TernDef<cr>
 map <leader>D :TernDefPreview<cr>
 map <leader>H :TernDoc<cr>
-let tern_show_argument_hints='on_move'
+let tern_show_argument_hints='on_hold'
 let tern_show_signature_in_pum=1
 
 
