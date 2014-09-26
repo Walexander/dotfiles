@@ -1,4 +1,5 @@
 fpath=(/usr/local/share/zsh-completions ~/.config/zsh/functions $fpath)
+zmodload zsh/langinfo
 path+=(/usr/local/sbin)
 HISTSIZE=100000
 SAVEHIST=100000
