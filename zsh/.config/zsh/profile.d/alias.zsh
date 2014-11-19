@@ -12,4 +12,4 @@ alias g=grunt
 alias gw=grunt watch
 alias gkw=grunt karma:all:start watch
 alias gc=grunt karma:cuke_me
-alias arstunnel="ssh -L 5440:dev-cluster.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com:5439 -L 5439:redshift-prod-1.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com:5439 ec2-54-85-158-4.compute-1.amazonaws.com -l will"
+alias arstunnel="ssh -L 5439:redshift-prod-1.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com:5439 ec2-54-85-158-4.compute-1.amazonaws.com -l will -N &"
