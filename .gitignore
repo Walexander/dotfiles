@@ -7,5 +7,6 @@ custom/*
 *.swp
 !custom/example.zshcache
 vim/.vim/bundle/
+vim/.vim/undo/
 cache/
 
