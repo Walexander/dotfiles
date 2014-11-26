@@ -8,5 +8,6 @@ custom/*
 !custom/example.zshcache
 vim/.vim/bundle/
 vim/.vim/undo/
+vim/.vim/.netrwhist
 cache/
 
