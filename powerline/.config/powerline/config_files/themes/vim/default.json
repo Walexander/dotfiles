@@ -2,10 +2,6 @@
 	"segments": {
 		"left": [
 			{
-				"function": "bufnr",
-				"exclude_modes": ["nc"]
-			},
-			{
 				"function": "mode",
 				"exclude_modes": ["nc"]
 			},
