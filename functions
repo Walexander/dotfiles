@@ -1,7 +1,7 @@
 #vim: set syntax=zsh
 function install_powerline(){
 
-	powerline_dir=$(pip show Powerline | grep Location | cut -d":" -f2 | gsed 's/\s//g' )/powerline/bindings
+	powerline_dir=$(pip show powerline-status | grep Location | cut -d":" -f2 | gsed 's/\s//g' )/powerline/bindings
 	if ! test -d $powerline_dir; then
 		pip install --user git+git://github.com/Lokaltog/powerline > /dev/null 2>&1
 	fi

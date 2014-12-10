@@ -1,4 +1,5 @@
-alias j=z
+alias j=fasd_cd
+alias v='f -e vim'
 alias sed=gsed
 alias vi="gvim -v"
 alias gpg=gpg2

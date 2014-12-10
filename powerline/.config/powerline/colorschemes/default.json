@@ -1,5 +1,4 @@
-{
-	"name": "Default",
+{ "name": "Default",
 	"groups": {
 		"background:divider":        { "fg": "gray5", "bg": "gray0", "attr": [] },
 		"session":                   { "fg": "black", "bg": "gray10", "attr": ["bold"] },
