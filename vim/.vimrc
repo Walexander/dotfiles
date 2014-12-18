@@ -22,9 +22,10 @@ Bundle 'Raimondi/delimitMate'
 Bundle 'bufexplorer.zip'
 Bundle 'michalliu/jsruntime.vim'
 Bundle 'airblade/vim-gitgutter'
-Bundle 'mbbill/undotree'
+Bundle 'sjl/gundo.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
+Bundle 'jpalardy/vim-slime'
 
 filetype plugin indent on     " required!
 
