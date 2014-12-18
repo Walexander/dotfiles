@@ -32,7 +32,10 @@ set hidden
 set ai
 set hlsearch
 
-set showbreak=\ \
+set wildmenu
+set guifont=Source\ Code\ Pro\ Medium:h13
+
+set showbreak=
 set nosmartindent
 
 set noshowmode
