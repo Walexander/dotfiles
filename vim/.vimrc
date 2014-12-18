@@ -93,6 +93,16 @@ map <leader>r :TernRef<cr>
 map <leader>d :TernDef<cr>
 map <leader>D :TernDefPreview<cr>
 map <leader>h :TernDoc<cr>
+inoremap <expr> <C-K> HUDG_GetDigraph()
+
+vmap  <expr>  <LEFT>   DVB_Drag('left')
+vmap  <expr>  <RIGHT>  DVB_Drag('right')
+vmap  <expr>  <DOWN>   DVB_Drag('down')
+vmap  <expr>  <UP>     DVB_Drag('up')
+vmap  <expr>  D        DVB_Duplicate()
+vmap  <expr>  ++       VMATH_YankAndAnalyse() 
+nmap          ++       vip++
+
 let tern_show_argument_hints='on_hold'
 let tern_show_signature_in_pum=1
 
