@@ -77,6 +77,11 @@ set splitright
 nnoremap <c-w>\| :vnew <cr>
 map <C-G> :!grunt dev <CR>
 map <leader><space> :noh <cr>
+map <silent> <Leader>H :vertical resize +5<cr>
+map <silent> <Leader>L :vertical resize -5<cr>
+map <silent> <Leader>J :resize +5<cr>
+map <silent> <Leader>K :resize -5<cr>
+
 nnoremap <Leader>cd :lcd %:p:h<cr>
 nnoremap <LocalLeader>c :cclose<cr>
 nnoremap <LocalLeader>n :cnext<Cr>
