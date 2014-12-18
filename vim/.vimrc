@@ -28,7 +28,7 @@ Bundle 'mattn/gist-vim'
 Bundle 'jpalardy/vim-slime'
 
 filetype plugin indent on     " required!
-
+set hidden
 set ai
 set hlsearch
 
@@ -53,9 +53,13 @@ set softtabstop=0
 set shiftwidth=4
 set tabstop=4
 
-nmap <leader>l :set list!<CR>
-set listchars=tab:▸\ ,eol:¬,nbsp:%
-map <LocalLeader>so :source ~/.vimrc<cr>
+let mapleader=","
+let maplocalleader=",,"
+set listchars=tab:▸\ ,eol:¬,nbsp:%,trail: ,trail:·
+
+map <leader>ev :new ~/.vimrc<cr>
+map <leader>sv :source ~/.vimrc<cr>
+map <leader>l :set list!<CR>
 
 syn sync fromstart
 syntax on
@@ -72,8 +76,6 @@ match OverLength /\%81v.\+/
 set splitright
 nnoremap <c-w>\| :vnew <cr>
 map <C-G> :!grunt dev <CR>
-let mapleader=","
-let maplocalleader=",,"
 map <leader><space> :noh <cr>
 nnoremap <Leader>cd :lcd %:p:h<cr>
 nnoremap <LocalLeader>c :cclose<cr>
