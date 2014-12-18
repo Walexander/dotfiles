@@ -126,10 +126,13 @@ let delimitMate_jump_expansion=1
 
 set undofile
 set udir=~/.vim/undo/
-map <F4> :UndotreeToggle <CR>
+let g:gundo_width=30
+let g:gundo_preview_bottom=1
+let g:gundo_auto_preview=0
+map <F4> :GundoToggle<CR>
 let g:undootree_SplitWidth=20
 
-let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
+let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git|dist|build|compile|comp'
 
 nnoremap <expr> G (v:count ? 'Gzv' : 'G')
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
@@ -144,3 +147,12 @@ let g:solarized_underline=0
 let g:solarized_italics=0
 set background=dark
 colorscheme solarized
+highlight Folded ctermfg=black ctermbg=green
+
+autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
+autocmd InsertLeave * let &l:foldmethod=w:last_fdm
+augroup CursorLineOnlyInActiveWindow
+  autocmd!
+  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+  autocmd WinLeave * setlocal nocursorline
+augroup END
