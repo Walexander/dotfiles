@@ -22,7 +22,6 @@ fu! CustomFoldText()
 endf
 setlocal foldenable
 setlocal foldmethod=syntax
-setlocal foldlevel=2
 set foldtext=CustomFoldText()
 set fillchars="fold: " 
 
