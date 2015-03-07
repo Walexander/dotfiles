@@ -26,6 +26,14 @@ Bundle 'sjl/gundo.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
 Bundle 'jpalardy/vim-slime'
+Bundle 'junegunn/vim-emoji'
+Bundle 'MarcWeber/vim-addon-errorformats'
+Plugin 'mnpk/vim-jira-complete'
+Bundle 'joonty/vdebug.git'
+Plugin 'michalliu/jsoncodecs.vim'
+Plugin 'cosminadrianpopescu/vim-sql-workbench'
+Plugin 'KevinGoodsell/vim-color-check'
+Plugin 'Tagbar'
 
 filetype plugin indent on     " required!
 set hidden
@@ -33,6 +41,7 @@ set ai
 set hlsearch
 
 set wildmenu
+"set wildmode=list:longest
 set guifont=Source\ Code\ Pro\ Medium:h13
 
 set showbreak=
@@ -63,6 +72,9 @@ set listchars=tab:▸\ ,eol:¬,nbsp:%,trail: ,trail:·
 map <leader>ev :new ~/.vimrc<cr>
 map <leader>sv :source ~/.vimrc<cr>
 map <leader>l :set list!<CR>
+map <leader>ct :runtime syntax/colortest.vim<cr>
+map <leader>lb :blast<cr>
+
 
 syn sync fromstart
 syntax on
@@ -78,6 +90,8 @@ match OverLength /\%81v.\+/
 
 set splitright
 nnoremap <c-w>\| :vnew <cr>
+nnoremap - <c-w>-
+map + <c-w>+
 map <C-G> :!grunt dev <CR>
 map <leader><space> :noh <cr>
 map <silent> <Leader>H :vertical resize +5<cr>
@@ -85,17 +99,21 @@ map <silent> <Leader>L :vertical resize -5<cr>
 map <silent> <Leader>J :resize +5<cr>
 map <silent> <Leader>K :resize -5<cr>
 
+botright cwindow
 nnoremap <Leader>cd :lcd %:p:h<cr>
-nnoremap <LocalLeader>c :cclose<cr>
+nnoremap <Leader>co :cw<cr>
+nnoremap <Leader>cc :cclose<cr>
 nnoremap <LocalLeader>n :cnext<Cr>
 nnoremap <LocalLeader>o :Copen<Cr>
 nnoremap <LocalLeader>m :Make<Cr>
 
-map <leader>R :TernRename <cr>
-map <leader>r :TernRef<cr>
-map <leader>d :TernDef<cr>
-map <leader>D :TernDefPreview<cr>
-map <leader>h :TernDoc<cr>
+map <Leader>gR :TernRename <cr>
+map <leader>gr :TernRef<cr>
+map <leader>gd :TernDef<cr>
+map <leader>gD :TernDefPreview<cr>
+map <leader>gh :TernDoc<cr>
+
+map <leader>nt :NERDTreeToggle<cr>
 inoremap <expr> <C-K> HUDG_GetDigraph()
 
 vmap  <expr>  <LEFT>   DVB_Drag('left')
@@ -104,10 +122,9 @@ vmap  <expr>  <DOWN>   DVB_Drag('down')
 vmap  <expr>  <UP>     DVB_Drag('up')
 vmap  <expr>  D        DVB_Duplicate()
 vmap  <expr>  ++       VMATH_YankAndAnalyse() 
-nmap          ++       vip++
 
-let tern_show_argument_hints='on_hold'
-let tern_show_signature_in_pum=1
+let tern_show_argument_hints='no'
+let tern_show_signature_in_pum=0
 
 let g:syntastic_javascript_jshint_args = '--config /Users/walexander/.jshintrc'
 let g:syntastic_javascript_checkers = ['jshint']
@@ -124,7 +141,7 @@ python powerline_setup()
 python del powerline_setup
 
 let delimitMate_expand_cr=2
-let delimiteMate_expand_sp=2
+let delimitMate_expand_sp=2
 let delimitMate_jump_expansion=1
 
 set undofile
@@ -132,7 +149,7 @@ set udir=~/.vim/undo/
 let g:gundo_width=30
 let g:gundo_preview_bottom=1
 let g:gundo_auto_preview=0
-map <F4> :GundoToggle<CR>
+map <leader>gu :GundoToggle<CR>
 let g:undootree_SplitWidth=20
 
 let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git|dist|build|compile|comp'
@@ -142,20 +159,62 @@ map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
-let g:solarized_termcolors=16
-let g:solarized_visibility='normal'
-let g:solarized_contrast="normal"
-let g:solarized_bold=1
+let g:solarized_visibility="normal"
 let g:solarized_underline=0
-let g:solarized_italics=0
+let g:solarized_termcolors=16
+let g:solarized_contrast="normal"
 set background=dark
 colorscheme solarized
-highlight Folded ctermfg=black ctermbg=green
+
+let g:jiracomplete_url = 'http://beanstockmedia.atlassian.net/'
+let g:jiracomplete_username = 'walexander'
+
 
 autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
 autocmd InsertLeave * let &l:foldmethod=w:last_fdm
-augroup CursorLineOnlyInActiveWindow
-  autocmd!
-  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-  autocmd WinLeave * setlocal nocursorline
-augroup END
+
+set foldlevelstart=2
+
+" In .vimrc
+silent! if emoji#available()
+  let g:gitgutter_sign_added = emoji#for('small_blue_diamond')
+  let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
+  let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
+  let g:gitgutter_sign_modified_removed = emoji#for('collision')
+endif
+
+let g:slime_target="tmux"
+set noswapfile
+
+let g:vdebug_options = {}
+let g:vdebug_options['watch_window_style'] = 'compact'
+let g:vdebug_keymap  = {}
+let g:vdebug_keymap['run'] = '<Leader>r'
+let g:vdebug_keymap['break_on_open'] = 0 
+let g:vdebug_keymap['run_to_cursor'] = "<Leader>h"
+let g:vdebug_keymap['step_over'] = "<Leader>o"
+let g:vdebug_keymap['step_into'] = "<Leader>i"
+let g:vdebug_keymap['step_out'] = "<Leader>t"
+let g:vdebug_keymap['set_breakpoint'] = "<Leader>b"
+
+let g:tagbar_type_javascript = {
+    \ 'ctagsbin': 'node',
+    \ 'ctagsargs': '/usr/local/lib/node_modules/jsdoc-tags/bin/jsdoc-tags -aq',
+    \ 'kinds': [
+        \ 'c:classes',
+        \ 'n:namespaces',
+        \ 'p:properties:0:1',
+        \ 'f:functions:0:1',
+        \ 'e:event',
+    \ ],
+    \ 'kind2scope': {
+        \ 'n' : 'namespace',
+        \ 'c' : 'class'
+    \ },
+    \ 'scope2kind': {
+        \ 'namespace': 'n',
+        \ 'class': 'c'
+    \ },
+    \ 'sro': '.',
+    \ 'replace': 1
+\ }
