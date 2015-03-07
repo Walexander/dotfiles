@@ -7,17 +7,18 @@
   "evil": true,
   "undef": true,
   "predef": [
-    "window", "document", "define", "require", "start",
+    "window", "document", "console", "define", "require", "start",
     "stop", "test", "asyncTest", "BSM", "equal",
 	"ok", "module", "deepEqual", "Image", "sinon",
 	"getConfig", "setTimeout", "clearTimeout", "describe", "ghostwriter",
 	"mocha", "chai", "it", "beforeEach", "before",
-	"after", "afterEach", "flog"
+	"after", "afterEach", "flog", "global", "QUnit"
   ],
   "unused": false,
   "indent": false,
   "-W087": true,
   "multistr": true,
   "-W099": true,
-  "-W030": true
+  "-W030": true,
+  "-W058": true
 }
