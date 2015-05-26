@@ -1,8 +1,11 @@
 filetype off                  " required!
 set nocompatible              " be iMproved
+
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
+
 Bundle 'gmarik/vundle'
+
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'
@@ -37,6 +40,7 @@ Plugin 'dbext.vim'
 Plugin 'unite.vim'
 Plugin 'surround.vim'
 Plugin 'elzr/vim-json'
+
 Plugin 'vim-airline'
 
 
@@ -186,13 +190,16 @@ let g:jiracomplete_username = 'walexander'
 
 autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
 autocmd InsertEnter * AirlineRefresh 
+
 autocmd InsertLeave * let &l:foldmethod=w:last_fdm
 autocmd InsertLeave * AirlineRefresh 
 
 set foldlevelstart=2
 
+
 " dbext
 let g:dbext_default_profile_psql_dbi = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=localhost;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_psql_qa_helix_dwh = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
 let g:dbext_default_profile_data_load= 'type=PGSQL:user=data_load:dbname=dwhdb:host=localhost:port=5439'
 
 
@@ -239,5 +246,8 @@ let g:tagbar_type_javascript = {
     \ 'sro': '.',
     \ 'replace': 1
 \ }
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme='powerlineish'
 
-:AirlineTheme sol 
+set backspace=indent,eol,start

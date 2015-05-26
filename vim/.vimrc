@@ -3,6 +3,7 @@ set nocompatible              " be iMproved
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 set t_Co=16
+
 Bundle 'gmarik/vundle'
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/syntastic'
@@ -34,6 +35,19 @@ Plugin 'michalliu/jsoncodecs.vim'
 Plugin 'cosminadrianpopescu/vim-sql-workbench'
 Plugin 'KevinGoodsell/vim-color-check'
 Plugin 'Tagbar'
+Plugin 'dbext.vim'
+Plugin 'unite.vim'
+Plugin 'surround.vim'
+Plugin 'elzr/vim-json'
+Plugin 'noah/vim256-color'
+Plugin 'xterm-color-table.vim'
+Plugin 'colorv.vim'
+Plugin 'itchyny/calendar.vim'
+Plugin 'xmledit'
+Plugin 'localvimrc'
+Plugin 'editorconfig-vim'
+
+let g:calendar_google_calendar = 1
 
 filetype plugin indent on     " required!
 set hidden
@@ -145,6 +159,8 @@ let delimitMate_expand_sp=2
 let delimitMate_jump_expansion=1
 
 set undofile
+
+
 set udir=~/.vim/undo/
 let g:gundo_width=30
 let g:gundo_preview_bottom=1
@@ -159,21 +175,27 @@ map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
-let g:solarized_visibility="normal"
 let g:solarized_underline=0
-let g:solarized_termcolors=16
-let g:solarized_contrast="normal"
+let g:solarized_diffmode="high"
 set background=dark
 colorscheme solarized
+
 
 let g:jiracomplete_url = 'http://beanstockmedia.atlassian.net/'
 let g:jiracomplete_username = 'walexander'
 
 
-autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
-autocmd InsertLeave * let &l:foldmethod=w:last_fdm
+"autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
+"autocmd InsertLeave * let &l:foldmethod=w:last_fdm
 
 set foldlevelstart=2
+
+" dbext
+let g:dbext_default_profile_psql_prod_helix_dwh_tableau = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=localhost;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_psql_qa_dwh_tableau = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_psql_qa_dwh_dataload = 'type=DBI:driver=Pg:user=data_load:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_prompt_for_parameters=0 
+
 
 " In .vimrc
 silent! if emoji#available()
@@ -197,24 +219,5 @@ let g:vdebug_keymap['step_into'] = "<Leader>i"
 let g:vdebug_keymap['step_out'] = "<Leader>t"
 let g:vdebug_keymap['set_breakpoint'] = "<Leader>b"
 
-let g:tagbar_type_javascript = {
-    \ 'ctagsbin': 'node',
-    \ 'ctagsargs': '/usr/local/lib/node_modules/jsdoc-tags/bin/jsdoc-tags -aq',
-    \ 'kinds': [
-        \ 'c:classes',
-        \ 'n:namespaces',
-        \ 'p:properties:0:1',
-        \ 'f:functions:0:1',
-        \ 'e:event',
-    \ ],
-    \ 'kind2scope': {
-        \ 'n' : 'namespace',
-        \ 'c' : 'class'
-    \ },
-    \ 'scope2kind': {
-        \ 'namespace': 'n',
-        \ 'class': 'c'
-    \ },
-    \ 'sro': '.',
-    \ 'replace': 1
-\ }
+
+let g:localvimrc_ask=0
