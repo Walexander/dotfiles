@@ -10,6 +10,7 @@ stow vim
 stow zsh
 stow powerline
 stow slate
+stow psql
 
 install_powerline
 install_gdiff
