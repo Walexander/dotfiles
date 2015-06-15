@@ -41,7 +41,6 @@ Plugin 'surround.vim'
 Plugin 'elzr/vim-json'
 Plugin 'noah/vim256-color'
 Plugin 'xterm-color-table.vim'
-Plugin 'colorv.vim'
 Plugin 'itchyny/calendar.vim'
 Plugin 'xmledit'
 Plugin 'localvimrc'
@@ -221,3 +220,15 @@ let g:vdebug_keymap['set_breakpoint'] = "<Leader>b"
 
 
 let g:localvimrc_ask=0
+
+" insert file / path info
+" --
+" just the file name
+inoremap \fn <C-R>=expand("%:t:r")<CR>
+" file name.ext
+inoremap \ff <C-R>=expand("%:t")<CR>
+" directory of file
+inoremap \fd <C-R>=expand("%:p:h")<CR>
+" relative directory path
+inoremap \fd <C-R>=expand("%:h")<CR>
+
