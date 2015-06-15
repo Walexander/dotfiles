@@ -1,11 +1,11 @@
 {
+        "default_top_theme": "powerline_unicode7",
 	"ext": {
 		"shell": {
-			"colorscheme": "solarized"
+			"colorscheme": "default"
 		},
 		"vim": {
 			"colorscheme": "default"
 		}
-
 	}
 }

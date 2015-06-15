@@ -1,0 +1,14 @@
+{
+	"segments": {
+		"right": [
+		    { "function": "powerline.segments.common.bat.battery",
+		      "args": { "format":"🔋  {capacity:3.0%}" }
+		    },
+	            { "function": "powerline.segments.common.time.date",
+	              "name": "time",
+	              "args": { "format": "%m/%d %H:%M",
+		          "istime": true }
+	            }
+		]
+	}
+}
