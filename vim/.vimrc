@@ -191,8 +191,9 @@ set foldlevelstart=2
 
 " dbext
 let g:dbext_default_profile_psql_prod_helix_dwh_tableau = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=localhost;port=5439;dbname=dwhdb:driver_parms='
-let g:dbext_default_profile_psql_qa_dwh_tableau = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
-let g:dbext_default_profile_psql_qa_dwh_dataload = 'type=DBI:driver=Pg:user=data_load:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_helixdwh_prod = 'type=DBI:driver=Pg:user=tableau:conn_parms=host=beanstock-qa.cx1nsbwqjxwv.us-east-1.redshift.amazonaws.com;port=5439;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_helixdwh_green = 'type=DBI:driver=Pg:user=data_load:conn_parms=host=localhost;port=5441;dbname=dwhdb:driver_parms='
+let g:dbext_default_profile_helixdwh_develop = 'type=DBI:driver=Pg:user=data_load:conn_parms=host=localhost;port=54320;dbname=dwhdb:driver_parms='
 let g:dbext_default_prompt_for_parameters=0 
 
 
@@ -232,3 +233,4 @@ inoremap \fd <C-R>=expand("%:p:h")<CR>
 " relative directory path
 inoremap \fd <C-R>=expand("%:h")<CR>
 
+set diffopt+=vertical
