@@ -1,0 +1,1009 @@
+2015-06-05 15:15:12	akwok	but i just tried it again and it works no
+2015-06-05 15:15:14	akwok	now*
+2015-06-05 15:15:17	akwok	sorry
+2015-06-05 15:15:28	walexander	I was not intentionally making elastic search changes. But I'll check with pato
+2015-06-05 15:15:56	akwok	btw i added a couple of scenarios in databus-761, still need to add one more
+2015-06-05 15:16:02	akwok	but let me know if that is what you are looking for
+2015-06-05 15:16:58	walexander	Great I will take a look. Have automated the tests locally, just need to get it working for circle ci
+2015-06-05 15:17:50	walexander	Raul is working on a way to parse the spec for the data 
+2015-06-05 15:21:41	walexander	Is having a holstered gun on your belt appropriate when taking children to the bus stop?
+2015-06-05 15:22:06	akwok	well i guess depends who you ask
+2015-06-05 15:22:20	akwok	the nra would say yes
+2015-06-05 15:22:29	akwok	but to me its a little overboard
+2015-06-05 15:23:07	walexander	Agreed. 
+2015-06-05 15:23:17	walexander	People are so paranoid 
+2015-06-05 15:23:51	walexander	Wonder if he fantasizes about saving the day from someone trying to rob the elementary school bus stop. 
+2015-06-05 15:24:26	akwok	yeah ppl think theyre liam neeson or something
+2015-06-05 15:24:28	akwok	lol
+2015-06-05 15:25:25	akwok	did that happen to you right now?  did some parent have a holstered fun while you were dropping off the girls?
+2015-06-05 15:27:39	walexander	this morning 
+2015-06-05 15:28:00	walexander	dude walked and waited with his kids to the bus stop 
+2015-06-05 15:28:23	akwok	did any of the kids notice?
+2015-06-05 15:28:25	walexander	with a 9mm strapped to his belt
+2015-06-05 15:28:28	walexander	i don't think so 
+2015-06-05 15:28:47	walexander	he works for blackwater
+2015-06-05 15:29:00	walexander	or wahtever they call themselves now
+2015-06-05 15:31:22	akwok	sounds familiar and just googled them, they got charged with killing 14 unarmed iraqis
+2015-06-05 15:31:39	walexander	yeah ... so naturally time for a little rebranding
+2015-06-05 15:35:09	akwok	crazy
+2015-06-08 13:15:06	akwok	Hey Will, working on the payment calculations examples.  Here is what I have so far (each scenario has one example--ill add more): 
+2015-06-08 13:15:06		Scenarios
+2015-06-08 13:15:06		1.  flat rate 
+2015-06-08 13:15:06		2.  rev share
+2015-06-08 13:15:06		3.  flat rate with a rev share over flat rate
+2015-06-08 13:15:06		4.  flat rate with a rev share over a specified threshold
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate payment term
+2015-06-08 13:15:06		Given a publisher has a flat rate payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> to <end_date>
+2015-06-08 13:15:06		And the term rate is <rate>
+2015-06-08 13:15:06		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00
+2015-06-08 13:15:06		|
+2015-06-08 13:15:06		Scenario:  The publisher has a revenue share payment term
+2015-06-08 13:15:06		Given a publisher has a revenue share payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the rate is <rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When <gross_revenue> in gross revenue and <num_request> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|payment_term        |start_date        |end_date        |rate         |serving fee
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |serving_fee     |gross_revenue     |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |80%        |0.01            |185.00            |152,755        |146.78
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate with a revenue share upside for anything above the flat rate (mixed without threshold)
+2015-06-08 13:15:06		Given a publisher has a mixed without threshold payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the flat rate is <rate> and the floating rate is <floating_rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When gross revenue is <gross_revenue> and <num_requests> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.  
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |floating_rate         |serving_fee     |gross_revenue     |num_requests     |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |0.80        |80%                |0.01            |345.00            |212,300        |308.27
+2015-06-08 13:15:18	akwok	does this look right?
+2015-06-08 13:52:29	akwok	unsure if i need to incorporate date
+2015-06-08 14:05:25	walexander	gimme some time to digest this but def looks like it's the right approach 
+2015-06-08 14:05:39	walexander	we may need to be explicit about the payment *rules* too 
+2015-06-08 14:06:12	akwok	i see like given the payment rule is US, site http://hello.com ?
+2015-06-08 14:06:35	walexander	not that much detail actually 
+2015-06-08 14:07:13	walexander	more like, given the following payment terms / And the terms are associated with payment rule id <rule id> 
+2015-06-08 14:08:36	walexander	and Given n impressions with gross rev of gross_rev And matching payment rule id <rule id> 
+2015-06-08 14:09:05	akwok	then do we need to explicitly have a payment rule_id table to reference?
+2015-06-08 14:09:31	walexander	not for the scenarios that are checking the payment terms only 
+2015-06-08 14:10:02	walexander	just makes it a bit easier if we have explicit statemnts for each entity we need to load 
+2015-06-08 14:10:54	walexander	since the impressions aren't explicitly linked to the terms, we will still need a rule to test the payment 
+2015-06-08 14:23:14	akwok	something like this: Given a publisher has a flat rate payment term
+2015-06-08 14:23:14		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 14:23:14		And the term rate is <rate>
+2015-06-08 14:23:14		And the terms are assoiated with payment ruld ID <payment_rule_id>
+2015-06-08 14:23:14		And the impressions match the payment rule ID
+2015-06-08 14:23:14		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 14:23:14		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 14:23:14		|start_date        |end_date        |rate         |num_requests    |net_pub_payment    |payment_rule_id
+2015-06-08 14:23:14		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00                |1
+2015-06-08 14:23:18	akwok	?
+2015-06-08 14:29:18	walexander	yes, that looks good
+2015-06-08 14:30:46	akwok	so then my question is, when the test is ran are you looking up somewhere what payment_rule_id 1 really is?
+2015-06-08 14:31:35	walexander	nah, we don't care -- we just need to load a pyament rule id into the database for it to work
+2015-06-08 14:31:44	walexander	so we don't need the last column in the assertion 
+2015-06-08 14:31:48	walexander	payment_rule_id 
+2015-06-08 14:32:04	akwok	i see
+2015-06-08 14:32:33	akwok	so we dont need a placeholder for payment_rule_id.  we just need to say the terms are associated with some payment rule ID
+2015-06-08 14:34:35	walexander	it may be easiest if all of the "fixture" data is specified as a table 
+2015-06-08 14:35:03	walexander	so, instead of just `When <num request> are recorded for ...`
+2015-06-08 14:35:34	walexander	we would say `And the system contains the following impression records:`  
+2015-06-08 14:36:04	walexander	``` event_dttm  |impression_cnt   |revenue  |... ```` 
+2015-06-08 14:37:14	walexander	jsut b/c it'll allow us to copy the table into a file and then load the file 
+2015-06-08 14:37:29	walexander	insetad of parsing the gherking and then manually creating an INSERT statement for each variation 
+2015-06-08 14:39:12	akwok	i see, so the when would be, when we process payment for the month of May
+2015-06-08 14:39:12		Then the pub payment would be x
+2015-06-08 14:39:14	akwok	?
+2015-06-08 15:02:00	walexander	Right. 
+2015-06-08 15:02:24	akwok	got it
+2015-06-08 15:02:44	walexander	Can asssert on Pub payment, net revenue, margin, etc 
+2015-06-08 15:03:44	walexander	Just thinking that In general when we have a Given that some data exists in the system, we specify that in a table 
+2015-06-08 15:03:59	walexander	I don't think we will have any need for When statements really. 
+2015-06-08 15:04:36	akwok	i see so the When statement is not requried
+2015-06-08 15:04:39	walexander	Given/Then should be all we need. When is meant to express action of some kind 
+2015-06-08 15:05:16	walexander	No, only Then and ( When or Given )
+2015-06-08 15:07:12	akwok	kk ill take another crack at it
+2015-06-08 15:21:10	akwok	so something like this: 
+2015-06-08 15:21:10		Scenario:  The publisher has a flat rate payment term
+2015-06-08 15:21:10		Given a publisher has a flat rate payment term from <start_date> and <end_date>
+2015-06-08 15:21:10		And the term rate is <rate>
+2015-06-08 15:21:10		And the terms are assoiated with payment ruld ID 1
+2015-06-08 15:21:10		And the impressions match the payment rule ID 1
+2015-06-08 15:21:10		And the system contains the following impression records:
+2015-06-08 15:21:10		|event_dttm     |request_cnt     
+2015-06-08 15:21:10		|05/01/2015        |1000            
+2015-06-08 15:21:10		|05/31/2015        |1000            
+2015-06-08 15:21:10		Then the publisher payment for 05/01/2015 to 05/30/2015 should be <net_pub_payment>.
+2015-06-08 15:21:10		Examples
+2015-06-08 15:21:10		|rate         |net_pub_payment    
+2015-06-08 15:21:10		|1.00        |2.00            
+2015-06-08 15:21:10		|1.10         |2.20
+2015-06-08 15:21:10		(i didnt include gross revenue in the impression record table because its a flat rate, but if we should re-use this table for the other scenarios, then I can add more to it)
+2015-06-08 20:32:29	akwok	Hey Will, made some adjustments and created scenarios here:  https://beanstockmedia.atlassian.net/browse/DATABUS-761  Let me know if this is what you are looking for.  Thanks
+2015-06-09 14:23:55	akwok	3 more days..OITNB
+2015-06-09 14:45:46	walexander	?
+2015-06-09 14:45:51	walexander	OITNB?
+2015-06-09 14:46:32	akwok	orange is the new black
+2015-06-09 14:47:45	walexander	you gonna binge watch the whole thign?
+2015-06-09 14:49:11	akwok	i need to refrain lol
+2015-06-09 14:49:35	akwok	im trying to study for my capm exam, so im doing that almost every night until im falling asleep writing notes
+2015-06-09 14:50:26	akwok	trying to not get side tracked, but idk if thats gonna happen lol
+2015-06-09 16:57:32	akwok	so for databus-761, your most recent comment, we would omit the when statement
+2015-06-09 16:57:34	akwok	?
+2015-06-09 17:33:45	walexander	No, a when statement is needed, but we just want to change the data we are checking in it 
+2015-06-09 17:34:29	walexander	We can't verify against  individual impressions, just against the aggregate 
+2015-06-09 17:35:22	walexander	So of you have one impression that should match rule 102 and another that should match 103 then the when statement would just provide those counts 
+2015-06-10 20:14:13	akwok	Hi Will, just fyi I commented in the ticket with an update.  let me know if thats good and i'll adjust the other scenarios.  Also, just want to confirm that for this network tag feature in HC, if publisher configures their own passback and managed tags, it means they should not be able to configure our integrated demand sources (APN, IXP, etx)?
+2015-06-16 14:40:56	walexander	hey annie
+2015-06-16 14:41:14	walexander	there are a shit load of helix console "sandbox" machines running -- can I turn them off
+2015-06-16 14:41:48	akwok	sure the latest HC is here: http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 14:41:52	akwok	if you can keep that running
+2015-06-16 14:43:39	walexander	hrmm ... that's not one of our hosts
+2015-06-16 18:22:40	akwok	Hi Will
+2015-06-16 18:22:58	akwok	noticed that the HC sandbox is down ( http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 18:30:37	walexander	Oh, sorry about that. 
+2015-06-16 18:30:43	walexander	I'll turn it back on. 
+2015-06-16 18:30:54	akwok	kk thanks!
+2015-06-16 18:31:15	walexander	And give you a new dns name -- http://console.qa.beanstock.net OK?
+2015-06-16 18:31:15	akwok	wanted to let ops check out the new network tags functionality and john also wants to demo it during sprint demo tomrrow
+2015-06-16 18:31:25	akwok	yes, sounds good
+2015-06-16 18:31:38	akwok	finally something i can memorize :simple_smile:
+2015-06-16 18:35:37	walexander	we have, literally, half a dozen machines labeled "helix-console" in some way
+2015-06-16 18:35:48	walexander	is there a way to check the version number?
+2015-06-16 18:36:10	walexander	so i know if I have the right one
+2015-06-16 18:37:22	akwok	i dont think so
+2015-06-16 18:38:27	akwok	but ben may know otherwise
+2015-06-16 18:38:39	walexander	no copyright notice or anything?
+2015-06-16 18:38:40	walexander	that's fine
+2015-06-16 18:43:30	akwok	i think there is some path where you can check the version.. /helix-console-webui/js/version.js
+2015-06-16 18:43:33	akwok	not sure if that helps
+2015-06-16 18:47:13	walexander	okay, that does help -- what version do we want?
+2015-06-16 18:47:25	akwok	1.10
+2015-06-16 18:48:30	walexander	can you let me know if this is it? http://ec2-54-158-10-132.compute-1.amazonaws.com
+2015-06-16 18:48:38	walexander	it's showing 0.5.1.BUILD-SNAPSHOT
+2015-06-16 18:48:44	walexander	but the branch is origin/release-v1.9
+2015-06-16 18:49:19	akwok	i get a 404 when i click that link
+2015-06-16 19:03:25	walexander	Isn the uri /helix-console-webui 
+2015-06-16 19:03:56	akwok	yes
+2015-06-16 20:34:02	walexander	okay, give it a shot now ... http://ec2-54-158-10-132.compute-1.amazonaws.com/helix-console-webui/
+2015-06-16 20:34:19	walexander	in ec2 the ip addresses are assigned dynamically when teh machine boots
+2015-06-16 20:35:02	walexander	for reasons unknown, the postgresql configuration on that server was configured to bind to an explicit IP address
+2015-06-16 20:35:07	walexander	which changed when the box bounced
+2015-06-16 20:35:15	walexander	never seen that kind of thing before
+2015-06-16 20:36:04	akwok	That is the one 
+2015-06-16 20:36:25	akwok	Ahh
+2015-06-16 20:41:57	walexander	kk, try http://console.qa.beanstock.net/helix-console-webui/
+2015-06-16 20:42:11	walexander	uh, wait a second on that actually
+2015-06-16 20:42:49	walexander	kk, now give it a shot http://console.qa.beanstock.net/
+2015-06-16 20:56:45	akwok	Kk works!
+2015-06-16 21:01:29	walexander	dope
+2015-06-16 21:01:46	walexander	that points at a load balancer
+2015-06-16 21:10:21	akwok	thanks!
+2015-06-17 16:13:30	akwok	would we need to include placements names in the zone map or just store and we can look up names with the corresponding IDs for reporting?
+2015-06-17 16:33:30	walexander	just store  it
+2015-06-18 12:23:53	akwok	should we make placement name a required field?
+2015-06-18 12:33:34	walexander	yes, but can we label it something else?
+2015-06-18 12:33:52	akwok	yes, what should we lable it
+2015-06-18 12:33:54	akwok	label*
+2015-06-18 12:34:42	walexander	longer term, I think we should manage each tag more like a demand source 
+2015-06-18 12:36:05	walexander	where the platform is defined as a buyer and then inventory-specific values are assigned to each platform for each piece of inventory 
+2015-06-18 12:36:45	walexander	so, apn is the platform and 1234567 (the APN placement id) is the value 
+2015-06-18 12:38:13	walexander	we should think of the network tags in a similar manner: The buyer is added globally for the publisher, then the tags are the inventory-specific values 
+2015-06-18 12:38:36	walexander	APN is to Expo as 123456 is to `<script src=....>`
+2015-06-18 12:39:44	walexander	during the demo we introduced the concept of being able to re-use tags on different inventory -- that same thing should probably apply to APN's 123456 placement id
+2015-06-18 12:40:45	walexander	publisher globally defines both APN and the placement (giving the placement a name and an id) 
+2015-06-18 12:41:20	walexander	then, when toggling APN on for specific inventory, they select from a list of the placements assigned to APN 
+2015-06-18 12:42:54	walexander	that way we are able to align our model more closely with the actual demand source's 
+2015-06-18 12:43:21	walexander	which makes the workflow a bit simpler (since pub doesn't need to remember placement id) 
+2015-06-18 12:43:47	akwok	so the use case is that these tags that the publisher will provide will be re-used often>
+2015-06-18 12:43:48	walexander	and it also makes reconciling the second party reporting a lot simpler
+2015-06-18 12:44:44	walexander	yes -- think about sizes 
+2015-06-18 12:45:18	walexander	right now, they need a distinct tag for each size
+2015-06-18 12:45:41	walexander	but most of the tags support specifying the size directly in the tag itself, 
+2015-06-18 12:47:30	walexander	if we allowed re-using the same placement, we could provide macros to dynamically add the size
+2015-06-18 12:48:57	akwok	so the tags are the same except the size defn within the tag
+2015-06-18 13:20:00	walexander	right -- so the same tag could be used for all sizes 
+2015-06-19 14:14:49	walexander	hi annie - do you have the tableau desktop product keys?
+2015-06-19 14:20:50	akwok	yes
+2015-06-19 14:25:20	walexander	can you hook a brother up?
+2015-06-19 14:25:38	akwok	yes trying to find the write url for the customer portal
+2015-06-19 14:26:52	akwok	here we go
+2015-06-19 14:26:53	akwok	try this
+2015-06-19 14:26:54	akwok	TDOP-0DD6-BEE0-C8EC-F170
+2015-06-19 14:27:53	walexander	thanks, i forgot I had access to those 
+2015-06-19 14:28:13	walexander	glad i'm not the only one that cannot find their portal login either!
+2015-06-19 14:28:49	akwok	lol its confusing tableau has to portals..one for the keys and the other for knowledgbase
+2015-06-19 14:33:25	akwok	question
+2015-06-19 14:33:54	akwok	so this last line of ryan's email "As for the org- everything will stay the same for now except those who had been reporting to me or Joe will now report to Jim moving forward." ...makes me think that joe is out too?
+2015-07-02 13:59:11	walexander	What would it take for you to provide a feng shui assessment of a house?  
+2015-07-02 14:11:17	akwok	I know basic stuff, I'm no expert 
+2015-07-02 14:11:25	akwok	But my friends dad is 
+2015-07-02 14:27:48	walexander	shirley wants to buy this place: http://www.zillow.com/homes/for_sale/60738193_zpid/1_pnd/36.900815,-76.010306,36.872875,-76.050045_rect/14_zm/1_fr/?view=map
+2015-07-02 14:29:09	walexander	the road doesn't run perpendicular to the house 
+2015-07-02 14:32:55	akwok	ha yea thats the first think i always look at
+2015-07-02 14:36:05	akwok	i dont the staircase that faces the front door is good fengshui
+2015-07-02 14:37:34	akwok	and i think generally spaces with a more open floor plan vs enclosed spaces is better
+2015-07-02 14:50:01	walexander	ah, that is tough 
+2015-07-02 14:51:24	akwok	yeah
+2015-07-02 14:51:42	akwok	they say the 3 most impt places for a good fenshui is your bedroom, kitchen and bathroom
+2015-07-02 14:52:15	akwok	are you moving to a different part of town?
+2015-07-02 15:21:59	walexander	Yeah, to the north side 
+2015-07-02 15:22:19	walexander	This hood turning into a frat house with these renters 
+2015-07-02 15:22:38	akwok	moving on up to the north side :notes:
+2015-07-02 15:22:45	akwok	lol
+2015-07-02 15:24:58	akwok	have home prices gone up where you live in the past few months?
+2015-07-02 15:25:10	walexander	Yeah, its the older side of town. 
+2015-07-02 15:25:36	walexander	There's a couple $8mm + homes down the street 
+2015-07-02 15:25:50	akwok	home prices have gone up around here in the past couple of months
+2015-07-02 15:26:04	walexander	Rates are really low right now 
+2015-07-02 15:26:10	walexander	Just hope they don't go up
+2015-07-02 15:26:31	walexander	For $500k, every 0.5% is an extra $200 a month 
+2015-07-02 15:27:13	walexander	Friend of mine just bought 
+2015-07-02 15:27:25	walexander	Bank wouldn't even lock the rate until the day they closed 
+2015-07-02 15:27:51	akwok	house buying processes is soo stressful
+2015-07-02 15:28:57	walexander	Yeah, esp when they have to verify all your cash
+2015-07-02 15:29:33	walexander	To make sure youre noy a terrorist, they Need statements going back a year
+2015-07-02 15:29:50	akwok	yea my friend told me her parents gave them some money and they had to look at their bank accts
+2015-06-05 15:15:12	akwok	but i just tried it again and it works no
+2015-06-05 15:15:14	akwok	now*
+2015-06-05 15:15:17	akwok	sorry
+2015-06-05 15:15:28	walexander	I was not intentionally making elastic search changes. But I'll check with pato
+2015-06-05 15:15:56	akwok	btw i added a couple of scenarios in databus-761, still need to add one more
+2015-06-05 15:16:02	akwok	but let me know if that is what you are looking for
+2015-06-05 15:16:58	walexander	Great I will take a look. Have automated the tests locally, just need to get it working for circle ci
+2015-06-05 15:17:50	walexander	Raul is working on a way to parse the spec for the data 
+2015-06-05 15:21:41	walexander	Is having a holstered gun on your belt appropriate when taking children to the bus stop?
+2015-06-05 15:22:06	akwok	well i guess depends who you ask
+2015-06-05 15:22:20	akwok	the nra would say yes
+2015-06-05 15:22:29	akwok	but to me its a little overboard
+2015-06-05 15:23:07	walexander	Agreed. 
+2015-06-05 15:23:17	walexander	People are so paranoid 
+2015-06-05 15:23:51	walexander	Wonder if he fantasizes about saving the day from someone trying to rob the elementary school bus stop. 
+2015-06-05 15:24:26	akwok	yeah ppl think theyre liam neeson or something
+2015-06-05 15:24:28	akwok	lol
+2015-06-05 15:25:25	akwok	did that happen to you right now?  did some parent have a holstered fun while you were dropping off the girls?
+2015-06-05 15:27:39	walexander	this morning 
+2015-06-05 15:28:00	walexander	dude walked and waited with his kids to the bus stop 
+2015-06-05 15:28:23	akwok	did any of the kids notice?
+2015-06-05 15:28:25	walexander	with a 9mm strapped to his belt
+2015-06-05 15:28:28	walexander	i don't think so 
+2015-06-05 15:28:47	walexander	he works for blackwater
+2015-06-05 15:29:00	walexander	or wahtever they call themselves now
+2015-06-05 15:31:22	akwok	sounds familiar and just googled them, they got charged with killing 14 unarmed iraqis
+2015-06-05 15:31:39	walexander	yeah ... so naturally time for a little rebranding
+2015-06-05 15:35:09	akwok	crazy
+2015-06-08 13:15:06	akwok	Hey Will, working on the payment calculations examples.  Here is what I have so far (each scenario has one example--ill add more): 
+2015-06-08 13:15:06		Scenarios
+2015-06-08 13:15:06		1.  flat rate 
+2015-06-08 13:15:06		2.  rev share
+2015-06-08 13:15:06		3.  flat rate with a rev share over flat rate
+2015-06-08 13:15:06		4.  flat rate with a rev share over a specified threshold
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate payment term
+2015-06-08 13:15:06		Given a publisher has a flat rate payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> to <end_date>
+2015-06-08 13:15:06		And the term rate is <rate>
+2015-06-08 13:15:06		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00
+2015-06-08 13:15:06		|
+2015-06-08 13:15:06		Scenario:  The publisher has a revenue share payment term
+2015-06-08 13:15:06		Given a publisher has a revenue share payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the rate is <rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When <gross_revenue> in gross revenue and <num_request> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|payment_term        |start_date        |end_date        |rate         |serving fee
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |serving_fee     |gross_revenue     |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |80%        |0.01            |185.00            |152,755        |146.78
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate with a revenue share upside for anything above the flat rate (mixed without threshold)
+2015-06-08 13:15:06		Given a publisher has a mixed without threshold payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the flat rate is <rate> and the floating rate is <floating_rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When gross revenue is <gross_revenue> and <num_requests> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.  
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |floating_rate         |serving_fee     |gross_revenue     |num_requests     |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |0.80        |80%                |0.01            |345.00            |212,300        |308.27
+2015-06-08 13:15:18	akwok	does this look right?
+2015-06-08 13:52:29	akwok	unsure if i need to incorporate date
+2015-06-08 14:05:25	walexander	gimme some time to digest this but def looks like it's the right approach 
+2015-06-08 14:05:39	walexander	we may need to be explicit about the payment *rules* too 
+2015-06-08 14:06:12	akwok	i see like given the payment rule is US, site http://hello.com ?
+2015-06-08 14:06:35	walexander	not that much detail actually 
+2015-06-08 14:07:13	walexander	more like, given the following payment terms / And the terms are associated with payment rule id <rule id> 
+2015-06-08 14:08:36	walexander	and Given n impressions with gross rev of gross_rev And matching payment rule id <rule id> 
+2015-06-08 14:09:05	akwok	then do we need to explicitly have a payment rule_id table to reference?
+2015-06-08 14:09:31	walexander	not for the scenarios that are checking the payment terms only 
+2015-06-08 14:10:02	walexander	just makes it a bit easier if we have explicit statemnts for each entity we need to load 
+2015-06-08 14:10:54	walexander	since the impressions aren't explicitly linked to the terms, we will still need a rule to test the payment 
+2015-06-08 14:23:14	akwok	something like this: Given a publisher has a flat rate payment term
+2015-06-08 14:23:14		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 14:23:14		And the term rate is <rate>
+2015-06-08 14:23:14		And the terms are assoiated with payment ruld ID <payment_rule_id>
+2015-06-08 14:23:14		And the impressions match the payment rule ID
+2015-06-08 14:23:14		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 14:23:14		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 14:23:14		|start_date        |end_date        |rate         |num_requests    |net_pub_payment    |payment_rule_id
+2015-06-08 14:23:14		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00                |1
+2015-06-08 14:23:18	akwok	?
+2015-06-08 14:29:18	walexander	yes, that looks good
+2015-06-08 14:30:46	akwok	so then my question is, when the test is ran are you looking up somewhere what payment_rule_id 1 really is?
+2015-06-08 14:31:35	walexander	nah, we don't care -- we just need to load a pyament rule id into the database for it to work
+2015-06-08 14:31:44	walexander	so we don't need the last column in the assertion 
+2015-06-08 14:31:48	walexander	payment_rule_id 
+2015-06-08 14:32:04	akwok	i see
+2015-06-08 14:32:33	akwok	so we dont need a placeholder for payment_rule_id.  we just need to say the terms are associated with some payment rule ID
+2015-06-08 14:34:35	walexander	it may be easiest if all of the "fixture" data is specified as a table 
+2015-06-08 14:35:03	walexander	so, instead of just `When <num request> are recorded for ...`
+2015-06-08 14:35:34	walexander	we would say `And the system contains the following impression records:`  
+2015-06-08 14:36:04	walexander	``` event_dttm  |impression_cnt   |revenue  |... ```` 
+2015-06-08 14:37:14	walexander	jsut b/c it'll allow us to copy the table into a file and then load the file 
+2015-06-08 14:37:29	walexander	insetad of parsing the gherking and then manually creating an INSERT statement for each variation 
+2015-06-08 14:39:12	akwok	i see, so the when would be, when we process payment for the month of May
+2015-06-08 14:39:12		Then the pub payment would be x
+2015-06-08 14:39:14	akwok	?
+2015-06-08 15:02:00	walexander	Right. 
+2015-06-08 15:02:24	akwok	got it
+2015-06-08 15:02:44	walexander	Can asssert on Pub payment, net revenue, margin, etc 
+2015-06-08 15:03:44	walexander	Just thinking that In general when we have a Given that some data exists in the system, we specify that in a table 
+2015-06-08 15:03:59	walexander	I don't think we will have any need for When statements really. 
+2015-06-08 15:04:36	akwok	i see so the When statement is not requried
+2015-06-08 15:04:39	walexander	Given/Then should be all we need. When is meant to express action of some kind 
+2015-06-08 15:05:16	walexander	No, only Then and ( When or Given )
+2015-06-08 15:07:12	akwok	kk ill take another crack at it
+2015-06-08 15:21:10	akwok	so something like this: 
+2015-06-08 15:21:10		Scenario:  The publisher has a flat rate payment term
+2015-06-08 15:21:10		Given a publisher has a flat rate payment term from <start_date> and <end_date>
+2015-06-08 15:21:10		And the term rate is <rate>
+2015-06-08 15:21:10		And the terms are assoiated with payment ruld ID 1
+2015-06-08 15:21:10		And the impressions match the payment rule ID 1
+2015-06-08 15:21:10		And the system contains the following impression records:
+2015-06-08 15:21:10		|event_dttm     |request_cnt     
+2015-06-08 15:21:10		|05/01/2015        |1000            
+2015-06-08 15:21:10		|05/31/2015        |1000            
+2015-06-08 15:21:10		Then the publisher payment for 05/01/2015 to 05/30/2015 should be <net_pub_payment>.
+2015-06-08 15:21:10		Examples
+2015-06-08 15:21:10		|rate         |net_pub_payment    
+2015-06-08 15:21:10		|1.00        |2.00            
+2015-06-08 15:21:10		|1.10         |2.20
+2015-06-08 15:21:10		(i didnt include gross revenue in the impression record table because its a flat rate, but if we should re-use this table for the other scenarios, then I can add more to it)
+2015-06-08 20:32:29	akwok	Hey Will, made some adjustments and created scenarios here:  https://beanstockmedia.atlassian.net/browse/DATABUS-761  Let me know if this is what you are looking for.  Thanks
+2015-06-09 14:23:55	akwok	3 more days..OITNB
+2015-06-09 14:45:46	walexander	?
+2015-06-09 14:45:51	walexander	OITNB?
+2015-06-09 14:46:32	akwok	orange is the new black
+2015-06-09 14:47:45	walexander	you gonna binge watch the whole thign?
+2015-06-09 14:49:11	akwok	i need to refrain lol
+2015-06-09 14:49:35	akwok	im trying to study for my capm exam, so im doing that almost every night until im falling asleep writing notes
+2015-06-09 14:50:26	akwok	trying to not get side tracked, but idk if thats gonna happen lol
+2015-06-09 16:57:32	akwok	so for databus-761, your most recent comment, we would omit the when statement
+2015-06-09 16:57:34	akwok	?
+2015-06-09 17:33:45	walexander	No, a when statement is needed, but we just want to change the data we are checking in it 
+2015-06-09 17:34:29	walexander	We can't verify against  individual impressions, just against the aggregate 
+2015-06-09 17:35:22	walexander	So of you have one impression that should match rule 102 and another that should match 103 then the when statement would just provide those counts 
+2015-06-10 20:14:13	akwok	Hi Will, just fyi I commented in the ticket with an update.  let me know if thats good and i'll adjust the other scenarios.  Also, just want to confirm that for this network tag feature in HC, if publisher configures their own passback and managed tags, it means they should not be able to configure our integrated demand sources (APN, IXP, etx)?
+2015-06-16 14:40:56	walexander	hey annie
+2015-06-16 14:41:14	walexander	there are a shit load of helix console "sandbox" machines running -- can I turn them off
+2015-06-16 14:41:48	akwok	sure the latest HC is here: http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 14:41:52	akwok	if you can keep that running
+2015-06-16 14:43:39	walexander	hrmm ... that's not one of our hosts
+2015-06-16 18:22:40	akwok	Hi Will
+2015-06-16 18:22:58	akwok	noticed that the HC sandbox is down ( http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 18:30:37	walexander	Oh, sorry about that. 
+2015-06-16 18:30:43	walexander	I'll turn it back on. 
+2015-06-16 18:30:54	akwok	kk thanks!
+2015-06-16 18:31:15	walexander	And give you a new dns name -- http://console.qa.beanstock.net OK?
+2015-06-16 18:31:15	akwok	wanted to let ops check out the new network tags functionality and john also wants to demo it during sprint demo tomrrow
+2015-06-16 18:31:25	akwok	yes, sounds good
+2015-06-16 18:31:38	akwok	finally something i can memorize :simple_smile:
+2015-06-16 18:35:37	walexander	we have, literally, half a dozen machines labeled "helix-console" in some way
+2015-06-16 18:35:48	walexander	is there a way to check the version number?
+2015-06-16 18:36:10	walexander	so i know if I have the right one
+2015-06-16 18:37:22	akwok	i dont think so
+2015-06-16 18:38:27	akwok	but ben may know otherwise
+2015-06-16 18:38:39	walexander	no copyright notice or anything?
+2015-06-16 18:38:40	walexander	that's fine
+2015-06-16 18:43:30	akwok	i think there is some path where you can check the version.. /helix-console-webui/js/version.js
+2015-06-16 18:43:33	akwok	not sure if that helps
+2015-06-16 18:47:13	walexander	okay, that does help -- what version do we want?
+2015-06-16 18:47:25	akwok	1.10
+2015-06-16 18:48:30	walexander	can you let me know if this is it? http://ec2-54-158-10-132.compute-1.amazonaws.com
+2015-06-16 18:48:38	walexander	it's showing 0.5.1.BUILD-SNAPSHOT
+2015-06-16 18:48:44	walexander	but the branch is origin/release-v1.9
+2015-06-16 18:49:19	akwok	i get a 404 when i click that link
+2015-06-16 19:03:25	walexander	Isn the uri /helix-console-webui 
+2015-06-16 19:03:56	akwok	yes
+2015-06-16 20:34:02	walexander	okay, give it a shot now ... http://ec2-54-158-10-132.compute-1.amazonaws.com/helix-console-webui/
+2015-06-16 20:34:19	walexander	in ec2 the ip addresses are assigned dynamically when teh machine boots
+2015-06-16 20:35:02	walexander	for reasons unknown, the postgresql configuration on that server was configured to bind to an explicit IP address
+2015-06-16 20:35:07	walexander	which changed when the box bounced
+2015-06-16 20:35:15	walexander	never seen that kind of thing before
+2015-06-16 20:36:04	akwok	That is the one 
+2015-06-16 20:36:25	akwok	Ahh
+2015-06-16 20:41:57	walexander	kk, try http://console.qa.beanstock.net/helix-console-webui/
+2015-06-16 20:42:11	walexander	uh, wait a second on that actually
+2015-06-16 20:42:49	walexander	kk, now give it a shot http://console.qa.beanstock.net/
+2015-06-16 20:56:45	akwok	Kk works!
+2015-06-16 21:01:29	walexander	dope
+2015-06-16 21:01:46	walexander	that points at a load balancer
+2015-06-16 21:10:21	akwok	thanks!
+2015-06-17 16:13:30	akwok	would we need to include placements names in the zone map or just store and we can look up names with the corresponding IDs for reporting?
+2015-06-17 16:33:30	walexander	just store  it
+2015-06-18 12:23:53	akwok	should we make placement name a required field?
+2015-06-18 12:33:34	walexander	yes, but can we label it something else?
+2015-06-18 12:33:52	akwok	yes, what should we lable it
+2015-06-18 12:33:54	akwok	label*
+2015-06-18 12:34:42	walexander	longer term, I think we should manage each tag more like a demand source 
+2015-06-18 12:36:05	walexander	where the platform is defined as a buyer and then inventory-specific values are assigned to each platform for each piece of inventory 
+2015-06-18 12:36:45	walexander	so, apn is the platform and 1234567 (the APN placement id) is the value 
+2015-06-18 12:38:13	walexander	we should think of the network tags in a similar manner: The buyer is added globally for the publisher, then the tags are the inventory-specific values 
+2015-06-18 12:38:36	walexander	APN is to Expo as 123456 is to `<script src=....>`
+2015-06-18 12:39:44	walexander	during the demo we introduced the concept of being able to re-use tags on different inventory -- that same thing should probably apply to APN's 123456 placement id
+2015-06-18 12:40:45	walexander	publisher globally defines both APN and the placement (giving the placement a name and an id) 
+2015-06-18 12:41:20	walexander	then, when toggling APN on for specific inventory, they select from a list of the placements assigned to APN 
+2015-06-18 12:42:54	walexander	that way we are able to align our model more closely with the actual demand source's 
+2015-06-18 12:43:21	walexander	which makes the workflow a bit simpler (since pub doesn't need to remember placement id) 
+2015-06-18 12:43:47	akwok	so the use case is that these tags that the publisher will provide will be re-used often>
+2015-06-18 12:43:48	walexander	and it also makes reconciling the second party reporting a lot simpler
+2015-06-18 12:44:44	walexander	yes -- think about sizes 
+2015-06-18 12:45:18	walexander	right now, they need a distinct tag for each size
+2015-06-18 12:45:41	walexander	but most of the tags support specifying the size directly in the tag itself, 
+2015-06-18 12:47:30	walexander	if we allowed re-using the same placement, we could provide macros to dynamically add the size
+2015-06-18 12:48:57	akwok	so the tags are the same except the size defn within the tag
+2015-06-18 13:20:00	walexander	right -- so the same tag could be used for all sizes 
+2015-06-19 14:14:49	walexander	hi annie - do you have the tableau desktop product keys?
+2015-06-19 14:20:50	akwok	yes
+2015-06-19 14:25:20	walexander	can you hook a brother up?
+2015-06-19 14:25:38	akwok	yes trying to find the write url for the customer portal
+2015-06-19 14:26:52	akwok	here we go
+2015-06-19 14:26:53	akwok	try this
+2015-06-19 14:26:54	akwok	TDOP-0DD6-BEE0-C8EC-F170
+2015-06-19 14:27:53	walexander	thanks, i forgot I had access to those 
+2015-06-19 14:28:13	walexander	glad i'm not the only one that cannot find their portal login either!
+2015-06-19 14:28:49	akwok	lol its confusing tableau has to portals..one for the keys and the other for knowledgbase
+2015-06-19 14:33:25	akwok	question
+2015-06-19 14:33:54	akwok	so this last line of ryan's email "As for the org- everything will stay the same for now except those who had been reporting to me or Joe will now report to Jim moving forward." ...makes me think that joe is out too?
+2015-07-02 13:59:11	walexander	What would it take for you to provide a feng shui assessment of a house?  
+2015-07-02 14:11:17	akwok	I know basic stuff, I'm no expert 
+2015-07-02 14:11:25	akwok	But my friends dad is 
+2015-07-02 14:27:48	walexander	shirley wants to buy this place: http://www.zillow.com/homes/for_sale/60738193_zpid/1_pnd/36.900815,-76.010306,36.872875,-76.050045_rect/14_zm/1_fr/?view=map
+2015-07-02 14:29:09	walexander	the road doesn't run perpendicular to the house 
+2015-07-02 14:32:55	akwok	ha yea thats the first think i always look at
+2015-07-02 14:36:05	akwok	i dont the staircase that faces the front door is good fengshui
+2015-07-02 14:37:34	akwok	and i think generally spaces with a more open floor plan vs enclosed spaces is better
+2015-07-02 14:50:01	walexander	ah, that is tough 
+2015-07-02 14:51:24	akwok	yeah
+2015-07-02 14:51:42	akwok	they say the 3 most impt places for a good fenshui is your bedroom, kitchen and bathroom
+2015-07-02 14:52:15	akwok	are you moving to a different part of town?
+2015-07-02 15:21:59	walexander	Yeah, to the north side 
+2015-07-02 15:22:19	walexander	This hood turning into a frat house with these renters 
+2015-07-02 15:22:38	akwok	moving on up to the north side :notes:
+2015-07-02 15:22:45	akwok	lol
+2015-07-02 15:24:58	akwok	have home prices gone up where you live in the past few months?
+2015-07-02 15:25:10	walexander	Yeah, its the older side of town. 
+2015-07-02 15:25:36	walexander	There's a couple $8mm + homes down the street 
+2015-07-02 15:25:50	akwok	home prices have gone up around here in the past couple of months
+2015-07-02 15:26:04	walexander	Rates are really low right now 
+2015-07-02 15:26:10	walexander	Just hope they don't go up
+2015-07-02 15:26:31	walexander	For $500k, every 0.5% is an extra $200 a month 
+2015-07-02 15:27:13	walexander	Friend of mine just bought 
+2015-07-02 15:27:25	walexander	Bank wouldn't even lock the rate until the day they closed 
+2015-07-02 15:27:51	akwok	house buying processes is soo stressful
+2015-07-02 15:28:57	walexander	Yeah, esp when they have to verify all your cash
+2015-07-02 15:29:33	walexander	To make sure youre noy a terrorist, they Need statements going back a year
+2015-07-02 15:29:50	akwok	yea my friend told me her parents gave them some money and they had to look at their bank accts
+2015-06-05 15:15:12	akwok	but i just tried it again and it works no
+2015-06-05 15:15:14	akwok	now*
+2015-06-05 15:15:17	akwok	sorry
+2015-06-05 15:15:28	walexander	I was not intentionally making elastic search changes. But I'll check with pato
+2015-06-05 15:15:56	akwok	btw i added a couple of scenarios in databus-761, still need to add one more
+2015-06-05 15:16:02	akwok	but let me know if that is what you are looking for
+2015-06-05 15:16:58	walexander	Great I will take a look. Have automated the tests locally, just need to get it working for circle ci
+2015-06-05 15:17:50	walexander	Raul is working on a way to parse the spec for the data 
+2015-06-05 15:21:41	walexander	Is having a holstered gun on your belt appropriate when taking children to the bus stop?
+2015-06-05 15:22:06	akwok	well i guess depends who you ask
+2015-06-05 15:22:20	akwok	the nra would say yes
+2015-06-05 15:22:29	akwok	but to me its a little overboard
+2015-06-05 15:23:07	walexander	Agreed. 
+2015-06-05 15:23:17	walexander	People are so paranoid 
+2015-06-05 15:23:51	walexander	Wonder if he fantasizes about saving the day from someone trying to rob the elementary school bus stop. 
+2015-06-05 15:24:26	akwok	yeah ppl think theyre liam neeson or something
+2015-06-05 15:24:28	akwok	lol
+2015-06-05 15:25:25	akwok	did that happen to you right now?  did some parent have a holstered fun while you were dropping off the girls?
+2015-06-05 15:27:39	walexander	this morning 
+2015-06-05 15:28:00	walexander	dude walked and waited with his kids to the bus stop 
+2015-06-05 15:28:23	akwok	did any of the kids notice?
+2015-06-05 15:28:25	walexander	with a 9mm strapped to his belt
+2015-06-05 15:28:28	walexander	i don't think so 
+2015-06-05 15:28:47	walexander	he works for blackwater
+2015-06-05 15:29:00	walexander	or wahtever they call themselves now
+2015-06-05 15:31:22	akwok	sounds familiar and just googled them, they got charged with killing 14 unarmed iraqis
+2015-06-05 15:31:39	walexander	yeah ... so naturally time for a little rebranding
+2015-06-05 15:35:09	akwok	crazy
+2015-06-08 13:15:06	akwok	Hey Will, working on the payment calculations examples.  Here is what I have so far (each scenario has one example--ill add more): 
+2015-06-08 13:15:06		Scenarios
+2015-06-08 13:15:06		1.  flat rate 
+2015-06-08 13:15:06		2.  rev share
+2015-06-08 13:15:06		3.  flat rate with a rev share over flat rate
+2015-06-08 13:15:06		4.  flat rate with a rev share over a specified threshold
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate payment term
+2015-06-08 13:15:06		Given a publisher has a flat rate payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> to <end_date>
+2015-06-08 13:15:06		And the term rate is <rate>
+2015-06-08 13:15:06		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00
+2015-06-08 13:15:06		|
+2015-06-08 13:15:06		Scenario:  The publisher has a revenue share payment term
+2015-06-08 13:15:06		Given a publisher has a revenue share payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the rate is <rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When <gross_revenue> in gross revenue and <num_request> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|payment_term        |start_date        |end_date        |rate         |serving fee
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |serving_fee     |gross_revenue     |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |80%        |0.01            |185.00            |152,755        |146.78
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate with a revenue share upside for anything above the flat rate (mixed without threshold)
+2015-06-08 13:15:06		Given a publisher has a mixed without threshold payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the flat rate is <rate> and the floating rate is <floating_rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When gross revenue is <gross_revenue> and <num_requests> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.  
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |floating_rate         |serving_fee     |gross_revenue     |num_requests     |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |0.80        |80%                |0.01            |345.00            |212,300        |308.27
+2015-06-08 13:15:18	akwok	does this look right?
+2015-06-08 13:52:29	akwok	unsure if i need to incorporate date
+2015-06-08 14:05:25	walexander	gimme some time to digest this but def looks like it's the right approach 
+2015-06-08 14:05:39	walexander	we may need to be explicit about the payment *rules* too 
+2015-06-08 14:06:12	akwok	i see like given the payment rule is US, site http://hello.com ?
+2015-06-08 14:06:35	walexander	not that much detail actually 
+2015-06-08 14:07:13	walexander	more like, given the following payment terms / And the terms are associated with payment rule id <rule id> 
+2015-06-08 14:08:36	walexander	and Given n impressions with gross rev of gross_rev And matching payment rule id <rule id> 
+2015-06-08 14:09:05	akwok	then do we need to explicitly have a payment rule_id table to reference?
+2015-06-08 14:09:31	walexander	not for the scenarios that are checking the payment terms only 
+2015-06-08 14:10:02	walexander	just makes it a bit easier if we have explicit statemnts for each entity we need to load 
+2015-06-08 14:10:54	walexander	since the impressions aren't explicitly linked to the terms, we will still need a rule to test the payment 
+2015-06-08 14:23:14	akwok	something like this: Given a publisher has a flat rate payment term
+2015-06-08 14:23:14		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 14:23:14		And the term rate is <rate>
+2015-06-08 14:23:14		And the terms are assoiated with payment ruld ID <payment_rule_id>
+2015-06-08 14:23:14		And the impressions match the payment rule ID
+2015-06-08 14:23:14		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 14:23:14		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 14:23:14		|start_date        |end_date        |rate         |num_requests    |net_pub_payment    |payment_rule_id
+2015-06-08 14:23:14		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00                |1
+2015-06-08 14:23:18	akwok	?
+2015-06-08 14:29:18	walexander	yes, that looks good
+2015-06-08 14:30:46	akwok	so then my question is, when the test is ran are you looking up somewhere what payment_rule_id 1 really is?
+2015-06-08 14:31:35	walexander	nah, we don't care -- we just need to load a pyament rule id into the database for it to work
+2015-06-08 14:31:44	walexander	so we don't need the last column in the assertion 
+2015-06-08 14:31:48	walexander	payment_rule_id 
+2015-06-08 14:32:04	akwok	i see
+2015-06-08 14:32:33	akwok	so we dont need a placeholder for payment_rule_id.  we just need to say the terms are associated with some payment rule ID
+2015-06-08 14:34:35	walexander	it may be easiest if all of the "fixture" data is specified as a table 
+2015-06-08 14:35:03	walexander	so, instead of just `When <num request> are recorded for ...`
+2015-06-08 14:35:34	walexander	we would say `And the system contains the following impression records:`  
+2015-06-08 14:36:04	walexander	``` event_dttm  |impression_cnt   |revenue  |... ```` 
+2015-06-08 14:37:14	walexander	jsut b/c it'll allow us to copy the table into a file and then load the file 
+2015-06-08 14:37:29	walexander	insetad of parsing the gherking and then manually creating an INSERT statement for each variation 
+2015-06-08 14:39:12	akwok	i see, so the when would be, when we process payment for the month of May
+2015-06-08 14:39:12		Then the pub payment would be x
+2015-06-08 14:39:14	akwok	?
+2015-06-08 15:02:00	walexander	Right. 
+2015-06-08 15:02:24	akwok	got it
+2015-06-08 15:02:44	walexander	Can asssert on Pub payment, net revenue, margin, etc 
+2015-06-08 15:03:44	walexander	Just thinking that In general when we have a Given that some data exists in the system, we specify that in a table 
+2015-06-08 15:03:59	walexander	I don't think we will have any need for When statements really. 
+2015-06-08 15:04:36	akwok	i see so the When statement is not requried
+2015-06-08 15:04:39	walexander	Given/Then should be all we need. When is meant to express action of some kind 
+2015-06-08 15:05:16	walexander	No, only Then and ( When or Given )
+2015-06-08 15:07:12	akwok	kk ill take another crack at it
+2015-06-08 15:21:10	akwok	so something like this: 
+2015-06-08 15:21:10		Scenario:  The publisher has a flat rate payment term
+2015-06-08 15:21:10		Given a publisher has a flat rate payment term from <start_date> and <end_date>
+2015-06-08 15:21:10		And the term rate is <rate>
+2015-06-08 15:21:10		And the terms are assoiated with payment ruld ID 1
+2015-06-08 15:21:10		And the impressions match the payment rule ID 1
+2015-06-08 15:21:10		And the system contains the following impression records:
+2015-06-08 15:21:10		|event_dttm     |request_cnt     
+2015-06-08 15:21:10		|05/01/2015        |1000            
+2015-06-08 15:21:10		|05/31/2015        |1000            
+2015-06-08 15:21:10		Then the publisher payment for 05/01/2015 to 05/30/2015 should be <net_pub_payment>.
+2015-06-08 15:21:10		Examples
+2015-06-08 15:21:10		|rate         |net_pub_payment    
+2015-06-08 15:21:10		|1.00        |2.00            
+2015-06-08 15:21:10		|1.10         |2.20
+2015-06-08 15:21:10		(i didnt include gross revenue in the impression record table because its a flat rate, but if we should re-use this table for the other scenarios, then I can add more to it)
+2015-06-08 20:32:29	akwok	Hey Will, made some adjustments and created scenarios here:  https://beanstockmedia.atlassian.net/browse/DATABUS-761  Let me know if this is what you are looking for.  Thanks
+2015-06-09 14:23:55	akwok	3 more days..OITNB
+2015-06-09 14:45:46	walexander	?
+2015-06-09 14:45:51	walexander	OITNB?
+2015-06-09 14:46:32	akwok	orange is the new black
+2015-06-09 14:47:45	walexander	you gonna binge watch the whole thign?
+2015-06-09 14:49:11	akwok	i need to refrain lol
+2015-06-09 14:49:35	akwok	im trying to study for my capm exam, so im doing that almost every night until im falling asleep writing notes
+2015-06-09 14:50:26	akwok	trying to not get side tracked, but idk if thats gonna happen lol
+2015-06-09 16:57:32	akwok	so for databus-761, your most recent comment, we would omit the when statement
+2015-06-09 16:57:34	akwok	?
+2015-06-09 17:33:45	walexander	No, a when statement is needed, but we just want to change the data we are checking in it 
+2015-06-09 17:34:29	walexander	We can't verify against  individual impressions, just against the aggregate 
+2015-06-09 17:35:22	walexander	So of you have one impression that should match rule 102 and another that should match 103 then the when statement would just provide those counts 
+2015-06-10 20:14:13	akwok	Hi Will, just fyi I commented in the ticket with an update.  let me know if thats good and i'll adjust the other scenarios.  Also, just want to confirm that for this network tag feature in HC, if publisher configures their own passback and managed tags, it means they should not be able to configure our integrated demand sources (APN, IXP, etx)?
+2015-06-16 14:40:56	walexander	hey annie
+2015-06-16 14:41:14	walexander	there are a shit load of helix console "sandbox" machines running -- can I turn them off
+2015-06-16 14:41:48	akwok	sure the latest HC is here: http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 14:41:52	akwok	if you can keep that running
+2015-06-16 14:43:39	walexander	hrmm ... that's not one of our hosts
+2015-06-16 18:22:40	akwok	Hi Will
+2015-06-16 18:22:58	akwok	noticed that the HC sandbox is down ( http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 18:30:37	walexander	Oh, sorry about that. 
+2015-06-16 18:30:43	walexander	I'll turn it back on. 
+2015-06-16 18:30:54	akwok	kk thanks!
+2015-06-16 18:31:15	walexander	And give you a new dns name -- http://console.qa.beanstock.net OK?
+2015-06-16 18:31:15	akwok	wanted to let ops check out the new network tags functionality and john also wants to demo it during sprint demo tomrrow
+2015-06-16 18:31:25	akwok	yes, sounds good
+2015-06-16 18:31:38	akwok	finally something i can memorize :simple_smile:
+2015-06-16 18:35:37	walexander	we have, literally, half a dozen machines labeled "helix-console" in some way
+2015-06-16 18:35:48	walexander	is there a way to check the version number?
+2015-06-16 18:36:10	walexander	so i know if I have the right one
+2015-06-16 18:37:22	akwok	i dont think so
+2015-06-16 18:38:27	akwok	but ben may know otherwise
+2015-06-16 18:38:39	walexander	no copyright notice or anything?
+2015-06-16 18:38:40	walexander	that's fine
+2015-06-16 18:43:30	akwok	i think there is some path where you can check the version.. /helix-console-webui/js/version.js
+2015-06-16 18:43:33	akwok	not sure if that helps
+2015-06-16 18:47:13	walexander	okay, that does help -- what version do we want?
+2015-06-16 18:47:25	akwok	1.10
+2015-06-16 18:48:30	walexander	can you let me know if this is it? http://ec2-54-158-10-132.compute-1.amazonaws.com
+2015-06-16 18:48:38	walexander	it's showing 0.5.1.BUILD-SNAPSHOT
+2015-06-16 18:48:44	walexander	but the branch is origin/release-v1.9
+2015-06-16 18:49:19	akwok	i get a 404 when i click that link
+2015-06-16 19:03:25	walexander	Isn the uri /helix-console-webui 
+2015-06-16 19:03:56	akwok	yes
+2015-06-16 20:34:02	walexander	okay, give it a shot now ... http://ec2-54-158-10-132.compute-1.amazonaws.com/helix-console-webui/
+2015-06-16 20:34:19	walexander	in ec2 the ip addresses are assigned dynamically when teh machine boots
+2015-06-16 20:35:02	walexander	for reasons unknown, the postgresql configuration on that server was configured to bind to an explicit IP address
+2015-06-16 20:35:07	walexander	which changed when the box bounced
+2015-06-16 20:35:15	walexander	never seen that kind of thing before
+2015-06-16 20:36:04	akwok	That is the one 
+2015-06-16 20:36:25	akwok	Ahh
+2015-06-16 20:41:57	walexander	kk, try http://console.qa.beanstock.net/helix-console-webui/
+2015-06-16 20:42:11	walexander	uh, wait a second on that actually
+2015-06-16 20:42:49	walexander	kk, now give it a shot http://console.qa.beanstock.net/
+2015-06-16 20:56:45	akwok	Kk works!
+2015-06-16 21:01:29	walexander	dope
+2015-06-16 21:01:46	walexander	that points at a load balancer
+2015-06-16 21:10:21	akwok	thanks!
+2015-06-17 16:13:30	akwok	would we need to include placements names in the zone map or just store and we can look up names with the corresponding IDs for reporting?
+2015-06-17 16:33:30	walexander	just store  it
+2015-06-18 12:23:53	akwok	should we make placement name a required field?
+2015-06-18 12:33:34	walexander	yes, but can we label it something else?
+2015-06-18 12:33:52	akwok	yes, what should we lable it
+2015-06-18 12:33:54	akwok	label*
+2015-06-18 12:34:42	walexander	longer term, I think we should manage each tag more like a demand source 
+2015-06-18 12:36:05	walexander	where the platform is defined as a buyer and then inventory-specific values are assigned to each platform for each piece of inventory 
+2015-06-18 12:36:45	walexander	so, apn is the platform and 1234567 (the APN placement id) is the value 
+2015-06-18 12:38:13	walexander	we should think of the network tags in a similar manner: The buyer is added globally for the publisher, then the tags are the inventory-specific values 
+2015-06-18 12:38:36	walexander	APN is to Expo as 123456 is to `<script src=....>`
+2015-06-18 12:39:44	walexander	during the demo we introduced the concept of being able to re-use tags on different inventory -- that same thing should probably apply to APN's 123456 placement id
+2015-06-18 12:40:45	walexander	publisher globally defines both APN and the placement (giving the placement a name and an id) 
+2015-06-18 12:41:20	walexander	then, when toggling APN on for specific inventory, they select from a list of the placements assigned to APN 
+2015-06-18 12:42:54	walexander	that way we are able to align our model more closely with the actual demand source's 
+2015-06-18 12:43:21	walexander	which makes the workflow a bit simpler (since pub doesn't need to remember placement id) 
+2015-06-18 12:43:47	akwok	so the use case is that these tags that the publisher will provide will be re-used often>
+2015-06-18 12:43:48	walexander	and it also makes reconciling the second party reporting a lot simpler
+2015-06-18 12:44:44	walexander	yes -- think about sizes 
+2015-06-18 12:45:18	walexander	right now, they need a distinct tag for each size
+2015-06-18 12:45:41	walexander	but most of the tags support specifying the size directly in the tag itself, 
+2015-06-18 12:47:30	walexander	if we allowed re-using the same placement, we could provide macros to dynamically add the size
+2015-06-18 12:48:57	akwok	so the tags are the same except the size defn within the tag
+2015-06-18 13:20:00	walexander	right -- so the same tag could be used for all sizes 
+2015-06-19 14:14:49	walexander	hi annie - do you have the tableau desktop product keys?
+2015-06-19 14:20:50	akwok	yes
+2015-06-19 14:25:20	walexander	can you hook a brother up?
+2015-06-19 14:25:38	akwok	yes trying to find the write url for the customer portal
+2015-06-19 14:26:52	akwok	here we go
+2015-06-19 14:26:53	akwok	try this
+2015-06-19 14:26:54	akwok	TDOP-0DD6-BEE0-C8EC-F170
+2015-06-19 14:27:53	walexander	thanks, i forgot I had access to those 
+2015-06-19 14:28:13	walexander	glad i'm not the only one that cannot find their portal login either!
+2015-06-19 14:28:49	akwok	lol its confusing tableau has to portals..one for the keys and the other for knowledgbase
+2015-06-19 14:33:25	akwok	question
+2015-06-19 14:33:54	akwok	so this last line of ryan's email "As for the org- everything will stay the same for now except those who had been reporting to me or Joe will now report to Jim moving forward." ...makes me think that joe is out too?
+2015-07-02 13:59:11	walexander	What would it take for you to provide a feng shui assessment of a house?  
+2015-07-02 14:11:17	akwok	I know basic stuff, I'm no expert 
+2015-07-02 14:11:25	akwok	But my friends dad is 
+2015-07-02 14:27:48	walexander	shirley wants to buy this place: http://www.zillow.com/homes/for_sale/60738193_zpid/1_pnd/36.900815,-76.010306,36.872875,-76.050045_rect/14_zm/1_fr/?view=map
+2015-07-02 14:29:09	walexander	the road doesn't run perpendicular to the house 
+2015-07-02 14:32:55	akwok	ha yea thats the first think i always look at
+2015-07-02 14:36:05	akwok	i dont the staircase that faces the front door is good fengshui
+2015-07-02 14:37:34	akwok	and i think generally spaces with a more open floor plan vs enclosed spaces is better
+2015-07-02 14:50:01	walexander	ah, that is tough 
+2015-07-02 14:51:24	akwok	yeah
+2015-07-02 14:51:42	akwok	they say the 3 most impt places for a good fenshui is your bedroom, kitchen and bathroom
+2015-07-02 14:52:15	akwok	are you moving to a different part of town?
+2015-07-02 15:21:59	walexander	Yeah, to the north side 
+2015-07-02 15:22:19	walexander	This hood turning into a frat house with these renters 
+2015-07-02 15:22:38	akwok	moving on up to the north side :notes:
+2015-07-02 15:22:45	akwok	lol
+2015-07-02 15:24:58	akwok	have home prices gone up where you live in the past few months?
+2015-07-02 15:25:10	walexander	Yeah, its the older side of town. 
+2015-07-02 15:25:36	walexander	There's a couple $8mm + homes down the street 
+2015-07-02 15:25:50	akwok	home prices have gone up around here in the past couple of months
+2015-07-02 15:26:04	walexander	Rates are really low right now 
+2015-07-02 15:26:10	walexander	Just hope they don't go up
+2015-07-02 15:26:31	walexander	For $500k, every 0.5% is an extra $200 a month 
+2015-07-02 15:27:13	walexander	Friend of mine just bought 
+2015-07-02 15:27:25	walexander	Bank wouldn't even lock the rate until the day they closed 
+2015-07-02 15:27:51	akwok	house buying processes is soo stressful
+2015-07-02 15:28:57	walexander	Yeah, esp when they have to verify all your cash
+2015-07-02 15:29:33	walexander	To make sure youre noy a terrorist, they Need statements going back a year
+2015-07-02 15:29:50	akwok	yea my friend told me her parents gave them some money and they had to look at their bank accts
+2015-06-04 14:38:58	akwok	btw i was taking this aptitude test for survey money yesterday and one of the question was around a cucumber being a pickle and i was like well I gotta thank Will for knowing that one
+2015-06-04 14:38:59	akwok	hahah
+2015-06-04 14:45:04	walexander	hehe
+2015-06-05 15:08:15	akwok	Hi Will, seeing this error when trying to search in bad ad lookup:    http://helix-console.beanstock.net/helix-console-webui/api/badadlookup/sear…e_range_start=1433462400000&date_range_end=1433548800000&page=0&perPage=50 Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+2015-06-05 15:08:15		pato suggested i check with you
+2015-06-05 15:13:51	walexander	He did?
+2015-06-05 15:14:08	akwok	he said it didnt look like elastic search
+2015-06-05 15:14:22	akwok	and that you were may have been making some changes earlier?
+2015-06-05 15:15:12	akwok	but i just tried it again and it works no
+2015-06-05 15:15:14	akwok	now*
+2015-06-05 15:15:17	akwok	sorry
+2015-06-05 15:15:28	walexander	I was not intentionally making elastic search changes. But I'll check with pato
+2015-06-05 15:15:56	akwok	btw i added a couple of scenarios in databus-761, still need to add one more
+2015-06-05 15:16:02	akwok	but let me know if that is what you are looking for
+2015-06-05 15:16:58	walexander	Great I will take a look. Have automated the tests locally, just need to get it working for circle ci
+2015-06-05 15:17:50	walexander	Raul is working on a way to parse the spec for the data 
+2015-06-05 15:21:41	walexander	Is having a holstered gun on your belt appropriate when taking children to the bus stop?
+2015-06-05 15:22:06	akwok	well i guess depends who you ask
+2015-06-05 15:22:20	akwok	the nra would say yes
+2015-06-05 15:22:29	akwok	but to me its a little overboard
+2015-06-05 15:23:07	walexander	Agreed. 
+2015-06-05 15:23:17	walexander	People are so paranoid 
+2015-06-05 15:23:51	walexander	Wonder if he fantasizes about saving the day from someone trying to rob the elementary school bus stop. 
+2015-06-05 15:24:26	akwok	yeah ppl think theyre liam neeson or something
+2015-06-05 15:24:28	akwok	lol
+2015-06-05 15:25:25	akwok	did that happen to you right now?  did some parent have a holstered gun while you were dropping off the girls?
+2015-06-05 15:27:39	walexander	this morning 
+2015-06-05 15:28:00	walexander	dude walked and waited with his kids to the bus stop 
+2015-06-05 15:28:23	akwok	did any of the kids notice?
+2015-06-05 15:28:25	walexander	with a 9mm strapped to his belt
+2015-06-05 15:28:28	walexander	i don't think so 
+2015-06-05 15:28:47	walexander	he works for blackwater
+2015-06-05 15:29:00	walexander	or wahtever they call themselves now
+2015-06-05 15:31:22	akwok	sounds familiar and just googled them, they got charged with killing 14 unarmed iraqis
+2015-06-05 15:31:39	walexander	yeah ... so naturally time for a little rebranding
+2015-06-05 15:35:09	akwok	crazy
+2015-06-08 13:15:06	akwok	Hey Will, working on the payment calculations examples.  Here is what I have so far (each scenario has one example--ill add more): 
+2015-06-08 13:15:06		Scenarios
+2015-06-08 13:15:06		1.  flat rate 
+2015-06-08 13:15:06		2.  rev share
+2015-06-08 13:15:06		3.  flat rate with a rev share over flat rate
+2015-06-08 13:15:06		4.  flat rate with a rev share over a specified threshold
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate payment term
+2015-06-08 13:15:06		Given a publisher has a flat rate payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> to <end_date>
+2015-06-08 13:15:06		And the term rate is <rate>
+2015-06-08 13:15:06		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00
+2015-06-08 13:15:06		|
+2015-06-08 13:15:06		Scenario:  The publisher has a revenue share payment term
+2015-06-08 13:15:06		Given a publisher has a revenue share payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the rate is <rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When <gross_revenue> in gross revenue and <num_request> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 13:15:06		|payment_term        |start_date        |end_date        |rate         |serving fee
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |serving_fee     |gross_revenue     |num_requests    |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |80%        |0.01            |185.00            |152,755        |146.78
+2015-06-08 13:15:06		Scenario:  The publisher has a flat rate with a revenue share upside for anything above the flat rate (mixed without threshold)
+2015-06-08 13:15:06		Given a publisher has a mixed without threshold payment term
+2015-06-08 13:15:06		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 13:15:06		And the flat rate is <rate> and the floating rate is <floating_rate>
+2015-06-08 13:15:06		And the serving fee rate is <serving_fee>
+2015-06-08 13:15:06		When gross revenue is <gross_revenue> and <num_requests> requests are recorded for the publisher
+2015-06-08 13:15:06		Then the publisher payment should be <net_pub_payment>.  
+2015-06-08 13:15:06		|start_date        |end_date        |rate         |floating_rate         |serving_fee     |gross_revenue     |num_requests     |net_pub_payment
+2015-06-08 13:15:06		|05/01/2015        |05/31/2015        |0.80        |80%                |0.01            |345.00            |212,300        |308.27
+2015-06-08 13:15:18	akwok	does this look right?
+2015-06-08 13:52:29	akwok	unsure if i need to incorporate date
+2015-06-08 14:05:25	walexander	gimme some time to digest this but def looks like it's the right approach 
+2015-06-08 14:05:39	walexander	we may need to be explicit about the payment *rules* too 
+2015-06-08 14:06:12	akwok	i see like given the payment rule is US, site http://hello.com ?
+2015-06-08 14:06:35	walexander	not that much detail actually 
+2015-06-08 14:07:13	walexander	more like, given the following payment terms / And the terms are associated with payment rule id <rule id> 
+2015-06-08 14:08:36	walexander	and Given <n> impressions with gross rev of <gross_rev> And matching payment rule id <rule id> 
+2015-06-08 14:09:05	akwok	then do we need to explicitly have a payment rule_id table to reference?
+2015-06-08 14:09:31	walexander	not for the scenarios that are checking the payment terms only 
+2015-06-08 14:10:02	walexander	just makes it a bit easier if we have explicit statemnts for each entity we need to load 
+2015-06-08 14:10:54	walexander	since the impressions aren't explicitly linked to the terms, we will still need a rule to test the payment 
+2015-06-08 14:23:14	akwok	something like this: 
+2015-06-08 14:23:14		Given a publisher has a flat rate payment term
+2015-06-08 14:23:14		And the term has a start and end date of <start_date> and <end_date>
+2015-06-08 14:23:14		And the term rate is <rate>
+2015-06-08 14:23:14		And the terms are assoiated with payment ruld ID <payment_rule_id>
+2015-06-08 14:23:14		And the impressions match the payment rule ID
+2015-06-08 14:23:14		When <num_requests> requests are recorded for the publisher from 05/01/2015 to 05/31/2015
+2015-06-08 14:23:14		Then the publisher payment should be <net_pub_payment>.
+2015-06-08 14:23:14		|start_date        |end_date        |rate         |num_requests    |net_pub_payment    |payment_rule_id
+2015-06-08 14:23:14		|05/01/2015        |05/31/2015        |1.00        |2000            |2.00                |1
+2015-06-08 14:23:18	akwok	?
+2015-06-08 14:29:18	walexander	yes, that looks good
+2015-06-08 14:30:46	akwok	so then my question is, when the test is ran are you looking up somewhere what payment_rule_id 1 really is?
+2015-06-08 14:31:35	walexander	nah, we don't care -- we just need to load a pyament rule id into the database for it to work
+2015-06-08 14:31:44	walexander	so we don't need the last column in the assertion 
+2015-06-08 14:31:48	walexander	payment_rule_id 
+2015-06-08 14:32:04	akwok	i see
+2015-06-08 14:32:33	akwok	so we dont need a placeholder for payment_rule_id.  we just need to say the terms are associated with some payment rule ID
+2015-06-08 14:34:35	walexander	it may be easiest if all of the "fixture" data is specified as a table 
+2015-06-08 14:35:03	walexander	so, instead of just `When <num request> are recorded for ...`
+2015-06-08 14:35:34	walexander	we would say `And the system contains the following impression records:`  
+2015-06-08 14:36:04	walexander	``` event_dttm  |impression_cnt   |revenue  |... ```` 
+2015-06-08 14:37:14	walexander	jsut b/c it'll allow us to copy the table into a file and then load the file 
+2015-06-08 14:37:29	walexander	insetad of parsing the gherking and then manually creating an INSERT statement for each variation 
+2015-06-08 14:39:12	akwok	i see, so the when would be, when we process payment for the month of May
+2015-06-08 14:39:12		Then the pub payment would be x
+2015-06-08 14:39:14	akwok	?
+2015-06-08 15:02:00	walexander	Right. 
+2015-06-08 15:02:24	akwok	got it
+2015-06-08 15:02:44	walexander	Can asssert on Pub payment, net revenue, margin, etc 
+2015-06-08 15:03:44	walexander	Just thinking that In general when we have a Given that some data exists in the system, we specify that in a table 
+2015-06-08 15:03:59	walexander	I don't think we will have any need for When statements really. 
+2015-06-08 15:04:36	akwok	i see so the When statement is not required
+2015-06-08 15:04:39	walexander	Given/Then should be all we need. When is meant to express action of some kind 
+2015-06-08 15:05:16	walexander	No, only Then and ( When or Given )
+2015-06-08 15:07:12	akwok	kk ill take another crack at it
+2015-06-08 15:21:10	akwok	so something like this: 
+2015-06-08 15:21:10		Scenario:  The publisher has a flat rate payment term
+2015-06-08 15:21:10		Given a publisher has a flat rate payment term from <start_date> and <end_date>
+2015-06-08 15:21:10		And the term rate is <rate>
+2015-06-08 15:21:10		And the terms are assoiated with payment ruld ID 1
+2015-06-08 15:21:10		And the impressions match the payment rule ID 1
+2015-06-08 15:21:10		And the system contains the following impression records:
+2015-06-08 15:21:10		|event_dttm     |request_cnt     
+2015-06-08 15:21:10		|05/01/2015        |1000            
+2015-06-08 15:21:10		|05/31/2015        |1000            
+2015-06-08 15:21:10		Then the publisher payment for 05/01/2015 to 05/30/2015 should be <net_pub_payment>.
+2015-06-08 15:21:10		Examples
+2015-06-08 15:21:10		|rate         |net_pub_payment    
+2015-06-08 15:21:10		|1.00        |2.00            
+2015-06-08 15:21:10		|1.10         |2.20
+2015-06-08 15:21:10		(i didnt include gross revenue in the impression record table because its a flat rate, but if we should re-use this table for the other scenarios, then I can add more to it)
+2015-06-08 20:32:29	akwok	Hey Will, made some adjustments and created scenarios here:  https://beanstockmedia.atlassian.net/browse/DATABUS-761  Let me know if this is what you are looking for.  Thanks
+2015-06-09 14:23:55	akwok	3 more days..OITNB
+2015-06-09 14:45:46	walexander	?
+2015-06-09 14:45:51	walexander	OITNB?
+2015-06-09 14:46:32	akwok	orange is the new black
+2015-06-09 14:47:45	walexander	you gonna binge watch the whole thign?
+2015-06-09 14:49:11	akwok	i need to refrain lol
+2015-06-09 14:49:35	akwok	im trying to study for my capm exam, so im doing that almost every night until im falling asleep writing notes
+2015-06-09 14:50:26	akwok	trying to not get side tracked, but idk if thats gonna happen lol
+2015-06-09 16:57:32	akwok	so for databus-761, your most recent comment, we would omit the when statement
+2015-06-09 16:57:34	akwok	?
+2015-06-09 17:33:45	walexander	No, a when statement is needed, but we just want to change the data we are checking in it 
+2015-06-09 17:34:29	walexander	We can't verify against  individual impressions, just against the aggregate 
+2015-06-09 17:35:22	walexander	So of you have one impression that should match rule 102 and another that should match 103 then the when statement would just provide those counts 
+2015-06-10 20:14:13	akwok	Hi Will, just fyi I commented in the ticket with an update.  let me know if thats good and i'll adjust the other scenarios.  Also, just want to confirm that for this network tag feature in HC, if publisher configures their own passback and managed tags, it means they should not be able to configure our integrated demand sources (APN, IXP, etx)?
+2015-06-16 14:40:56	walexander	hey annie
+2015-06-16 14:41:14	walexander	there are a shit load of helix console "sandbox" machines running -- can I turn them off
+2015-06-16 14:41:48	akwok	sure the latest HC is here: http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 14:41:52	akwok	if you can keep that running
+2015-06-16 14:43:39	walexander	hrmm ... that's not one of our hosts
+2015-06-16 18:22:40	akwok	Hi Will
+2015-06-16 18:22:58	akwok	noticed that the HC sandbox is down ( http://ec2-54-158-5-220.compute-1.amazonaws.com/
+2015-06-16 18:30:37	walexander	Oh, sorry about that. 
+2015-06-16 18:30:43	walexander	I'll turn it back on. 
+2015-06-16 18:30:54	akwok	kk thanks!
+2015-06-16 18:31:15	walexander	And give you a new dns name -- http://console.qa.beanstock.net OK?
+2015-06-16 18:31:15	akwok	wanted to let ops check out the new network tags functionality and john also wants to demo it during sprint demo tomrrow
+2015-06-16 18:31:25	akwok	yes, sounds good
+2015-06-16 18:31:38	akwok	finally something i can memorize :simple_smile:
+2015-06-16 18:35:37	walexander	we have, literally, half a dozen machines labeled "helix-console" in some way
+2015-06-16 18:35:48	walexander	is there a way to check the version number?
+2015-06-16 18:36:10	walexander	so i know if I have the right one
+2015-06-16 18:37:22	akwok	i dont think so
+2015-06-16 18:38:27	akwok	but ben may know otherwise
+2015-06-16 18:38:39	walexander	no copyright notice or anything?
+2015-06-16 18:38:40	walexander	that's fine
+2015-06-16 18:43:30	akwok	i think there is some path where you can check the version.. /helix-console-webui/js/version.js
+2015-06-16 18:43:33	akwok	not sure if that helps
+2015-06-16 18:47:13	walexander	okay, that does help -- what version do we want?
+2015-06-16 18:47:25	akwok	1.10
+2015-06-16 18:48:30	walexander	can you let me know if this is it? http://ec2-54-158-10-132.compute-1.amazonaws.com
+2015-06-16 18:48:38	walexander	it's showing 0.5.1.BUILD-SNAPSHOT
+2015-06-16 18:48:44	walexander	but the branch is origin/release-v1.9
+2015-06-16 18:49:19	akwok	i get a 404 when i click that link
+2015-06-16 19:03:25	walexander	Isn the uri /helix-console-webui 
+2015-06-16 19:03:56	akwok	yes
+2015-06-16 20:34:02	walexander	okay, give it a shot now ... http://ec2-54-158-10-132.compute-1.amazonaws.com/helix-console-webui/
+2015-06-16 20:34:19	walexander	in ec2 the ip addresses are assigned dynamically when teh machine boots
+2015-06-16 20:35:02	walexander	for reasons unknown, the postgresql configuration on that server was configured to bind to an explicit IP address
+2015-06-16 20:35:07	walexander	which changed when the box bounced
+2015-06-16 20:35:15	walexander	never seen that kind of thing before
+2015-06-16 20:36:04	akwok	That is the one 
+2015-06-16 20:36:25	akwok	Ahh
+2015-06-16 20:41:57	walexander	kk, try http://console.qa.beanstock.net/helix-console-webui/
+2015-06-16 20:42:11	walexander	uh, wait a second on that actually
+2015-06-16 20:42:49	walexander	kk, now give it a shot http://console.qa.beanstock.net/
+2015-06-16 20:56:45	akwok	Kk works!
+2015-06-16 21:01:29	walexander	dope
+2015-06-16 21:01:46	walexander	that points at a load balancer
+2015-06-16 21:10:21	akwok	thanks!
+2015-06-17 16:13:30	akwok	would we need to include placements names in the zone map or just store it and we can look up names with the corresponding IDs for reporting?
+2015-06-17 16:33:30	walexander	just store  it
+2015-06-18 12:23:53	akwok	should we make placement name a required field?
+2015-06-18 12:33:34	walexander	yes, but can we label it something else?
+2015-06-18 12:33:52	akwok	yes, what should we lable it
+2015-06-18 12:33:54	akwok	label*
+2015-06-18 12:34:42	walexander	longer term, I think we should manage each tag more like a demand source 
+2015-06-18 12:36:05	walexander	where the platform is defined as a buyer and then inventory-specific values are assigned to each platform for each piece of inventory 
+2015-06-18 12:36:45	walexander	so, apn is the platform and 1234567 (the APN placement id) is the value 
+2015-06-18 12:38:13	walexander	we should think of the network tags in a similar manner: The buyer is added globally for the publisher, then the tags are the inventory-specific values 
+2015-06-18 12:38:36	walexander	APN is to Expo as 123456 is to `<script src=....>`
+2015-06-18 12:39:44	walexander	during the demo we introduced the concept of being able to re-use tags on different inventory -- that same thing should probably apply to APN's 123456 placement id
+2015-06-18 12:40:45	walexander	publisher globally defines both APN and the placement (giving the placement a name and an id) 
+2015-06-18 12:41:20	walexander	then, when toggling APN on for specific inventory, they select from a list of the placements assigned to APN 
+2015-06-18 12:42:54	walexander	that way we are able to align our model more closely with the actual demand source's 
+2015-06-18 12:43:21	walexander	which makes the workflow a bit simpler (since pub doesn't need to remember placement id) 
+2015-06-18 12:43:47	akwok	so the use case is that these tags that the publisher will provide will be re-used often?
+2015-06-18 12:43:48	walexander	and it also makes reconciling the second party reporting a lot simpler
+2015-06-18 12:44:44	walexander	yes -- think about sizes 
+2015-06-18 12:45:18	walexander	right now, they need a distinct tag for each size
+2015-06-18 12:45:41	walexander	but most of the tags support specifying the size directly in the tag itself, 
+2015-06-18 12:47:30	walexander	if we allowed re-using the same placement, we could provide macros to dynamically add the size
+2015-06-18 12:48:57	akwok	so the tags are the same except the size defn within the tag
+2015-06-18 13:20:00	walexander	right -- so the same tag could be used for all sizes 
+2015-06-19 14:14:49	walexander	hi annie - do you have the tableau desktop product keys?
+2015-06-19 14:20:50	akwok	yes
+2015-06-19 14:25:20	walexander	can you hook a brother up?
+2015-06-19 14:25:38	akwok	yes trying to find the right url for the customer portal
+2015-06-19 14:26:52	akwok	here we go
+2015-06-19 14:26:53	akwok	try this
+2015-06-19 14:26:54	akwok	TDOP-0DD6-BEE0-C8EC-F170
+2015-06-19 14:27:53	walexander	thanks, i forgot I had access to those 
+2015-06-19 14:28:13	walexander	glad i'm not the only one that cannot find their portal login either!
+2015-06-19 14:28:49	akwok	lol its confusing tableau has to portals..one for the keys and the other for knowledgbase
+2015-06-19 14:33:25	akwok	question
+2015-06-19 14:33:54	akwok	so this last line of ryan's email "As for the org- everything will stay the same for now except those who had been reporting to me or Joe will now report to Jim moving forward." ...makes me think that joe is out too?
+2015-07-02 13:59:11	walexander	What would it take for you to provide a feng shui assessment of a house?  
+2015-07-02 14:11:17	akwok	I know basic stuff, I'm no expert 
+2015-07-02 14:11:25	akwok	But my friends dad is 
+2015-07-02 14:27:48	walexander	shirley wants to buy this place: http://www.zillow.com/homes/for_sale/60738193_zpid/1_pnd/36.900815,-76.010306,36.872875,-76.050045_rect/14_zm/1_fr/?view=map --- Zillow: 1528 Stephens Rd, Virginia Beach, VA 23454 is For Sale  | Zillow
+2015-07-02 14:29:09	walexander	the road doesn't run perpendicular to the house 
+2015-07-02 14:32:55	akwok	ha yea thats the first think i always look at
+2015-07-02 14:36:05	akwok	i dont the staircase that faces the front door is good fengshui
+2015-07-02 14:37:34	akwok	and i think generally spaces with a more open floor plan vs enclosed spaces is better
+2015-07-02 14:50:01	walexander	ah, that is tough 
+2015-07-02 14:51:24	akwok	yeah
+2015-07-02 14:51:42	akwok	they say the 3 most impt places for a good fenshui is your bedroom, kitchen and bathroom
+2015-07-02 14:52:15	akwok	are you moving to a different part of town?
+2015-07-02 15:21:59	walexander	Yeah, to the north side 
+2015-07-02 15:22:19	walexander	This hood turning into a frat house with these renters 
+2015-07-02 15:22:38	akwok	moving on up to the north side :notes:
+2015-07-02 15:22:45	akwok	lol
+2015-07-02 15:24:58	akwok	have home prices gone up where you live in the past few months?
+2015-07-02 15:25:10	walexander	Yeah, its the older side of town. 
+2015-07-02 15:25:36	walexander	There's a couple $8mm + homes down the street 
+2015-07-02 15:25:50	akwok	home prices have gone up around here in the past couple of months
+2015-07-02 15:26:04	walexander	Rates are really low right now 
+2015-07-02 15:26:10	walexander	Just hope they don't go up
+2015-07-02 15:26:31	walexander	For $500k, every 0.5% is an extra $200 a month 
+2015-07-02 15:27:13	walexander	Friend of mine just bought 
+2015-07-02 15:27:25	walexander	Bank wouldn't even lock the rate until the day they closed 
+2015-07-02 15:27:51	akwok	house buying processes is soo stressful
+2015-07-02 15:28:57	walexander	Yeah, esp when they have to verify all your cash
+2015-07-02 15:29:33	walexander	To make sure youre noy a terrorist, they Need statements going back a year
+2015-07-02 15:29:50	akwok	yea my friend told me her parents gave them some money and they had to look at their bank accts

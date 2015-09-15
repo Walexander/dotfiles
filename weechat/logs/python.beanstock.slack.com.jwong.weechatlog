@@ -1,0 +1,804 @@
+2015-06-26 15:06:12	walexander	we are calling BSM['onSyncClear()'] 
+2015-06-26 15:06:13	jwong	but onSyncClear should be openly available to be called
+2015-06-26 15:06:26	walexander	by doing that via the timeout 
+2015-06-26 15:06:56	walexander	the second impression will overwrite the current's onSyncClear
+2015-06-26 15:07:07	jwong	i dont think theres any harm in that though
+2015-06-26 15:07:13	jwong	i think that function is generic enough
+2015-06-26 15:07:20	jwong	that if we overrode it
+2015-06-26 15:07:28	walexander	we call the second impressions' onSyncClear *twice* though 
+2015-06-26 15:07:35	walexander	well, we call it onc3
+2015-06-26 15:07:38	walexander	and hten we undef it
+2015-06-26 15:07:50	jwong	yeah and i think i see that being a bigger problem as well
+2015-06-26 15:07:51	walexander	so, what happens is we count the secondi mpression 
+2015-06-26 15:07:55	jwong	but not hte first
+2015-06-26 15:08:05	walexander	the first imp will never get counted
+2015-06-26 15:08:37	jwong	if we take out line 58
+2015-06-26 15:08:57	jwong	the problem becomes then that we clear with the same impression data?
+2015-06-26 15:10:48	walexander	right
+2015-06-26 15:12:47	jwong	most of the time on chrome i see one auction go sync
+2015-06-26 15:12:51	jwong	the other sees a cookie
+2015-06-26 15:12:54	jwong	and goes async
+2015-06-26 15:17:05	walexander	https://jsfiddle.net/9trgneqf/2/
+2015-06-26 15:17:33	walexander	that's essentially what we're doing now -- and it should alert twice
+2015-06-26 15:17:45	walexander	but only once -- then it throws `window.say is not a function`
+2015-06-26 15:18:02	jwong	yeah line 58 has to go
+2015-06-26 15:18:14	jwong	and i also proved that onSyncClear doesnt need to be unique
+2015-06-26 15:18:21	jwong	the impression data is different
+2015-06-26 15:20:04	walexander	no, line 75 has to change
+2015-06-26 15:20:06	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F06T33PCL/screen_shot_2015-06-26_at_12.17.43_pm.png|Screen Shot 2015-06-26 at 12.17.43 PM.png>
+2015-06-26 15:20:44	jwong	thats with line 58 gone and nothing else
+2015-06-26 15:21:01	walexander	yeah, but look how the second /request pixel fires *after* the first cleared
+2015-06-26 15:21:36	walexander	set the delay to be like 10 seconds
+2015-06-26 15:22:01	jwong	alright ill do this in a unit test
+2015-06-26 16:42:14	jwong	lol
+2015-06-26 18:22:20	walexander	will we send user_id and session_id on the request pixel?
+2015-06-26 18:22:30	jwong	no just the cleared
+2015-06-26 18:22:52	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/161#query/results
+2015-06-26 18:23:02	walexander	requests without impressions 
+2015-06-26 18:24:25	jwong	bnVsbAo= ?
+2015-06-26 18:24:34	walexander	yeah, but shit -- fucked that up 
+2015-06-26 18:24:38	walexander	that's the default id 
+2015-06-26 18:34:02	walexander	check this out: http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:35:29	walexander	bunch of those look like dupes 
+2015-06-26 18:36:39	jwong	what do you mean??
+2015-06-26 18:37:17	walexander	if you look at the imps for ip_address 0a99e023
+2015-06-26 18:37:31	walexander	and compare teh referrer url 
+2015-06-26 18:37:38	walexander	it's identical 
+2015-06-26 18:37:58	walexander	no way that should be happening
+2015-06-26 18:38:13	walexander	but they have distinct impression_id's
+2015-06-26 18:38:34	walexander	makes me think that someone is using one APN creative to deliver multiple ads
+2015-06-26 18:39:42	jwong	hmm
+2015-06-26 18:39:49	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:39:49	jwong	i havent found an identical referer
+2015-06-26 18:40:00	jwong	yeah im on that one
+2015-06-26 18:40:03	walexander	2nd and 3rd?
+2015-06-26 18:40:14	walexander	sorry, http://hive.prod.beanstock.net:8888/beeswax/execute/query/166#query/results
+2015-06-26 18:41:01	walexander	yeah, maybe you're right though 
+2015-06-26 18:42:09	walexander	0a99e023 is a fucking 10.x IP 
+2015-06-26 18:44:27	jwong	work computers ?
+2015-06-26 18:44:38	walexander	should still be sent to us
+2015-06-26 18:44:58	jwong	:robots:
+2015-06-26 18:45:08	walexander	lol
+2015-06-26 18:47:57	walexander	are these three referers duplicates? http://hive.prod.beanstock.net:8888/beeswax/execute/query/168#query/results
+2015-06-26 18:49:11	jwong	hmm
+2015-06-26 18:49:22	jwong	at glance they look like it
+2015-06-26 18:49:31	jwong	usually you can notice a change in sequence pretty easily
+2015-06-26 18:50:54	jwong	```
+2015-06-26 18:50:54		"Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1709.117 Amigo/32.0.1709.117 MRCHROME SOC Safari/537.36"
+2015-06-26 18:50:54		```
+2015-06-26 18:51:04	walexander	amigo?
+2015-06-26 18:51:12	jwong	http://myip.ms/view/comp_browseragents/1308072/Mozilla_5_0_Windows_NT_6_3_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_32_0_1709_117_Amigo_32_0_1709_117_MRCHROME_SOC_Safari_537_36.html
+2015-06-26 18:51:23	jwong	our dear froms in Belarus
+2015-06-26 18:52:06	jwong	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:26	walexander	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:35	walexander	lol
+2015-06-26 18:52:46	jwong	damn these are efficient ass daters
+2015-06-26 18:53:03	jwong	got a browser extension loading meetme ?
+2015-06-26 18:53:17	walexander	meetme is nowhere to be found i'm sure
+2015-06-26 18:53:35	jwong	bro download this
+2015-06-26 18:53:36	jwong	http://s1.amigo.mail.ru/
+2015-06-26 18:54:41	jwong	jk dont dude
+2015-06-26 18:54:47	walexander	lol
+2015-06-26 18:55:09	walexander	i can't imagine they're *not* monetizing it 
+2015-06-26 18:55:35	jwong	so they got APN tags
+2015-06-26 18:55:42	jwong	filling somewhere on their UI
+2015-06-26 18:55:55	jwong	apn is a POS lol
+2015-06-26 18:56:16	jwong	or is it adshoard
+2015-06-26 18:58:06	jwong	well i better start optimizing for our Amigo
+2015-06-26 18:58:21	walexander	it's not adshoard
+2015-06-26 21:38:04	jwong	```
+2015-06-26 21:38:04		        BSM['onSyncClear'] = function(price) {
+2015-06-26 21:38:04		            window.clearTimeout(timers.shift())
+2015-06-26 21:38:04		            onSyncClear(price)
+2015-06-26 21:38:04		        }
+2015-06-26 21:38:04		```
+2015-06-26 21:38:34	jwong	if we can assume that the first scheduled cleared is the earliest onSyncClear() to fire
+2015-06-26 21:38:48	jwong	then i think i got it dude
+2015-06-29 12:44:37	jwong	:disappointed:
+2015-06-29 13:06:56	walexander	?
+2015-06-29 13:07:36	jwong	nothin just saw u cancelled all the meetings
+2015-06-29 13:08:11	jwong	i vaguely remember u saying something u were gonna be out on vacay during this time?
+2015-06-29 13:08:13	walexander	Yeah my bad, 
+2015-06-29 13:08:30	walexander	Yeah gonna be off tomorrow and Wednesday 
+2015-06-29 13:08:53	jwong	ahh kk
+2015-07-02 16:16:36	walexander	feeding sadie these days is like caring for a geriatric patient
+2015-07-02 16:17:04	jwong	she wont eat ?
+2015-07-02 16:17:28	walexander	shirley's instructions: ``` SHe gets  .... 3 tramamil 1 gabapentin and 2 fish oils and the rest of the can above the sink. Mix. Serve.  ```
+2015-07-02 16:17:44	walexander	hah, no, she eats just fine
+2015-07-02 16:18:25	walexander	she's on these pain killers (3 tramamil) that are evidently highly regulated
+2015-07-02 16:18:35	jwong	haha i just googled it
+2015-07-02 16:18:38	jwong	poor girl man
+2015-07-02 16:19:01	walexander	she's fine -- biggest problem w/ her eating is that she spends five minutes likcing the bowl, banging it all around
+2015-07-02 16:19:07	jwong	lolol omg
+2015-07-02 16:19:11	jwong	thats sasha
+2015-07-02 16:19:23	jwong	fucking collar and tag banging against this metal dish of hers
+2015-07-02 16:19:33	walexander	it's like, no, those aren't the jets -- they're the dog devouring her stainless steel serving dish like it was a bread bowl
+2015-07-02 16:19:37	jwong	its like a tone deaf triangle players
+2015-07-02 16:19:44	walexander	hahahha
+2015-07-02 16:19:52	jwong	ding, ding ding, ding ....... ding ding ding
+2015-07-02 16:20:13	walexander	my brother got this thing to stop his dog's tags from clanking together
+2015-07-02 16:20:28	jwong	its so stupid tho.. im like "oh ur still hungry" _gets more dry food_ ... then she walks away
+2015-07-02 16:20:40	walexander	hahhaa, she walks away from food, eh?
+2015-07-02 16:20:52	jwong	yeah bro.. unless shes real hungry
+2015-07-02 16:21:07	jwong	i like the clanking, lets me know where she is.. like a cow bell
+2015-07-02 16:21:20	jwong	i just wish her bowl wasnt metal
+2015-07-02 16:21:26	walexander	i know -- bro's dog is like a cat all ready (super skittish)
+2015-07-02 16:21:37	walexander	but I think the tags clanking were scaring it
+2015-07-02 16:21:42	jwong	oh man
+2015-07-02 16:21:50	walexander	worst.dog.ever
+2015-07-02 16:21:55	jwong	hahah
+2015-07-02 16:22:00	jwong	lab pitty too?
+2015-07-02 16:22:05	walexander	no, not at all
+2015-07-02 16:22:13	walexander	some kind of collie
+2015-07-02 16:22:23	jwong	fur
+2015-07-02 16:22:34	jwong	thats all i can think about when i hear collies... hair for days
+2015-07-02 16:22:36	walexander	he's pretty well behaved, but just terrified all the time
+2015-07-02 16:22:42	walexander	this dog sheds like it's his job
+2015-07-02 16:22:46	jwong	LOL
+2015-07-02 16:22:50	jwong	its life purpose
+2015-07-02 16:23:00	walexander	we stayed at their place
+2015-07-02 16:23:03	walexander	for the weekend
+2015-07-02 16:23:16	walexander	i'm picking dog hair out of my toothbrush, off my clothes
+2015-07-02 16:23:17	walexander	for weeks
+2015-07-02 16:23:26	walexander	it's like it breeds itself
+2015-07-02 16:24:35	walexander	dude, i never told you, but when i was in LA last, after I went out to dinner the second night, got back to the hotel and showered -- found a fucking tick
+2015-07-02 16:25:20	walexander	wasn't engorged yet (thank god!) but mother fucker was lodged in my leg
+2015-07-02 16:25:27	walexander	you guys got a lotta ticks out there?
+2015-07-02 16:26:01	walexander	http://www.inquisitr.com/2078855/lyme-disease-impacts-yolanda-foster-avril-lavigne-ashley-olsen-lyme-disease-symptoms-and-treatment/
+2015-07-02 16:26:08	walexander	all them celebs getting lyme disease
+2015-07-02 16:26:27	jwong	haha whaaat
+2015-07-02 16:26:36	jwong	nah tbh i dont think ive ever encountered a tick
+2015-07-02 16:26:41	walexander	yeah man, weirdest thing
+2015-07-02 16:26:47	jwong	how the hell did u get one from the hotel lol
+2015-07-02 16:26:59	jwong	thats strang dude
+2015-07-02 16:27:02	walexander	i was wondering if I got it at the restaurant
+2015-07-02 16:27:36	jwong	i dunno bro.. for ticks u gotta be in the woods after a hike or something
+2015-07-02 16:27:47	jwong	but not here in the city.. let alone in scurrvine
+2015-07-02 16:28:14	walexander	we were in newport beach -- javier's
+2015-07-02 16:28:46	walexander	which was beautiful -- right along the PCH
+2015-07-02 16:29:01	walexander	oh man, you have got to watch this season of True Detective.  It's set in LA
+2015-07-02 16:30:02	walexander	the juxtaposition of the shots is amazing -- like, the most amazing mountains and cliffs, right next to some 8 lane mega highway mixing bowl
+2015-07-02 16:30:36	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif4.gif?w=660&h=372
+2015-07-02 16:30:58	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif1.gif?w=660&h=372
+2015-07-02 16:31:34	jwong	hey im right off that interchange
+2015-07-02 16:31:42	jwong	off rosecrans
+2015-07-02 16:31:45	walexander	no way!  you recognize that place?
+2015-07-02 16:31:49	walexander	bullis
+2015-07-02 16:31:55	jwong	yeah dude i live right off that free way
+2015-07-02 16:32:02	jwong	thats tthe 110 105 interchange
+2015-07-02 16:32:04	walexander	```i'm still in the hood / yeah that's cool ...```
+2015-07-02 16:32:25	walexander	ever hear of Vernon, CA?
+2015-07-02 16:32:30	jwong	yeah
+2015-07-02 16:32:53	walexander	total residents: 95.  daytime population: 75,000
+2015-07-02 16:33:35	jwong	haha yeah
+2015-07-02 16:33:40	jwong	its like santa fe springs
+2015-07-02 16:33:41	walexander	show is based in a city called Vinci but everyone saying it's pretty clear it's meant to be Vernon
+2015-07-02 16:33:46	jwong	or the arts district
+2015-07-02 16:33:54	jwong	its all industrial
+2015-07-02 16:34:15	jwong	thats where u dont wanna be at night
+2015-07-02 16:34:16	walexander	yeah -- sweat shop economy is how they describe it in the show
+2015-07-02 16:34:34	jwong	nighttime population 10,000
+2015-07-06 16:30:25	walexander	Yo, lemme get ten minute 
+2015-07-06 16:30:42	jwong	for sure ill be on the hangout
+2015-07-06 16:30:49	walexander	Sorry for second delay -- Shirley just got back from seeing this house 
+2015-07-06 16:31:10	jwong	nice!
+2015-07-06 16:31:45	walexander	Some 60s era Asian fusion shit http://www.zillow.com/homedetails/2520-Entrada-Dr-Virginia-Beach-VA-23456/60741990_zpid/
+2015-07-06 16:33:13	jwong	fuuuck
+2015-07-06 16:33:21	jwong	this is a freakin mansion
+2015-07-06 16:33:45	walexander	Its not as nice as it looks 
+2015-07-06 16:33:56	jwong	bro.... 4,418 sqft ?!!
+2015-07-06 16:34:02	walexander	That thing is like a time capsule from 1967
+2015-07-06 16:34:06	jwong	u need golf carts
+2015-07-06 16:34:32	walexander	It has an intercom system that probably looked super state of art then 
+2015-07-06 16:34:54	jwong	oh god.. Keller Williams
+2015-07-06 16:35:08	jwong	they are freakin everywhere
+2015-07-06 16:36:52	walexander	Hehe 
+2015-07-06 16:38:17	walexander	Since the value of the structure compared to the lot is so wonky, I'd have to get what's called a farmers loan 
+2015-07-06 16:39:19	jwong	yeah.. wood shingles
+2015-07-06 16:39:41	jwong	wood shingles eveywhere
+2015-07-06 16:40:08	jwong	but that ceiling looks gorgeous dude
+2015-06-26 15:06:12	walexander	we are calling BSM['onSyncClear()'] 
+2015-06-26 15:06:13	jwong	but onSyncClear should be openly available to be called
+2015-06-26 15:06:26	walexander	by doing that via the timeout 
+2015-06-26 15:06:56	walexander	the second impression will overwrite the current's onSyncClear
+2015-06-26 15:07:07	jwong	i dont think theres any harm in that though
+2015-06-26 15:07:13	jwong	i think that function is generic enough
+2015-06-26 15:07:20	jwong	that if we overrode it
+2015-06-26 15:07:28	walexander	we call the second impressions' onSyncClear *twice* though 
+2015-06-26 15:07:35	walexander	well, we call it onc3
+2015-06-26 15:07:38	walexander	and hten we undef it
+2015-06-26 15:07:50	jwong	yeah and i think i see that being a bigger problem as well
+2015-06-26 15:07:51	walexander	so, what happens is we count the secondi mpression 
+2015-06-26 15:07:55	jwong	but not hte first
+2015-06-26 15:08:05	walexander	the first imp will never get counted
+2015-06-26 15:08:37	jwong	if we take out line 58
+2015-06-26 15:08:57	jwong	the problem becomes then that we clear with the same impression data?
+2015-06-26 15:10:48	walexander	right
+2015-06-26 15:12:47	jwong	most of the time on chrome i see one auction go sync
+2015-06-26 15:12:51	jwong	the other sees a cookie
+2015-06-26 15:12:54	jwong	and goes async
+2015-06-26 15:17:05	walexander	https://jsfiddle.net/9trgneqf/2/
+2015-06-26 15:17:33	walexander	that's essentially what we're doing now -- and it should alert twice
+2015-06-26 15:17:45	walexander	but only once -- then it throws `window.say is not a function`
+2015-06-26 15:18:02	jwong	yeah line 58 has to go
+2015-06-26 15:18:14	jwong	and i also proved that onSyncClear doesnt need to be unique
+2015-06-26 15:18:21	jwong	the impression data is different
+2015-06-26 15:20:04	walexander	no, line 75 has to change
+2015-06-26 15:20:06	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F06T33PCL/screen_shot_2015-06-26_at_12.17.43_pm.png|Screen Shot 2015-06-26 at 12.17.43 PM.png>
+2015-06-26 15:20:44	jwong	thats with line 58 gone and nothing else
+2015-06-26 15:21:01	walexander	yeah, but look how the second /request pixel fires *after* the first cleared
+2015-06-26 15:21:36	walexander	set the delay to be like 10 seconds
+2015-06-26 15:22:01	jwong	alright ill do this in a unit test
+2015-06-26 16:42:14	jwong	lol
+2015-06-26 18:22:20	walexander	will we send user_id and session_id on the request pixel?
+2015-06-26 18:22:30	jwong	no just the cleared
+2015-06-26 18:22:52	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/161#query/results
+2015-06-26 18:23:02	walexander	requests without impressions 
+2015-06-26 18:24:25	jwong	bnVsbAo= ?
+2015-06-26 18:24:34	walexander	yeah, but shit -- fucked that up 
+2015-06-26 18:24:38	walexander	that's the default id 
+2015-06-26 18:34:02	walexander	check this out: http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:35:29	walexander	bunch of those look like dupes 
+2015-06-26 18:36:39	jwong	what do you mean??
+2015-06-26 18:37:17	walexander	if you look at the imps for ip_address 0a99e023
+2015-06-26 18:37:31	walexander	and compare teh referrer url 
+2015-06-26 18:37:38	walexander	it's identical 
+2015-06-26 18:37:58	walexander	no way that should be happening
+2015-06-26 18:38:13	walexander	but they have distinct impression_id's
+2015-06-26 18:38:34	walexander	makes me think that someone is using one APN creative to deliver multiple ads
+2015-06-26 18:39:42	jwong	hmm
+2015-06-26 18:39:49	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:39:49	jwong	i havent found an identical referer
+2015-06-26 18:40:00	jwong	yeah im on that one
+2015-06-26 18:40:03	walexander	2nd and 3rd?
+2015-06-26 18:40:14	walexander	sorry, http://hive.prod.beanstock.net:8888/beeswax/execute/query/166#query/results
+2015-06-26 18:41:01	walexander	yeah, maybe you're right though 
+2015-06-26 18:42:09	walexander	0a99e023 is a fucking 10.x IP 
+2015-06-26 18:44:27	jwong	work computers ?
+2015-06-26 18:44:38	walexander	should still be sent to us
+2015-06-26 18:44:58	jwong	:robots:
+2015-06-26 18:45:08	walexander	lol
+2015-06-26 18:47:57	walexander	are these three referers duplicates? http://hive.prod.beanstock.net:8888/beeswax/execute/query/168#query/results
+2015-06-26 18:49:11	jwong	hmm
+2015-06-26 18:49:22	jwong	at glance they look like it
+2015-06-26 18:49:31	jwong	usually you can notice a change in sequence pretty easily
+2015-06-26 18:50:54	jwong	```
+2015-06-26 18:50:54		"Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1709.117 Amigo/32.0.1709.117 MRCHROME SOC Safari/537.36"
+2015-06-26 18:50:54		```
+2015-06-26 18:51:04	walexander	amigo?
+2015-06-26 18:51:12	jwong	http://myip.ms/view/comp_browseragents/1308072/Mozilla_5_0_Windows_NT_6_3_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_32_0_1709_117_Amigo_32_0_1709_117_MRCHROME_SOC_Safari_537_36.html
+2015-06-26 18:51:23	jwong	our dear froms in Belarus
+2015-06-26 18:52:06	jwong	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:26	walexander	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:35	walexander	lol
+2015-06-26 18:52:46	jwong	damn these are efficient ass daters
+2015-06-26 18:53:03	jwong	got a browser extension loading meetme ?
+2015-06-26 18:53:17	walexander	meetme is nowhere to be found i'm sure
+2015-06-26 18:53:35	jwong	bro download this
+2015-06-26 18:53:36	jwong	http://s1.amigo.mail.ru/
+2015-06-26 18:54:41	jwong	jk dont dude
+2015-06-26 18:54:47	walexander	lol
+2015-06-26 18:55:09	walexander	i can't imagine they're *not* monetizing it 
+2015-06-26 18:55:35	jwong	so they got APN tags
+2015-06-26 18:55:42	jwong	filling somewhere on their UI
+2015-06-26 18:55:55	jwong	apn is a POS lol
+2015-06-26 18:56:16	jwong	or is it adshoard
+2015-06-26 18:58:06	jwong	well i better start optimizing for our Amigo
+2015-06-26 18:58:21	walexander	it's not adshoard
+2015-06-26 21:38:04	jwong	```
+2015-06-26 21:38:04		        BSM['onSyncClear'] = function(price) {
+2015-06-26 21:38:04		            window.clearTimeout(timers.shift())
+2015-06-26 21:38:04		            onSyncClear(price)
+2015-06-26 21:38:04		        }
+2015-06-26 21:38:04		```
+2015-06-26 21:38:34	jwong	if we can assume that the first scheduled cleared is the earliest onSyncClear() to fire
+2015-06-26 21:38:48	jwong	then i think i got it dude
+2015-06-29 12:44:37	jwong	:disappointed:
+2015-06-29 13:06:56	walexander	?
+2015-06-29 13:07:36	jwong	nothin just saw u cancelled all the meetings
+2015-06-29 13:08:11	jwong	i vaguely remember u saying something u were gonna be out on vacay during this time?
+2015-06-29 13:08:13	walexander	Yeah my bad, 
+2015-06-29 13:08:30	walexander	Yeah gonna be off tomorrow and Wednesday 
+2015-06-29 13:08:53	jwong	ahh kk
+2015-07-02 16:16:36	walexander	feeding sadie these days is like caring for a geriatric patient
+2015-07-02 16:17:04	jwong	she wont eat ?
+2015-07-02 16:17:28	walexander	shirley's instructions: ``` SHe gets  .... 3 tramamil 1 gabapentin and 2 fish oils and the rest of the can above the sink. Mix. Serve.  ```
+2015-07-02 16:17:44	walexander	hah, no, she eats just fine
+2015-07-02 16:18:25	walexander	she's on these pain killers (3 tramamil) that are evidently highly regulated
+2015-07-02 16:18:35	jwong	haha i just googled it
+2015-07-02 16:18:38	jwong	poor girl man
+2015-07-02 16:19:01	walexander	she's fine -- biggest problem w/ her eating is that she spends five minutes likcing the bowl, banging it all around
+2015-07-02 16:19:07	jwong	lolol omg
+2015-07-02 16:19:11	jwong	thats sasha
+2015-07-02 16:19:23	jwong	fucking collar and tag banging against this metal dish of hers
+2015-07-02 16:19:33	walexander	it's like, no, those aren't the jets -- they're the dog devouring her stainless steel serving dish like it was a bread bowl
+2015-07-02 16:19:37	jwong	its like a tone deaf triangle players
+2015-07-02 16:19:44	walexander	hahahha
+2015-07-02 16:19:52	jwong	ding, ding ding, ding ....... ding ding ding
+2015-07-02 16:20:13	walexander	my brother got this thing to stop his dog's tags from clanking together
+2015-07-02 16:20:28	jwong	its so stupid tho.. im like "oh ur still hungry" _gets more dry food_ ... then she walks away
+2015-07-02 16:20:40	walexander	hahhaa, she walks away from food, eh?
+2015-07-02 16:20:52	jwong	yeah bro.. unless shes real hungry
+2015-07-02 16:21:07	jwong	i like the clanking, lets me know where she is.. like a cow bell
+2015-07-02 16:21:20	jwong	i just wish her bowl wasnt metal
+2015-07-02 16:21:26	walexander	i know -- bro's dog is like a cat all ready (super skittish)
+2015-07-02 16:21:37	walexander	but I think the tags clanking were scaring it
+2015-07-02 16:21:42	jwong	oh man
+2015-07-02 16:21:50	walexander	worst.dog.ever
+2015-07-02 16:21:55	jwong	hahah
+2015-07-02 16:22:00	jwong	lab pitty too?
+2015-07-02 16:22:05	walexander	no, not at all
+2015-07-02 16:22:13	walexander	some kind of collie
+2015-07-02 16:22:23	jwong	fur
+2015-07-02 16:22:34	jwong	thats all i can think about when i hear collies... hair for days
+2015-07-02 16:22:36	walexander	he's pretty well behaved, but just terrified all the time
+2015-07-02 16:22:42	walexander	this dog sheds like it's his job
+2015-07-02 16:22:46	jwong	LOL
+2015-07-02 16:22:50	jwong	its life purpose
+2015-07-02 16:23:00	walexander	we stayed at their place
+2015-07-02 16:23:03	walexander	for the weekend
+2015-07-02 16:23:16	walexander	i'm picking dog hair out of my toothbrush, off my clothes
+2015-07-02 16:23:17	walexander	for weeks
+2015-07-02 16:23:26	walexander	it's like it breeds itself
+2015-07-02 16:24:35	walexander	dude, i never told you, but when i was in LA last, after I went out to dinner the second night, got back to the hotel and showered -- found a fucking tick
+2015-07-02 16:25:20	walexander	wasn't engorged yet (thank god!) but mother fucker was lodged in my leg
+2015-07-02 16:25:27	walexander	you guys got a lotta ticks out there?
+2015-07-02 16:26:01	walexander	http://www.inquisitr.com/2078855/lyme-disease-impacts-yolanda-foster-avril-lavigne-ashley-olsen-lyme-disease-symptoms-and-treatment/
+2015-07-02 16:26:08	walexander	all them celebs getting lyme disease
+2015-07-02 16:26:27	jwong	haha whaaat
+2015-07-02 16:26:36	jwong	nah tbh i dont think ive ever encountered a tick
+2015-07-02 16:26:41	walexander	yeah man, weirdest thing
+2015-07-02 16:26:47	jwong	how the hell did u get one from the hotel lol
+2015-07-02 16:26:59	jwong	thats strang dude
+2015-07-02 16:27:02	walexander	i was wondering if I got it at the restaurant
+2015-07-02 16:27:36	jwong	i dunno bro.. for ticks u gotta be in the woods after a hike or something
+2015-07-02 16:27:47	jwong	but not here in the city.. let alone in scurrvine
+2015-07-02 16:28:14	walexander	we were in newport beach -- javier's
+2015-07-02 16:28:46	walexander	which was beautiful -- right along the PCH
+2015-07-02 16:29:01	walexander	oh man, you have got to watch this season of True Detective.  It's set in LA
+2015-07-02 16:30:02	walexander	the juxtaposition of the shots is amazing -- like, the most amazing mountains and cliffs, right next to some 8 lane mega highway mixing bowl
+2015-07-02 16:30:36	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif4.gif?w=660&h=372
+2015-07-02 16:30:58	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif1.gif?w=660&h=372
+2015-07-02 16:31:34	jwong	hey im right off that interchange
+2015-07-02 16:31:42	jwong	off rosecrans
+2015-07-02 16:31:45	walexander	no way!  you recognize that place?
+2015-07-02 16:31:49	walexander	bullis
+2015-07-02 16:31:55	jwong	yeah dude i live right off that free way
+2015-07-02 16:32:02	jwong	thats tthe 110 105 interchange
+2015-07-02 16:32:04	walexander	```i'm still in the hood / yeah that's cool ...```
+2015-07-02 16:32:25	walexander	ever hear of Vernon, CA?
+2015-07-02 16:32:30	jwong	yeah
+2015-07-02 16:32:53	walexander	total residents: 95.  daytime population: 75,000
+2015-07-02 16:33:35	jwong	haha yeah
+2015-07-02 16:33:40	jwong	its like santa fe springs
+2015-07-02 16:33:41	walexander	show is based in a city called Vinci but everyone saying it's pretty clear it's meant to be Vernon
+2015-07-02 16:33:46	jwong	or the arts district
+2015-07-02 16:33:54	jwong	its all industrial
+2015-07-02 16:34:15	jwong	thats where u dont wanna be at night
+2015-07-02 16:34:16	walexander	yeah -- sweat shop economy is how they describe it in the show
+2015-07-02 16:34:34	jwong	nighttime population 10,000
+2015-07-06 16:30:25	walexander	Yo, lemme get ten minute 
+2015-07-06 16:30:42	jwong	for sure ill be on the hangout
+2015-07-06 16:30:49	walexander	Sorry for second delay -- Shirley just got back from seeing this house 
+2015-07-06 16:31:10	jwong	nice!
+2015-07-06 16:31:45	walexander	Some 60s era Asian fusion shit http://www.zillow.com/homedetails/2520-Entrada-Dr-Virginia-Beach-VA-23456/60741990_zpid/
+2015-07-06 16:33:13	jwong	fuuuck
+2015-07-06 16:33:21	jwong	this is a freakin mansion
+2015-07-06 16:33:45	walexander	Its not as nice as it looks 
+2015-07-06 16:33:56	jwong	bro.... 4,418 sqft ?!!
+2015-07-06 16:34:02	walexander	That thing is like a time capsule from 1967
+2015-07-06 16:34:06	jwong	u need golf carts
+2015-07-06 16:34:32	walexander	It has an intercom system that probably looked super state of art then 
+2015-07-06 16:34:54	jwong	oh god.. Keller Williams
+2015-07-06 16:35:08	jwong	they are freakin everywhere
+2015-07-06 16:36:52	walexander	Hehe 
+2015-07-06 16:38:17	walexander	Since the value of the structure compared to the lot is so wonky, I'd have to get what's called a farmers loan 
+2015-07-06 16:39:19	jwong	yeah.. wood shingles
+2015-07-06 16:39:41	jwong	wood shingles eveywhere
+2015-07-06 16:40:08	jwong	but that ceiling looks gorgeous dude
+2015-06-26 15:06:12	walexander	we are calling BSM['onSyncClear()'] 
+2015-06-26 15:06:13	jwong	but onSyncClear should be openly available to be called
+2015-06-26 15:06:26	walexander	by doing that via the timeout 
+2015-06-26 15:06:56	walexander	the second impression will overwrite the current's onSyncClear
+2015-06-26 15:07:07	jwong	i dont think theres any harm in that though
+2015-06-26 15:07:13	jwong	i think that function is generic enough
+2015-06-26 15:07:20	jwong	that if we overrode it
+2015-06-26 15:07:28	walexander	we call the second impressions' onSyncClear *twice* though 
+2015-06-26 15:07:35	walexander	well, we call it onc3
+2015-06-26 15:07:38	walexander	and hten we undef it
+2015-06-26 15:07:50	jwong	yeah and i think i see that being a bigger problem as well
+2015-06-26 15:07:51	walexander	so, what happens is we count the secondi mpression 
+2015-06-26 15:07:55	jwong	but not hte first
+2015-06-26 15:08:05	walexander	the first imp will never get counted
+2015-06-26 15:08:37	jwong	if we take out line 58
+2015-06-26 15:08:57	jwong	the problem becomes then that we clear with the same impression data?
+2015-06-26 15:10:48	walexander	right
+2015-06-26 15:12:47	jwong	most of the time on chrome i see one auction go sync
+2015-06-26 15:12:51	jwong	the other sees a cookie
+2015-06-26 15:12:54	jwong	and goes async
+2015-06-26 15:17:05	walexander	https://jsfiddle.net/9trgneqf/2/
+2015-06-26 15:17:33	walexander	that's essentially what we're doing now -- and it should alert twice
+2015-06-26 15:17:45	walexander	but only once -- then it throws `window.say is not a function`
+2015-06-26 15:18:02	jwong	yeah line 58 has to go
+2015-06-26 15:18:14	jwong	and i also proved that onSyncClear doesnt need to be unique
+2015-06-26 15:18:21	jwong	the impression data is different
+2015-06-26 15:20:04	walexander	no, line 75 has to change
+2015-06-26 15:20:06	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F06T33PCL/screen_shot_2015-06-26_at_12.17.43_pm.png|Screen Shot 2015-06-26 at 12.17.43 PM.png>
+2015-06-26 15:20:44	jwong	thats with line 58 gone and nothing else
+2015-06-26 15:21:01	walexander	yeah, but look how the second /request pixel fires *after* the first cleared
+2015-06-26 15:21:36	walexander	set the delay to be like 10 seconds
+2015-06-26 15:22:01	jwong	alright ill do this in a unit test
+2015-06-26 16:42:14	jwong	lol
+2015-06-26 18:22:20	walexander	will we send user_id and session_id on the request pixel?
+2015-06-26 18:22:30	jwong	no just the cleared
+2015-06-26 18:22:52	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/161#query/results
+2015-06-26 18:23:02	walexander	requests without impressions 
+2015-06-26 18:24:25	jwong	bnVsbAo= ?
+2015-06-26 18:24:34	walexander	yeah, but shit -- fucked that up 
+2015-06-26 18:24:38	walexander	that's the default id 
+2015-06-26 18:34:02	walexander	check this out: http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:35:29	walexander	bunch of those look like dupes 
+2015-06-26 18:36:39	jwong	what do you mean??
+2015-06-26 18:37:17	walexander	if you look at the imps for ip_address 0a99e023
+2015-06-26 18:37:31	walexander	and compare teh referrer url 
+2015-06-26 18:37:38	walexander	it's identical 
+2015-06-26 18:37:58	walexander	no way that should be happening
+2015-06-26 18:38:13	walexander	but they have distinct impression_id's
+2015-06-26 18:38:34	walexander	makes me think that someone is using one APN creative to deliver multiple ads
+2015-06-26 18:39:42	jwong	hmm
+2015-06-26 18:39:49	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:39:49	jwong	i havent found an identical referer
+2015-06-26 18:40:00	jwong	yeah im on that one
+2015-06-26 18:40:03	walexander	2nd and 3rd?
+2015-06-26 18:40:14	walexander	sorry, http://hive.prod.beanstock.net:8888/beeswax/execute/query/166#query/results
+2015-06-26 18:41:01	walexander	yeah, maybe you're right though 
+2015-06-26 18:42:09	walexander	0a99e023 is a fucking 10.x IP 
+2015-06-26 18:44:27	jwong	work computers ?
+2015-06-26 18:44:38	walexander	should still be sent to us
+2015-06-26 18:44:58	jwong	:robots:
+2015-06-26 18:45:08	walexander	lol
+2015-06-26 18:47:57	walexander	are these three referers duplicates? http://hive.prod.beanstock.net:8888/beeswax/execute/query/168#query/results
+2015-06-26 18:49:11	jwong	hmm
+2015-06-26 18:49:22	jwong	at glance they look like it
+2015-06-26 18:49:31	jwong	usually you can notice a change in sequence pretty easily
+2015-06-26 18:50:54	jwong	```
+2015-06-26 18:50:54		"Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1709.117 Amigo/32.0.1709.117 MRCHROME SOC Safari/537.36"
+2015-06-26 18:50:54		```
+2015-06-26 18:51:04	walexander	amigo?
+2015-06-26 18:51:12	jwong	http://myip.ms/view/comp_browseragents/1308072/Mozilla_5_0_Windows_NT_6_3_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_32_0_1709_117_Amigo_32_0_1709_117_MRCHROME_SOC_Safari_537_36.html
+2015-06-26 18:51:23	jwong	our dear froms in Belarus
+2015-06-26 18:52:06	jwong	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:26	walexander	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:35	walexander	lol
+2015-06-26 18:52:46	jwong	damn these are efficient ass daters
+2015-06-26 18:53:03	jwong	got a browser extension loading meetme ?
+2015-06-26 18:53:17	walexander	meetme is nowhere to be found i'm sure
+2015-06-26 18:53:35	jwong	bro download this
+2015-06-26 18:53:36	jwong	http://s1.amigo.mail.ru/
+2015-06-26 18:54:41	jwong	jk dont dude
+2015-06-26 18:54:47	walexander	lol
+2015-06-26 18:55:09	walexander	i can't imagine they're *not* monetizing it 
+2015-06-26 18:55:35	jwong	so they got APN tags
+2015-06-26 18:55:42	jwong	filling somewhere on their UI
+2015-06-26 18:55:55	jwong	apn is a POS lol
+2015-06-26 18:56:16	jwong	or is it adshoard
+2015-06-26 18:58:06	jwong	well i better start optimizing for our Amigo
+2015-06-26 18:58:21	walexander	it's not adshoard
+2015-06-26 21:38:04	jwong	```
+2015-06-26 21:38:04		        BSM['onSyncClear'] = function(price) {
+2015-06-26 21:38:04		            window.clearTimeout(timers.shift())
+2015-06-26 21:38:04		            onSyncClear(price)
+2015-06-26 21:38:04		        }
+2015-06-26 21:38:04		```
+2015-06-26 21:38:34	jwong	if we can assume that the first scheduled cleared is the earliest onSyncClear() to fire
+2015-06-26 21:38:48	jwong	then i think i got it dude
+2015-06-29 12:44:37	jwong	:disappointed:
+2015-06-29 13:06:56	walexander	?
+2015-06-29 13:07:36	jwong	nothin just saw u cancelled all the meetings
+2015-06-29 13:08:11	jwong	i vaguely remember u saying something u were gonna be out on vacay during this time?
+2015-06-29 13:08:13	walexander	Yeah my bad, 
+2015-06-29 13:08:30	walexander	Yeah gonna be off tomorrow and Wednesday 
+2015-06-29 13:08:53	jwong	ahh kk
+2015-07-02 16:16:36	walexander	feeding sadie these days is like caring for a geriatric patient
+2015-07-02 16:17:04	jwong	she wont eat ?
+2015-07-02 16:17:28	walexander	shirley's instructions: ``` SHe gets  .... 3 tramamil 1 gabapentin and 2 fish oils and the rest of the can above the sink. Mix. Serve.  ```
+2015-07-02 16:17:44	walexander	hah, no, she eats just fine
+2015-07-02 16:18:25	walexander	she's on these pain killers (3 tramamil) that are evidently highly regulated
+2015-07-02 16:18:35	jwong	haha i just googled it
+2015-07-02 16:18:38	jwong	poor girl man
+2015-07-02 16:19:01	walexander	she's fine -- biggest problem w/ her eating is that she spends five minutes likcing the bowl, banging it all around
+2015-07-02 16:19:07	jwong	lolol omg
+2015-07-02 16:19:11	jwong	thats sasha
+2015-07-02 16:19:23	jwong	fucking collar and tag banging against this metal dish of hers
+2015-07-02 16:19:33	walexander	it's like, no, those aren't the jets -- they're the dog devouring her stainless steel serving dish like it was a bread bowl
+2015-07-02 16:19:37	jwong	its like a tone deaf triangle players
+2015-07-02 16:19:44	walexander	hahahha
+2015-07-02 16:19:52	jwong	ding, ding ding, ding ....... ding ding ding
+2015-07-02 16:20:13	walexander	my brother got this thing to stop his dog's tags from clanking together
+2015-07-02 16:20:28	jwong	its so stupid tho.. im like "oh ur still hungry" _gets more dry food_ ... then she walks away
+2015-07-02 16:20:40	walexander	hahhaa, she walks away from food, eh?
+2015-07-02 16:20:52	jwong	yeah bro.. unless shes real hungry
+2015-07-02 16:21:07	jwong	i like the clanking, lets me know where she is.. like a cow bell
+2015-07-02 16:21:20	jwong	i just wish her bowl wasnt metal
+2015-07-02 16:21:26	walexander	i know -- bro's dog is like a cat all ready (super skittish)
+2015-07-02 16:21:37	walexander	but I think the tags clanking were scaring it
+2015-07-02 16:21:42	jwong	oh man
+2015-07-02 16:21:50	walexander	worst.dog.ever
+2015-07-02 16:21:55	jwong	hahah
+2015-07-02 16:22:00	jwong	lab pitty too?
+2015-07-02 16:22:05	walexander	no, not at all
+2015-07-02 16:22:13	walexander	some kind of collie
+2015-07-02 16:22:23	jwong	fur
+2015-07-02 16:22:34	jwong	thats all i can think about when i hear collies... hair for days
+2015-07-02 16:22:36	walexander	he's pretty well behaved, but just terrified all the time
+2015-07-02 16:22:42	walexander	this dog sheds like it's his job
+2015-07-02 16:22:46	jwong	LOL
+2015-07-02 16:22:50	jwong	its life purpose
+2015-07-02 16:23:00	walexander	we stayed at their place
+2015-07-02 16:23:03	walexander	for the weekend
+2015-07-02 16:23:16	walexander	i'm picking dog hair out of my toothbrush, off my clothes
+2015-07-02 16:23:17	walexander	for weeks
+2015-07-02 16:23:26	walexander	it's like it breeds itself
+2015-07-02 16:24:35	walexander	dude, i never told you, but when i was in LA last, after I went out to dinner the second night, got back to the hotel and showered -- found a fucking tick
+2015-07-02 16:25:20	walexander	wasn't engorged yet (thank god!) but mother fucker was lodged in my leg
+2015-07-02 16:25:27	walexander	you guys got a lotta ticks out there?
+2015-07-02 16:26:01	walexander	http://www.inquisitr.com/2078855/lyme-disease-impacts-yolanda-foster-avril-lavigne-ashley-olsen-lyme-disease-symptoms-and-treatment/
+2015-07-02 16:26:08	walexander	all them celebs getting lyme disease
+2015-07-02 16:26:27	jwong	haha whaaat
+2015-07-02 16:26:36	jwong	nah tbh i dont think ive ever encountered a tick
+2015-07-02 16:26:41	walexander	yeah man, weirdest thing
+2015-07-02 16:26:47	jwong	how the hell did u get one from the hotel lol
+2015-07-02 16:26:59	jwong	thats strang dude
+2015-07-02 16:27:02	walexander	i was wondering if I got it at the restaurant
+2015-07-02 16:27:36	jwong	i dunno bro.. for ticks u gotta be in the woods after a hike or something
+2015-07-02 16:27:47	jwong	but not here in the city.. let alone in scurrvine
+2015-07-02 16:28:14	walexander	we were in newport beach -- javier's
+2015-07-02 16:28:46	walexander	which was beautiful -- right along the PCH
+2015-07-02 16:29:01	walexander	oh man, you have got to watch this season of True Detective.  It's set in LA
+2015-07-02 16:30:02	walexander	the juxtaposition of the shots is amazing -- like, the most amazing mountains and cliffs, right next to some 8 lane mega highway mixing bowl
+2015-07-02 16:30:36	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif4.gif?w=660&h=372
+2015-07-02 16:30:58	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif1.gif?w=660&h=372
+2015-07-02 16:31:34	jwong	hey im right off that interchange
+2015-07-02 16:31:42	jwong	off rosecrans
+2015-07-02 16:31:45	walexander	no way!  you recognize that place?
+2015-07-02 16:31:49	walexander	bullis
+2015-07-02 16:31:55	jwong	yeah dude i live right off that free way
+2015-07-02 16:32:02	jwong	thats tthe 110 105 interchange
+2015-07-02 16:32:04	walexander	```i'm still in the hood / yeah that's cool ...```
+2015-07-02 16:32:25	walexander	ever hear of Vernon, CA?
+2015-07-02 16:32:30	jwong	yeah
+2015-07-02 16:32:53	walexander	total residents: 95.  daytime population: 75,000
+2015-07-02 16:33:35	jwong	haha yeah
+2015-07-02 16:33:40	jwong	its like santa fe springs
+2015-07-02 16:33:41	walexander	show is based in a city called Vinci but everyone saying it's pretty clear it's meant to be Vernon
+2015-07-02 16:33:46	jwong	or the arts district
+2015-07-02 16:33:54	jwong	its all industrial
+2015-07-02 16:34:15	jwong	thats where u dont wanna be at night
+2015-07-02 16:34:16	walexander	yeah -- sweat shop economy is how they describe it in the show
+2015-07-02 16:34:34	jwong	nighttime population 10,000
+2015-07-06 16:30:25	walexander	Yo, lemme get ten minute 
+2015-07-06 16:30:42	jwong	for sure ill be on the hangout
+2015-07-06 16:30:49	walexander	Sorry for second delay -- Shirley just got back from seeing this house 
+2015-07-06 16:31:10	jwong	nice!
+2015-07-06 16:31:45	walexander	Some 60s era Asian fusion shit http://www.zillow.com/homedetails/2520-Entrada-Dr-Virginia-Beach-VA-23456/60741990_zpid/
+2015-07-06 16:33:13	jwong	fuuuck
+2015-07-06 16:33:21	jwong	this is a freakin mansion
+2015-07-06 16:33:45	walexander	Its not as nice as it looks 
+2015-07-06 16:33:56	jwong	bro.... 4,418 sqft ?!!
+2015-07-06 16:34:02	walexander	That thing is like a time capsule from 1967
+2015-07-06 16:34:06	jwong	u need golf carts
+2015-07-06 16:34:32	walexander	It has an intercom system that probably looked super state of art then 
+2015-07-06 16:34:54	jwong	oh god.. Keller Williams
+2015-07-06 16:35:08	jwong	they are freakin everywhere
+2015-07-06 16:36:52	walexander	Hehe 
+2015-07-06 16:38:17	walexander	Since the value of the structure compared to the lot is so wonky, I'd have to get what's called a farmers loan 
+2015-07-06 16:39:19	jwong	yeah.. wood shingles
+2015-07-06 16:39:41	jwong	wood shingles eveywhere
+2015-07-06 16:40:08	jwong	but that ceiling looks gorgeous dude
+2015-06-26 15:04:26	walexander	it will run the *second* impression's onSyncClear() 
+2015-06-26 15:04:32	jwong	but if try to call it directly, the scope in which that executes doesnt find onSyncClear
+2015-06-26 15:04:45	jwong	now that i think about it
+2015-06-26 15:05:00	jwong	why do we need to make onSyncClear undefined?
+2015-06-26 15:05:03	walexander	you can just `setTimeout(onSyncClear, interval) `
+2015-06-26 15:05:48	jwong	one call to onSyncClear should be scheduled to fire regardless every time we doc write
+2015-06-26 15:05:55	walexander	it's likely that `price` will be defined doing that 
+2015-06-26 15:06:01	walexander	yeah, but the thing is 
+2015-06-26 15:06:12	walexander	we are calling BSM['onSyncClear()'] 
+2015-06-26 15:06:13	jwong	but onSyncClear should be openly available to be called
+2015-06-26 15:06:26	walexander	by doing that via the timeout 
+2015-06-26 15:06:56	walexander	the second impression will overwrite the current's onSyncClear
+2015-06-26 15:07:07	jwong	i dont think theres any harm in that though
+2015-06-26 15:07:13	jwong	i think that function is generic enough
+2015-06-26 15:07:20	jwong	that if we overrode it
+2015-06-26 15:07:28	walexander	we call the second impressions' onSyncClear *twice* though 
+2015-06-26 15:07:35	walexander	well, we call it onc3
+2015-06-26 15:07:38	walexander	and hten we undef it
+2015-06-26 15:07:50	jwong	yeah and i think i see that being a bigger problem as well
+2015-06-26 15:07:51	walexander	so, what happens is we count the secondi mpression 
+2015-06-26 15:07:55	jwong	but not hte first
+2015-06-26 15:08:05	walexander	the first imp will never get counted
+2015-06-26 15:08:37	jwong	if we take out line 58
+2015-06-26 15:08:57	jwong	the problem becomes then that we clear with the same impression data?
+2015-06-26 15:10:48	walexander	right
+2015-06-26 15:12:47	jwong	most of the time on chrome i see one auction go sync
+2015-06-26 15:12:51	jwong	the other sees a cookie
+2015-06-26 15:12:54	jwong	and goes async
+2015-06-26 15:17:05	walexander	https://jsfiddle.net/9trgneqf/2/ --- Test your JavaScript, CSS, HTML or CoffeeScript online with JSFiddle code editor.
+2015-06-26 15:17:33	walexander	that's essentially what we're doing now -- and it should alert twice
+2015-06-26 15:17:45	walexander	but only once -- then it throws `window.say is not a function`
+2015-06-26 15:18:02	jwong	yeah line 58 has to go
+2015-06-26 15:18:14	jwong	and i also proved that onSyncClear doesnt need to be unique
+2015-06-26 15:18:21	jwong	the impression data is different
+2015-06-26 15:20:04	walexander	no, line 75 has to change
+2015-06-26 15:20:06	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F06T33PCL/screen_shot_2015-06-26_at_12.17.43_pm.png|Screen Shot 2015-06-26 at 12.17.43 PM.png>
+2015-06-26 15:20:44	jwong	thats with line 58 gone and nothing else
+2015-06-26 15:21:01	walexander	yeah, but look how the second /request pixel fires *after* the first cleared
+2015-06-26 15:21:36	walexander	set the delay to be like 10 seconds
+2015-06-26 15:22:01	jwong	alright ill do this in a unit test
+2015-06-26 16:42:14	jwong	lol
+2015-06-26 18:22:20	walexander	will we send user_id and session_id on the request pixel?
+2015-06-26 18:22:30	jwong	no just the cleared
+2015-06-26 18:22:52	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/161#query/results
+2015-06-26 18:23:02	walexander	requests without impressions 
+2015-06-26 18:24:25	jwong	bnVsbAo= ?
+2015-06-26 18:24:34	walexander	yeah, but shit -- fucked that up 
+2015-06-26 18:24:38	walexander	that's the default id 
+2015-06-26 18:34:02	walexander	check this out: http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:35:29	walexander	bunch of those look like dupes 
+2015-06-26 18:36:39	jwong	what do you mean??
+2015-06-26 18:37:17	walexander	if you look at the imps for ip_address 0a99e023
+2015-06-26 18:37:31	walexander	and compare teh referrer url 
+2015-06-26 18:37:38	walexander	it's identical 
+2015-06-26 18:37:58	walexander	no way that should be happening
+2015-06-26 18:38:13	walexander	but they have distinct impression_id's
+2015-06-26 18:38:34	walexander	makes me think that someone is using one APN creative to deliver multiple ads
+2015-06-26 18:39:42	jwong	hmm
+2015-06-26 18:39:49	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/query/164#query/results
+2015-06-26 18:39:49	jwong	i havent found an identical referer
+2015-06-26 18:40:00	jwong	yeah im on that one
+2015-06-26 18:40:03	walexander	2nd and 3rd?
+2015-06-26 18:40:14	walexander	sorry, http://hive.prod.beanstock.net:8888/beeswax/execute/query/166#query/results
+2015-06-26 18:41:01	walexander	yeah, maybe you're right though 
+2015-06-26 18:42:09	walexander	0a99e023 is a fucking 10.x IP 
+2015-06-26 18:44:27	jwong	work computers ?
+2015-06-26 18:44:38	walexander	should still be sent to us
+2015-06-26 18:44:58	jwong	:robots:
+2015-06-26 18:45:08	walexander	lol
+2015-06-26 18:47:57	walexander	are these three referers duplicates? http://hive.prod.beanstock.net:8888/beeswax/execute/query/168#query/results
+2015-06-26 18:49:11	jwong	hmm
+2015-06-26 18:49:22	jwong	at glance they look like it
+2015-06-26 18:49:31	jwong	usually you can notice a change in sequence pretty easily
+2015-06-26 18:50:54	jwong	```
+2015-06-26 18:50:54		"Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1709.117 Amigo/32.0.1709.117 MRCHROME SOC Safari/537.36"
+2015-06-26 18:50:54		```
+2015-06-26 18:51:04	walexander	amigo?
+2015-06-26 18:51:12	jwong	http://myip.ms/view/comp_browseragents/1308072/Mozilla_5_0_Windows_NT_6_3_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_32_0_1709_117_Amigo_32_0_1709_117_MRCHROME_SOC_Safari_537_36.html --- Mozilla 5 0 Windows NT 6 3 AppleWebKit 537 36 KHTML Gecko Chrome 32 1709 117 Amigo MRCHROME SOC Safari
+2015-06-26 18:51:23	jwong	our dear froms in Belarus
+2015-06-26 18:52:06	jwong	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/ --- The Next Web: Russia's Mail.Ru Launches New Social Browser 'Amigo'
+2015-06-26 18:52:26	walexander	http://thenextweb.com/eu/2012/09/27/mail-ru-amigo-browser/
+2015-06-26 18:52:35	walexander	lol
+2015-06-26 18:52:46	jwong	damn these are efficient ass daters
+2015-06-26 18:53:03	jwong	got a browser extension loading meetme ?
+2015-06-26 18:53:17	walexander	meetme is nowhere to be found i'm sure
+2015-06-26 18:53:35	jwong	bro download this
+2015-06-26 18:53:36	jwong	http://s1.amigo.mail.ru/ --- Браузер «Амиго»
+2015-06-26 18:54:41	jwong	jk dont dude
+2015-06-26 18:54:47	walexander	lol
+2015-06-26 18:55:09	walexander	i can't imagine they're *not* monetizing it 
+2015-06-26 18:55:35	jwong	so they got APN tags
+2015-06-26 18:55:42	jwong	filling somewhere on their UI
+2015-06-26 18:55:55	jwong	apn is a POS lol
+2015-06-26 18:56:16	jwong	or is it adshoard
+2015-06-26 18:58:06	jwong	well i better start optimizing for our Amigo
+2015-06-26 18:58:21	walexander	it's not adshoard
+2015-06-26 21:38:04	jwong	```
+2015-06-26 21:38:04		        BSM['onSyncClear'] = function(price) {
+2015-06-26 21:38:04		            window.clearTimeout(timers.shift())
+2015-06-26 21:38:04		            onSyncClear(price)
+2015-06-26 21:38:04		        }
+2015-06-26 21:38:04		```
+2015-06-26 21:38:34	jwong	if we can assume that the first scheduled cleared is the earliest onSyncClear() to fire
+2015-06-26 21:38:48	jwong	then i think i got it dude
+2015-06-29 12:44:37	jwong	:disappointed:
+2015-06-29 13:06:56	walexander	?
+2015-06-29 13:07:36	jwong	nothin just saw u cancelled all the meetings
+2015-06-29 13:08:11	jwong	i vaguely remember u saying something u were gonna be out on vacay during this time?
+2015-06-29 13:08:13	walexander	Yeah my bad, 
+2015-06-29 13:08:30	walexander	Yeah gonna be off tomorrow and Wednesday 
+2015-06-29 13:08:53	jwong	ahh kk
+2015-07-02 16:16:36	walexander	feeding sadie these days is like caring for a geriatric patient
+2015-07-02 16:17:04	jwong	she wont eat ?
+2015-07-02 16:17:28	walexander	shirley's instructions: ``` SHe gets  .... 3 tramamil 1 gabapentin and 2 fish oils and the rest of the can above the sink. Mix. Serve.  ```
+2015-07-02 16:17:44	walexander	hah, no, she eats just fine
+2015-07-02 16:18:25	walexander	she's on these pain killers (3 tramamil) that are evidently highly regulated
+2015-07-02 16:18:35	jwong	haha i just googled it
+2015-07-02 16:18:38	jwong	poor girl man
+2015-07-02 16:19:01	walexander	she's fine -- biggest problem w/ her eating is that she spends five minutes likcing the bowl, banging it all around
+2015-07-02 16:19:07	jwong	lolol omg
+2015-07-02 16:19:11	jwong	thats sasha
+2015-07-02 16:19:23	jwong	fucking collar and tag banging against this metal dish of hers
+2015-07-02 16:19:33	walexander	it's like, no, those aren't the jets -- they're the dog devouring her stainless steel serving dish like it was a bread bowl
+2015-07-02 16:19:37	jwong	its like a tone deaf triangle players
+2015-07-02 16:19:44	walexander	hahahha
+2015-07-02 16:19:52	jwong	ding, ding ding, ding ....... ding ding ding
+2015-07-02 16:20:13	walexander	my brother got this thing to stop his dog's tags from clanking together
+2015-07-02 16:20:28	jwong	its so stupid tho.. im like "oh ur still hungry" _gets more dry food_ ... then she walks away
+2015-07-02 16:20:40	walexander	hahhaa, she walks away from food, eh?
+2015-07-02 16:20:52	jwong	yeah bro.. unless shes real hungry
+2015-07-02 16:21:07	jwong	i like the clanking, lets me know where she is.. like a cow bell
+2015-07-02 16:21:20	jwong	i just wish her bowl wasnt metal
+2015-07-02 16:21:26	walexander	i know -- bro's dog is like a cat all ready (super skittish)
+2015-07-02 16:21:37	walexander	but I think the tags clanking were scaring it
+2015-07-02 16:21:42	jwong	oh man
+2015-07-02 16:21:50	walexander	worst.dog.ever
+2015-07-02 16:21:55	jwong	hahah
+2015-07-02 16:22:00	jwong	lab pitty too?
+2015-07-02 16:22:05	walexander	no, not at all
+2015-07-02 16:22:13	walexander	some kind of collie
+2015-07-02 16:22:23	jwong	fur
+2015-07-02 16:22:34	jwong	thats all i can think about when i hear collies... hair for days
+2015-07-02 16:22:36	walexander	he's pretty well behaved, but just terrified all the time
+2015-07-02 16:22:42	walexander	this dog sheds like it's his job
+2015-07-02 16:22:46	jwong	LOL
+2015-07-02 16:22:50	jwong	its life purpose
+2015-07-02 16:23:00	walexander	we stayed at their place
+2015-07-02 16:23:03	walexander	for the weekend
+2015-07-02 16:23:16	walexander	i'm picking dog hair out of my toothbrush, off my clothes
+2015-07-02 16:23:17	walexander	for weeks
+2015-07-02 16:23:26	walexander	it's like it breeds itself
+2015-07-02 16:24:35	walexander	dude, i never told you, but when i was in LA last, after I went out to dinner the second night, got back to the hotel and showered -- found a fucking tick
+2015-07-02 16:25:20	walexander	wasn't engorged yet (thank god!) but mother fucker was lodged in my leg
+2015-07-02 16:25:27	walexander	you guys got a lotta ticks out there?
+2015-07-02 16:26:01	walexander	http://www.inquisitr.com/2078855/lyme-disease-impacts-yolanda-foster-avril-lavigne-ashley-olsen-lyme-disease-symptoms-and-treatment/ --- The Inquisitr News: Lyme Disease Impacts Yolanda Foster, Avril Lavigne, Ashley Olsen: Lyme Disease Symptoms, Diagnosis, Treatment
+2015-07-02 16:26:08	walexander	all them celebs getting lyme disease
+2015-07-02 16:26:27	jwong	haha whaaat
+2015-07-02 16:26:36	jwong	nah tbh i dont think ive ever encountered a tick
+2015-07-02 16:26:41	walexander	yeah man, weirdest thing
+2015-07-02 16:26:47	jwong	how the hell did u get one from the hotel lol
+2015-07-02 16:26:59	jwong	thats strang dude
+2015-07-02 16:27:02	walexander	i was wondering if I got it at the restaurant
+2015-07-02 16:27:36	jwong	i dunno bro.. for ticks u gotta be in the woods after a hike or something
+2015-07-02 16:27:47	jwong	but not here in the city.. let alone in scurrvine
+2015-07-02 16:28:14	walexander	we were in newport beach -- javier's
+2015-07-02 16:28:46	walexander	which was beautiful -- right along the PCH
+2015-07-02 16:29:01	walexander	oh man, you have got to watch this season of True Detective.  It's set in LA
+2015-07-02 16:30:02	walexander	the juxtaposition of the shots is amazing -- like, the most amazing mountains and cliffs, right next to some 8 lane mega highway mixing bowl
+2015-07-02 16:30:36	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif4.gif?w=660&h=372 --- 660x372px image
+2015-07-02 16:30:58	walexander	https://grist.files.wordpress.com/2015/06/truedetectivegif1.gif?w=660&h=372 --- 660x372px image
+2015-07-02 16:31:34	jwong	hey im right off that interchange
+2015-07-02 16:31:42	jwong	off rosecrans
+2015-07-02 16:31:45	walexander	no way!  you recognize that place?
+2015-07-02 16:31:49	walexander	bullis
+2015-07-02 16:31:55	jwong	yeah dude i live right off that free way
+2015-07-02 16:32:02	jwong	thats tthe 110 105 interchange
+2015-07-02 16:32:04	walexander	```i'm still in the hood / yeah that's cool ...```
+2015-07-02 16:32:25	walexander	ever hear of Vernon, CA?
+2015-07-02 16:32:30	jwong	yeah
+2015-07-02 16:32:53	walexander	total residents: 95.  daytime population: 75,000
+2015-07-02 16:33:35	jwong	haha yeah
+2015-07-02 16:33:40	jwong	its like santa fe springs
+2015-07-02 16:33:41	walexander	show is based in a city called Vinci but everyone saying it's pretty clear it's meant to be Vernon
+2015-07-02 16:33:46	jwong	or the arts district
+2015-07-02 16:33:54	jwong	its all industrial
+2015-07-02 16:34:15	jwong	thats where u dont wanna be at night
+2015-07-02 16:34:16	walexander	yeah -- sweat shop economy is how they describe it in the show
+2015-07-02 16:34:34	jwong	nighttime population 10,000
+2015-07-06 16:30:25	walexander	Yo, lemme get ten minute 
+2015-07-06 16:30:42	jwong	for sure ill be on the hangout
+2015-07-06 16:30:49	walexander	Sorry for second delay -- Shirley just got back from seeing this house 
+2015-07-06 16:31:10	jwong	nice!
+2015-07-06 16:31:45	walexander	Some 60s era Asian fusion shit http://www.zillow.com/homedetails/2520-Entrada-Dr-Virginia-Beach-VA-23456/60741990_zpid/ --- Princess Anne Home For Sale
+2015-07-06 16:33:13	jwong	fuuuck
+2015-07-06 16:33:21	jwong	this is a freakin mansion
+2015-07-06 16:33:45	walexander	Its not as nice as it looks 
+2015-07-06 16:33:56	jwong	bro.... 4,418 sqft ?!!
+2015-07-06 16:34:02	walexander	That thing is like a time capsule from 1967
+2015-07-06 16:34:06	jwong	u need golf carts
+2015-07-06 16:34:32	walexander	It has an intercom system that probably looked super state of art then 
+2015-07-06 16:34:54	jwong	oh god.. Keller Williams
+2015-07-06 16:35:08	jwong	they are freakin everywhere
+2015-07-06 16:36:52	walexander	Hehe 
+2015-07-06 16:38:17	walexander	Since the value of the structure compared to the lot is so wonky, I'd have to get what's called a farmers loan 
+2015-07-06 16:39:19	jwong	yeah.. wood shingles
+2015-07-06 16:39:41	jwong	wood shingles eveywhere
+2015-07-06 16:40:08	jwong	but that ceiling looks gorgeous dude

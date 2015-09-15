@@ -1,0 +1,1 @@
+/Users/walexander/git/weechat-emojis/emojis.py

@@ -1,0 +1,95 @@
+2015-07-07 13:02:35		perl scripts loaded: buffers, colorize_lines, highmon, iset, sort_buffers
+2015-07-07 13:02:35		python: stdout/stderr: Package python-xmpp (xmpppy) must be installed to use Jabber protocol.
+2015-07-07 13:02:35		python: stdout/stderr: Get xmpppy with your package manager, or at this URL: http://xmpppy.sourceforge.net/
+2015-07-07 13:02:35	=!=	python: function "register" not found (or failed) in file "/Users/walexander/.weechat/python/autoload/jabber.py"
+2015-07-07 13:02:35		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:02:35		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notification_center.py", line 7, in <module>
+2015-07-07 13:02:35		python: stdout/stderr:     from pync import Notifier
+2015-07-07 13:02:35		python: stdout/stderr: ImportError: No module named pync
+2015-07-07 13:02:35	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notification_center.py"
+2015-07-07 13:02:35		python: stdout/stderr: Missing package(s) for notify: No module named notify2
+2015-07-07 13:02:35		python: stdout/stderr: You must have notify2 installed.
+2015-07-07 13:02:35		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:02:35		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notify.py", line 74, in <module>
+2015-07-07 13:02:35		python: stdout/stderr:     "low"      : notify2.URGENCY_LOW,
+2015-07-07 13:02:35		python: stdout/stderr: NameError: name 'notify2' is not defined
+2015-07-07 13:02:35	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notify.py"
+2015-07-07 13:02:35		URL server listening on ('192.168.1.193', 60420)
+2015-07-07 13:02:35		python scripts loaded: autosort, buffer_autoset, cmd_help, colorize_nicks, go, slack_extension, text_item, translate, urlserver, weemoticons
+2015-07-07 13:02:35	=!=	ruby: function "weechat_init" is missing in file "/Users/walexander/.weechat/ruby/autoload/notification_center.rb"
+2015-07-07 13:02:36		script: 299 scripts for WeeChat 1.1.1
+2015-07-07 13:02:36		Plugins loaded: alias, aspell, charset, exec, fifo, guile, irc, logger, lua, perl, python, relay, ruby, script, tcl, trigger, xfer
+2015-07-07 13:04:48		URL server stopped
+2015-07-07 13:04:48		python: scripts unloaded
+2015-07-07 13:04:48		Highmon buffer has been closed but output is still set to buffer, unusual results may occur. To recreate the buffer use /highmon fix
+2015-07-07 13:04:48		perl: scripts unloaded
+2015-07-07 13:05:32		perl scripts loaded: buffers, colorize_lines, highmon, iset, sort_buffers
+2015-07-07 13:05:32		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:05:32		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notification_center.py", line 7, in <module>
+2015-07-07 13:05:32		python: stdout/stderr:     from pync import Notifier
+2015-07-07 13:05:32		python: stdout/stderr: ImportError: No module named pync
+2015-07-07 13:05:32	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notification_center.py"
+2015-07-07 13:05:32		python: stdout/stderr: Missing package(s) for notify: No module named notify2
+2015-07-07 13:05:32		python: stdout/stderr: You must have notify2 installed.
+2015-07-07 13:05:32		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:05:32		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notify.py", line 74, in <module>
+2015-07-07 13:05:32		python: stdout/stderr:     "low"      : notify2.URGENCY_LOW,
+2015-07-07 13:05:32		python: stdout/stderr: NameError: name 'notify2' is not defined
+2015-07-07 13:05:32	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notify.py"
+2015-07-07 13:05:32		URL server listening on ('192.168.1.193', 60594)
+2015-07-07 13:05:32		python scripts loaded: autosort, buffer_autoset, cmd_help, colorize_nicks, go, jabber, slack_extension, text_item, translate, urlserver, weemoticons
+2015-07-07 13:05:32	=!=	ruby: function "weechat_init" is missing in file "/Users/walexander/.weechat/ruby/autoload/notification_center.rb"
+2015-07-07 13:05:32		script: 299 scripts for WeeChat 1.1.1
+2015-07-07 13:05:32		Plugins loaded: alias, aspell, charset, exec, fifo, guile, irc, logger, lua, perl, python, relay, ruby, script, tcl, trigger, xfer
+2015-07-07 13:08:53		URL server stopped
+2015-07-07 13:08:53		python: scripts unloaded
+2015-07-07 13:08:53		Highmon buffer has been closed but output is still set to buffer, unusual results may occur. To recreate the buffer use /highmon fix
+2015-07-07 13:08:53		perl: scripts unloaded
+2015-07-07 13:08:56		fifo: removing old fifo pipe "/Users/walexander/.weechat/weechat_fifo_94135"
+2015-07-07 13:08:56		guile scripts loaded: emote
+2015-07-07 13:08:56		perl scripts loaded: buffers, colorize_lines, highmon, iset, sort_buffers
+2015-07-07 13:08:57		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:08:57		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notification_center.py", line 7, in <module>
+2015-07-07 13:08:57		python: stdout/stderr:     from pync import Notifier
+2015-07-07 13:08:57		python: stdout/stderr: ImportError: No module named pync
+2015-07-07 13:08:57	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notification_center.py"
+2015-07-07 13:08:57		python: stdout/stderr: Missing package(s) for notify: No module named notify2
+2015-07-07 13:08:57		python: stdout/stderr: You must have notify2 installed.
+2015-07-07 13:08:57		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:08:57		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notify.py", line 74, in <module>
+2015-07-07 13:08:57		python: stdout/stderr:     "low"      : notify2.URGENCY_LOW,
+2015-07-07 13:08:57		python: stdout/stderr: NameError: name 'notify2' is not defined
+2015-07-07 13:08:57	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notify.py"
+2015-07-07 13:08:57		URL server listening on ('192.168.1.193', 60774)
+2015-07-07 13:08:57		python scripts loaded: autosort, buffer_autoset, cmd_help, colorize_nicks, go, jabber, slack_extension, text_item, translate, urlserver, weemoticons
+2015-07-07 13:08:57	=!=	ruby: function "weechat_init" is missing in file "/Users/walexander/.weechat/ruby/autoload/notification_center.rb"
+2015-07-07 13:08:57		script: 299 scripts for WeeChat 1.2
+2015-07-07 13:08:57		Plugins loaded: alias, aspell, charset, exec, fifo, guile, irc, logger, lua, perl, python, relay, ruby, script, tcl, trigger, xfer
+2015-07-07 13:11:19		URL server stopped
+2015-07-07 13:11:19		python: scripts unloaded
+2015-07-07 13:11:19		Highmon buffer has been closed but output is still set to buffer, unusual results may occur. To recreate the buffer use /highmon fix
+2015-07-07 13:11:19		perl: scripts unloaded
+2015-07-07 13:12:34		fifo: removing old fifo pipe "/Users/walexander/.weechat/weechat_fifo_98098"
+2015-07-07 13:12:34		guile scripts loaded: emote
+2015-07-07 13:12:34		perl scripts loaded: buffers, colorize_lines, highmon, iset, sort_buffers
+2015-07-07 13:12:34		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:12:34		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notification_center.py", line 7, in <module>
+2015-07-07 13:12:34		python: stdout/stderr:     from pync import Notifier
+2015-07-07 13:12:34		python: stdout/stderr: ImportError: No module named pync
+2015-07-07 13:12:34	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notification_center.py"
+2015-07-07 13:12:34		python: stdout/stderr: Missing package(s) for notify: No module named notify2
+2015-07-07 13:12:34		python: stdout/stderr: You must have notify2 installed.
+2015-07-07 13:12:34		python: stdout/stderr: Traceback (most recent call last):
+2015-07-07 13:12:34		python: stdout/stderr:   File "/Users/walexander/.weechat/python/autoload/notify.py", line 74, in <module>
+2015-07-07 13:12:34		python: stdout/stderr:     "low"      : notify2.URGENCY_LOW,
+2015-07-07 13:12:34		python: stdout/stderr: NameError: name 'notify2' is not defined
+2015-07-07 13:12:34	=!=	python: unable to parse file "/Users/walexander/.weechat/python/autoload/notify.py"
+2015-07-07 13:12:34		URL server listening on ('192.168.1.193', 60933)
+2015-07-07 13:12:34		python scripts loaded: autosort, buffer_autoset, cmd_help, colorize_nicks, go, jabber, slack_extension, text_item, translate, urlserver, weemoticons
+2015-07-07 13:12:34	=!=	ruby: function "weechat_init" is missing in file "/Users/walexander/.weechat/ruby/autoload/notification_center.rb"
+2015-07-07 13:12:34		script: 299 scripts for WeeChat 1.2
+2015-07-07 13:12:34		Plugins loaded: alias, aspell, charset, exec, fifo, guile, irc, logger, lua, perl, python, relay, ruby, script, tcl, trigger, xfer
+2015-07-07 13:12:48		URL server stopped
+2015-07-07 13:12:48		python: scripts unloaded
+2015-07-07 13:12:48		Highmon buffer has been closed but output is still set to buffer, unusual results may occur. To recreate the buffer use /highmon fix
+2015-07-07 13:12:48		perl: scripts unloaded

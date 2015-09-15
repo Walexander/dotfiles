@@ -1,0 +1,826 @@
+2015-06-16 13:02:21	rdm	for circle ci... we'll need a postgres instance, I imagine
+2015-06-16 13:02:34	walexander	two more things: 1) get circle to install postgresql on the machine that's running tests
+2015-06-16 13:02:58	walexander	and 2) have circle run the tests without `vagrant` sections 
+2015-06-16 13:03:14	walexander	for the first, you can create a circle.yml file and add a `dependencies:` section
+2015-06-16 13:03:17	walexander	https://circleci.com/docs/installing-custom-software
+2015-06-16 13:03:48	walexander	and then, https://circleci.com/docs/manually#databases
+2015-06-16 13:04:30	rdm	Hmm... I'm going to also need to mention the stuff I installed through pip
+2015-06-16 13:04:51	walexander	right  -- put those in separate sections
+2015-06-16 13:05:45	walexander	``` 
+2015-06-16 13:05:45		dependencies: 
+2015-06-16 13:05:45		     postgres:
+2015-06-16 13:05:45		           sudo apt-get install postgresql92
+2015-06-16 13:05:45		    hindsight: 
+2015-06-16 13:05:45		           sudo pip install hindsight
+2015-06-16 13:05:45		````
+2015-06-16 13:05:51	rdm	does that stuff run in the root of the project?
+2015-06-16 13:05:58	rdm	(thinking of doing a requirements.txt for pip...)
+2015-06-16 13:06:04	walexander	yes
+2015-06-16 13:06:12	rdm	kk, nice
+2015-06-16 13:06:32	walexander	it's an ubuntu 12.04 instance
+2015-06-16 13:07:28	walexander	if you need to, you can get ssh access tot he build server by clicking on Rebuild ``` with ssh``` button 
+2015-06-16 13:07:34	walexander	https://circleci.com/gh/beanstock/data-pipeline/59
+2015-06-16 13:08:40	rdm	Ok, I hit that... I don't see any ssh creds - I guess it's going to feed me stuff via the browser..
+2015-06-16 13:08:51	rdm	ah, I see them...
+2015-06-16 13:10:56	rdm	kk, nice, I'll exercise that once I've handled the obvious issues
+2015-06-16 13:11:20	rdm	It wants to do an npm test right now - we using any node stuff in this project?
+2015-06-16 13:11:51	walexander	there's a package.json and that's what it detects
+2015-06-16 13:12:54	rdm	package.json specifies make test but the makefile is in ddl... so, should be instead: `cd ddl && make test` I think?
+2015-06-16 13:13:16	walexander	i originally thought we could have a Makefile at the top level 
+2015-06-16 13:14:38	walexander	the `deploy/install` is really for the `adp/` folder -- was thinking we could move `deploy` into `adp/deploy` and have the `adp/Makefile` run `adp/deploy/install`, `adp/deploy/test` etc.
+2015-06-16 13:14:53	rdm	We can... easy enough to have it delegate targets however -- do `test:` `    cd ddl && make test` for example - it depends on what level of control you want at each level
+2015-06-16 13:15:30	rdm	so if make test needs to delegate to makefiles in multiple directories, you list them out like you want
+2015-06-16 13:15:31	walexander	I just want `make test` run at all three levels `/; /adp; and /ddl` to run the tests 
+2015-06-16 13:15:47	rdm	Easy enough
+2015-06-16 13:16:24	rdm	though for now the tests specific to the top level is an empty list and delegating to the others won't change that - gotta supply them
+2015-06-16 13:17:34	walexander	can the top-level `make test` simply run the tests for both `ddl` and `adp`
+2015-06-16 13:17:35	walexander	?
+2015-06-16 13:17:39	rdm	sure
+2015-06-16 13:17:53	rdm	does it matter which order they get run in?
+2015-06-16 13:17:58	walexander	nope
+2015-06-16 13:18:22	rdm	kk, that's even easier
+2015-06-16 13:18:23	walexander	for the depencies: I think it's okay if we install postgresql via the circle.yml and not worry about vagrant 
+2015-06-16 13:18:41	rdm	kk
+2015-06-16 13:18:43	walexander	but for the `pip` deps, probably makes sense to install those via `npm`
+2015-06-16 13:19:13	walexander	in `package.json` you can specify a `scripts: { preinstall: "pre-install-script" } ` 
+2015-06-16 13:19:54	walexander	that way, `npm install` will install those automatically and we won'ptt need to add them to the `circle.yml`
+2015-06-16 13:21:00	rdm	Hmm... so vagrant vs. local postgres server will be external to npm install... probably deserves a sentence in the readme or something once I get it working...
+2015-06-16 13:21:58	walexander	separate question:  I need to do like a pivot table in redshift 
+2015-06-16 13:22:45	walexander	have a table like: ```
+2015-06-16 13:22:45		type  |date    |totals
+2015-06-16 13:22:45		foo     |1/1/1 |5
+2015-06-16 13:22:45		bar     |1/1/1 | 7
+2015-06-16 13:22:45		```
+2015-06-16 13:24:01	walexander	and what I want is a query that returns ```
+2015-06-16 13:24:01		date    |foo     |bar
+2015-06-16 13:24:01		1/1/1 |8          | 7 
+2015-06-16 13:24:01		```
+2015-06-16 13:24:34	rdm	I presume the foo/bar stuff is dynamic? so need something to do an initial query to find those values and then generate and run the resulting select
+2015-06-16 13:25:19	rdm	supposedly the csvkit that I'm using for the gherkin stuff supports pivoting
+2015-06-16 13:25:31	rdm	oh, no, that's pandas
+2015-06-16 13:25:36	rdm	that supports pivoting
+2015-06-16 13:26:14	rdm	Or easy enough to write the code to do it - about the same complexity one way or the other
+2015-06-16 13:26:24	walexander	basically something like ```SELECT date, sum(foo), sum(bar) FROM (  select date, CASE type WHEN 'foo' THEN totals ELSE 0 END, CASE type WHEN 'bar' THEN totals ELSE 0 END ) ```
+2015-06-16 13:26:46	rdm	yeah
+2015-06-16 13:27:12	walexander	but probably not possible to make that dynamic in redshift at least
+2015-06-16 13:27:20	walexander	?
+2015-06-16 13:27:51	rdm	yeah, redshift doesn't even give us stored procedures and everything needs to drive it from the outside
+2015-06-16 13:28:17	walexander	yeah -- and doesn't support `crosstab` like postgres does
+2015-06-16 13:28:49	rdm	yeah.. doesn't fit their pricing model, I guess...
+2015-06-18 10:02:25	rdm	Does it seem reasonable to use http://lab.beanstock.com for https://beanstockmedia.atlassian.net/browse/DATABUS-754 (if so, I'll need login creds - if not, I need to decide between pasting that into helix or spinning up a new server for this purpose)
+2015-06-18 10:15:12	walexander	no, don't worry about that one -- we'll use tableau for that
+2015-06-18 10:15:46	walexander	can you takee a look at this: https://github.com/cucumber/cucumber-js
+2015-06-18 10:16:01	walexander	and see if that's easily used for parsing the gherkin
+2015-06-18 10:40:43	rdm	Should I care about https://robots.thoughtbot.com/writing-better-cucumber-scenarios-or-why-were
+2015-06-18 10:41:45	rdm	(which basically says "don't structure data")
+2015-06-18 10:41:51	walexander	eh, fuck 'em
+2015-06-18 10:41:54	rdm	kk
+2015-06-22 20:04:57	rdm	are we logging kafka offset for a pipeline run anywhere?
+2015-06-22 20:06:54	rdm	(it looks like we are for green... hmm...)
+2015-06-22 20:58:22	walexander	we are -- in working/from_kafka we put the offset file into a folder for the next hour
+2015-06-22 20:58:54	walexander	any reason you're interested?
+2015-06-22 20:59:11	rdm	databus-755
+2015-06-22 20:59:38	rdm	wants me to detect when kafka offset delta between runs exceeds a threshold
+2015-06-22 20:59:51	rdm	tracking it like this makes it possible to do sanely
+2015-06-22 21:01:38	walexander	tracking it like ... ?
+2015-06-22 21:02:11	rdm	so, for example, I could look at
+2015-06-22 21:02:12	rdm	s3://databus-production/green.prod/working/2015_05_23/01_00/kafka/offsets.json
+2015-06-22 21:02:26	rdm	or maybe a smaller set of files to see recent offsets
+2015-06-22 21:03:42	rdm	I sort of have to ignore that the most recent one I can plausibly test probably will not exist... but that sort of stuff i can fiddle with after I've got it basically working
+2015-06-22 21:05:44	walexander	the offset will exist before any job attempts to process using that offset 
+2015-06-22 21:05:50	walexander	if that helps 
+2015-06-22 21:06:13	rdm	yeah, any understanding i can get helps
+2015-06-22 21:08:32	walexander	i just merged the `sentry` branch into master
+2015-06-22 21:08:55	rdm	nice
+2015-06-22 21:09:25	rdm	(i think i saw that in #databus
+2015-06-22 21:10:12	walexander	use the adp/defs/pipeline_sentry.json to run a task that calculates the deltas for the latest offset
+2015-06-22 21:10:21	rdm	(and I've got it pulled now)
+2015-06-22 21:11:09	rdm	that's got a lot of stuff in it... I'll need to digest it
+2015-06-22 21:11:20	walexander	don't need to worry about what's in it now really 
+2015-06-22 21:11:37	rdm	is an instance of this thing running?
+2015-06-22 21:11:40	walexander	yes
+2015-06-22 21:11:54	walexander	https://console.aws.amazon.com/datapipeline/home?region=us-east-1#ExecutionDetailsPlace:pipelineId=df-076586216LXCCQ2LKC5K&show=latest
+2015-06-22 21:12:19	walexander	it's feeding http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard
+2015-06-22 21:12:57	rdm	Ah... that's the source of the kafka counts?
+2015-06-22 21:12:57	walexander	which is comparing event counts from kafka -> hive -> redshift
+2015-06-22 21:13:28	walexander	that's just ingesting the `report_c` files generated by the hadoop-event-processor job 
+2015-06-22 21:14:05	walexander	and doing a `select count(*) FROM ... WHERE import_ds = '...'` against hive and redshift, then importing all three counts into `work.import_counts`
+2015-06-22 21:14:28	walexander	`that` being the pipeline_sentry pipeline
+2015-06-22 21:14:36	walexander	the tableau workbook is just reading that tabl e
+2015-06-22 21:15:12	rdm	kk... I guess we'll want to build an analog of that workbook in looker if we sign that deal with them
+2015-06-22 21:15:30	walexander	at some point 
+2015-06-22 21:15:41	walexander	i sent you an invite to `opsgenie.com`
+2015-06-22 21:16:22	walexander	pipeline_sentry runs this script https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-22 21:16:25	rdm	it says you are jas... this invite is just me, i take it? it wants me to reset my password
+2015-06-22 21:16:59	walexander	if that script fails, it sends email to opsgenie which opens a ticket
+2015-06-22 21:17:58	walexander	there's an open ticket in there now for 1000am today -- due to the redshift counts not matching the hive ones (caused by adx import) 
+2015-06-22 21:19:36	rdm	that'll happen every day, I guess, until we decide how we want to fix that
+2015-06-22 21:19:58	walexander	yeah, working on it 
+2015-06-22 21:20:29	rdm	I should be able to read the code well enough to figure out what's going on
+2015-06-22 21:21:16	walexander	if your script exits non-zero, it'll run the `onFail` action defined in the pipeline
+2015-06-22 21:22:31	walexander	if we use the same subject line as the `sns_failure_notification` https://github.com/beanstock/data-pipeline/blob/master/adp/defs/pipeline_sentry.json#L30
+2015-06-22 21:22:44	rdm	hmm... so alerts can't include any information from the script? or would a prefix of stdout or stderr be useful?
+2015-06-22 21:23:16	rdm	Or should that subject be a url maybe... hmm...
+2015-06-22 21:23:16	walexander	it's lame, but no -- just what's available to the pipeline itself
+2015-06-22 21:23:21	rdm	figures
+2015-06-22 21:23:31	walexander	put the urls' in the message, the subject should be the same 
+2015-06-22 21:24:07	walexander	opsgenie's set up to parse the `import_ds` from the subject and use that as the "key" 
+2015-06-22 21:24:08	rdm	it would be a constant, that url - like the tableau page
+2015-06-22 21:24:16	rdm	ah! ok
+2015-06-22 21:24:30	walexander	that way, an `onsuccess` message will clear the status
+2015-06-22 21:24:54	rdm	onsuccess from a rerun of the pipeline?
+2015-06-22 21:24:57	walexander	you can just put a link to the s3:// log location
+2015-06-22 21:25:06	walexander	right, or another attempt
+2015-06-23 11:57:04	walexander	do you have admin user password to redshift-qa-1
+2015-06-23 14:28:58	rdm	sry, just noticed this - i do
+2015-06-23 14:29:22	rdm	or at least now it's the same as production
+2015-06-23 14:30:26	walexander	i changed it
+2015-06-23 14:30:54	rdm	makes sense
+2015-06-23 14:34:08	rdm	do you have any favorite jira references which suggest tests for data-pipeline's adp/ directory?
+2015-06-23 14:35:42	rdm	I mean... a lot of that winds up being tested at deployment time, which is the whole reason for  the blue/green ...
+2015-06-23 14:36:27	walexander	i'm not worried about testing adp/ 
+2015-06-23 14:36:52	rdm	kk, I'll disable the autofail I've got in there as a placeholder
+2015-06-23 14:36:55	walexander	not much possible beyond the blue/green stuff
+2015-06-23 14:38:05	rdm	but before I push that out to github, there's the "blue/green" switch issue. Is there some way that autodeploy can know which color is "prod" so that it can [tear down if needed and] deploy the other
+2015-06-23 14:42:36	rdm	I guess a dns query would make sense - just need to decide on what name to query
+2015-06-23 14:42:56	rdm	cold be as simple as a cname lookup?
+2015-06-23 14:44:10	walexander	that's a good question
+2015-06-23 14:44:44	walexander	i think we'll need to maintain that value somewhere to indicate the non-live environment
+2015-06-23 15:11:20	walexander	Or we could just use a blue and a green branch in github 
+2015-06-23 15:12:18	rdm	hmm... so either (a) deploy to master would deploy a 'master' pipeline, or (b) only green and blue branches would autodeploy
+2015-06-23 15:12:54	rdm	I guess we could make that happen using a test on branch name
+2015-06-23 15:18:24	walexander	yeah, master could just be copy of whatever is live -- circle can be set up to only run against certain branches if we want
+2015-06-23 15:19:44	walexander	we can maintain the `blue` vs `green` as an environment variable in the circle.yml (and `git rebase` into those instead of merging) 
+2015-06-23 15:20:36	rdm	what advantage do we get from enforced rebase, here?
+2015-06-23 15:21:16	walexander	the circle.yml can be different between the two branches -- not a big deal 
+2015-06-24 17:43:38	walexander	where did you implement those changes to the publisher payment calculation?
+2015-06-24 18:06:36	walexander	Ping 
+2015-06-24 18:06:57	rdm	that was in mart.v_measures_h
+2015-06-24 18:09:04	rdm	Also...
+2015-06-24 18:09:08	rdm	ddl/sql/V2.0.5__import_counts.sql does not work in postgres, because distkey is redshift only.   The only ways I can see to resolve this are (a) remove distkey from definition [presumably inefficient] or (b) use a different definition for postgres and redshift - probably best thing there is to replace the sql file(s) with something which generates that text and update references accordingly
+2015-06-24 18:09:55	walexander	You can remove the distkey 
+2015-06-24 18:10:04	rdm	ok! that makes it easy
+2015-06-24 18:10:37	walexander	Relative to the 11bn rows in f_* tables, that one is tiny
+2015-06-24 18:10:55	rdm	yeah
+2015-06-24 18:11:12	walexander	Do we have any tests around pub payment yet?
+2015-06-24 18:11:18	rdm	we should probably have an index on event_dttm, also, in the f_* tables
+2015-06-24 18:11:40	rdm	We do have a couple, but not for the mixed with threshold nor for mixed without threshold
+2015-06-24 18:12:24	rdm	(the last two scenarios in DATABUS-761 were publisher payment scenarios)
+2015-06-24 18:12:28	walexander	Kk, regarding the index on event dttm -- isn't the event dttm the sort key or something ?
+2015-06-24 18:13:01	rdm	we're pretty much always using order by 1 with event_dttm being column 1, if that is what you mean?
+2015-06-24 18:13:39	walexander	I believe the sort key specified in schema is what redshift uses to order the data on disk
+2015-06-24 18:14:00	rdm	and I think I remember seeing an index on it in some incarnation of some redshift database, but I haven't been seeing anything recently... but maybe I'm not recognizing sort keys?
+2015-06-24 18:14:35	walexander	Yeah, not sure if psql shows them. Have to query the pg catalog tables 
+2015-06-24 18:15:11	walexander	Adding a where event dttm predicate definitely improves qiery performance 
+2015-06-24 18:19:53	rdm	\di is not showing any indices on f_* tables other than f_site_status
+2015-06-24 18:20:15	rdm	apparently our only indices in prod are primary key indices
+2015-06-24 18:20:40	rdm	so it's some other mechanism making event_dttm queries faster
+2015-06-24 18:25:13	rdm	maybe it's because pipeline uses analyze after every run?
+2015-06-24 18:27:53	rdm	hmm... and it is a 'sortkey' - I wonder where that gets declared?
+2015-06-24 19:10:32	walexander	i see in the 1.1transition folder there is code to sync payment rules and terms
+2015-06-24 19:10:40	walexander	but is there anything to sync the rest of the dimensions?
+2015-06-24 20:25:44	rdm	i could write that, but i have not
+2015-06-24 20:25:52	rdm	it's a fairly straightforward process
+2015-06-24 20:26:29	rdm	didn't see any problems with the others - which suggests they don't get updated all that often and the existing helix code was good enough
+2015-06-24 20:42:00	rdm	though there is something of an issue - matching redshift schema up with helix schema
+2015-06-24 21:01:06	walexander	Why is that?
+2015-06-24 21:01:21	rdm	different table names, different column structures
+2015-06-24 21:04:01	rdm	I did a draft ad_size routine - needs testing - a couple #FIXME comments in it
+2015-06-24 21:05:48	rdm	probably doesn't make sense to update d_country from helix, since there's no corresponding table there, and that's probably more driven by "political accidents" than our sales team
+2015-06-24 21:07:32	rdm	d_depth another one that's probably best treated as constant
+2015-06-24 21:08:11	rdm	same for d_device_type
+2015-06-24 21:08:43	rdm	and for d_fold_position
+2015-06-24 21:10:06	rdm	d_payment_term I'm not touching - if that goes bad, we've already got d_paymentterm and d_paymentrule which are normalized
+2015-06-24 21:21:20	rdm	so basically - after leaving out some other obvious ones, that leaves placement+sitesection_placement+sitesection -> d_placement,    ??? -> d_platform,   publisher -> d_publisher,   sitesection+????  -> d_section, and site -> d_site
+2015-06-24 21:23:00	rdm	I'm not completely sure what should go in for the ??? bits - for sections it might be the sitesection_arch_v5 that we need
+2015-06-29 07:53:01	rdm	It seems to me.. with the kafka count alert thing... we could use it like it is - as long as adx import is on schedule - so just have a config for when it comes in, and invert the test once a day. This way if we get schedule drift, it will go off for not showing up (and maybe go off again at a different time of the day for showing up).
+2015-06-29 07:55:55	rdm	But that also suggests we should have another set of alerts based on counts from further upstream? The cloudx proxy could aggregate its own sums - might mean we get an alert when it's restarted? Don't want too many alerts going off but a few here and there let us know that the system is working... (And if we can't get the adx proxy wired for sum alerts next month, we can make the downstream side of the alert sensitive to adx load id, or its absence?)
+2015-06-29 07:58:28	rdm	I'm giving you databus-716 since I don't think I should be addressing it in 1.1 and if you want me to tackle it in 2.0 I'll need soe guidance...
+2015-06-29 08:02:40	rdm	And I gave databus-750 to jas (since he needs to put some more thought into that one)
+2015-06-29 08:03:00	rdm	that leaves me with databus-755 which is this alerting thing - I could use some hints or guidance there, also
+2015-06-30 19:50:23	rdm	on green, "android" gets rolled up into chrome. But shouldn't mobile and desktop be kept separate? I mean if we are going to track browser_name at all...
+2015-07-02 12:45:09	rdm	Hmm...
+2015-07-02 12:45:25	rdm	my opsgenie account is suspended - did you do that?
+2015-07-06 13:01:04	walexander	Hey man I won't be able to make today's training so start without me 
+2015-06-16 13:02:21	rdm	for circle ci... we'll need a postgres instance, I imagine
+2015-06-16 13:02:34	walexander	two more things: 1) get circle to install postgresql on the machine that's running tests
+2015-06-16 13:02:58	walexander	and 2) have circle run the tests without `vagrant` sections 
+2015-06-16 13:03:14	walexander	for the first, you can create a circle.yml file and add a `dependencies:` section
+2015-06-16 13:03:17	walexander	https://circleci.com/docs/installing-custom-software
+2015-06-16 13:03:48	walexander	and then, https://circleci.com/docs/manually#databases
+2015-06-16 13:04:30	rdm	Hmm... I'm going to also need to mention the stuff I installed through pip
+2015-06-16 13:04:51	walexander	right  -- put those in separate sections
+2015-06-16 13:05:45	walexander	``` 
+2015-06-16 13:05:45		dependencies: 
+2015-06-16 13:05:45		     postgres:
+2015-06-16 13:05:45		           sudo apt-get install postgresql92
+2015-06-16 13:05:45		    hindsight: 
+2015-06-16 13:05:45		           sudo pip install hindsight
+2015-06-16 13:05:45		````
+2015-06-16 13:05:51	rdm	does that stuff run in the root of the project?
+2015-06-16 13:05:58	rdm	(thinking of doing a requirements.txt for pip...)
+2015-06-16 13:06:04	walexander	yes
+2015-06-16 13:06:12	rdm	kk, nice
+2015-06-16 13:06:32	walexander	it's an ubuntu 12.04 instance
+2015-06-16 13:07:28	walexander	if you need to, you can get ssh access tot he build server by clicking on Rebuild ``` with ssh``` button 
+2015-06-16 13:07:34	walexander	https://circleci.com/gh/beanstock/data-pipeline/59
+2015-06-16 13:08:40	rdm	Ok, I hit that... I don't see any ssh creds - I guess it's going to feed me stuff via the browser..
+2015-06-16 13:08:51	rdm	ah, I see them...
+2015-06-16 13:10:56	rdm	kk, nice, I'll exercise that once I've handled the obvious issues
+2015-06-16 13:11:20	rdm	It wants to do an npm test right now - we using any node stuff in this project?
+2015-06-16 13:11:51	walexander	there's a package.json and that's what it detects
+2015-06-16 13:12:54	rdm	package.json specifies make test but the makefile is in ddl... so, should be instead: `cd ddl && make test` I think?
+2015-06-16 13:13:16	walexander	i originally thought we could have a Makefile at the top level 
+2015-06-16 13:14:38	walexander	the `deploy/install` is really for the `adp/` folder -- was thinking we could move `deploy` into `adp/deploy` and have the `adp/Makefile` run `adp/deploy/install`, `adp/deploy/test` etc.
+2015-06-16 13:14:53	rdm	We can... easy enough to have it delegate targets however -- do `test:` `    cd ddl && make test` for example - it depends on what level of control you want at each level
+2015-06-16 13:15:30	rdm	so if make test needs to delegate to makefiles in multiple directories, you list them out like you want
+2015-06-16 13:15:31	walexander	I just want `make test` run at all three levels `/; /adp; and /ddl` to run the tests 
+2015-06-16 13:15:47	rdm	Easy enough
+2015-06-16 13:16:24	rdm	though for now the tests specific to the top level is an empty list and delegating to the others won't change that - gotta supply them
+2015-06-16 13:17:34	walexander	can the top-level `make test` simply run the tests for both `ddl` and `adp`
+2015-06-16 13:17:35	walexander	?
+2015-06-16 13:17:39	rdm	sure
+2015-06-16 13:17:53	rdm	does it matter which order they get run in?
+2015-06-16 13:17:58	walexander	nope
+2015-06-16 13:18:22	rdm	kk, that's even easier
+2015-06-16 13:18:23	walexander	for the depencies: I think it's okay if we install postgresql via the circle.yml and not worry about vagrant 
+2015-06-16 13:18:41	rdm	kk
+2015-06-16 13:18:43	walexander	but for the `pip` deps, probably makes sense to install those via `npm`
+2015-06-16 13:19:13	walexander	in `package.json` you can specify a `scripts: { preinstall: "pre-install-script" } ` 
+2015-06-16 13:19:54	walexander	that way, `npm install` will install those automatically and we won'ptt need to add them to the `circle.yml`
+2015-06-16 13:21:00	rdm	Hmm... so vagrant vs. local postgres server will be external to npm install... probably deserves a sentence in the readme or something once I get it working...
+2015-06-16 13:21:58	walexander	separate question:  I need to do like a pivot table in redshift 
+2015-06-16 13:22:45	walexander	have a table like: ```
+2015-06-16 13:22:45		type  |date    |totals
+2015-06-16 13:22:45		foo     |1/1/1 |5
+2015-06-16 13:22:45		bar     |1/1/1 | 7
+2015-06-16 13:22:45		```
+2015-06-16 13:24:01	walexander	and what I want is a query that returns ```
+2015-06-16 13:24:01		date    |foo     |bar
+2015-06-16 13:24:01		1/1/1 |8          | 7 
+2015-06-16 13:24:01		```
+2015-06-16 13:24:34	rdm	I presume the foo/bar stuff is dynamic? so need something to do an initial query to find those values and then generate and run the resulting select
+2015-06-16 13:25:19	rdm	supposedly the csvkit that I'm using for the gherkin stuff supports pivoting
+2015-06-16 13:25:31	rdm	oh, no, that's pandas
+2015-06-16 13:25:36	rdm	that supports pivoting
+2015-06-16 13:26:14	rdm	Or easy enough to write the code to do it - about the same complexity one way or the other
+2015-06-16 13:26:24	walexander	basically something like ```SELECT date, sum(foo), sum(bar) FROM (  select date, CASE type WHEN 'foo' THEN totals ELSE 0 END, CASE type WHEN 'bar' THEN totals ELSE 0 END ) ```
+2015-06-16 13:26:46	rdm	yeah
+2015-06-16 13:27:12	walexander	but probably not possible to make that dynamic in redshift at least
+2015-06-16 13:27:20	walexander	?
+2015-06-16 13:27:51	rdm	yeah, redshift doesn't even give us stored procedures and everything needs to drive it from the outside
+2015-06-16 13:28:17	walexander	yeah -- and doesn't support `crosstab` like postgres does
+2015-06-16 13:28:49	rdm	yeah.. doesn't fit their pricing model, I guess...
+2015-06-18 10:02:25	rdm	Does it seem reasonable to use http://lab.beanstock.com for https://beanstockmedia.atlassian.net/browse/DATABUS-754 (if so, I'll need login creds - if not, I need to decide between pasting that into helix or spinning up a new server for this purpose)
+2015-06-18 10:15:12	walexander	no, don't worry about that one -- we'll use tableau for that
+2015-06-18 10:15:46	walexander	can you takee a look at this: https://github.com/cucumber/cucumber-js
+2015-06-18 10:16:01	walexander	and see if that's easily used for parsing the gherkin
+2015-06-18 10:40:43	rdm	Should I care about https://robots.thoughtbot.com/writing-better-cucumber-scenarios-or-why-were
+2015-06-18 10:41:45	rdm	(which basically says "don't structure data")
+2015-06-18 10:41:51	walexander	eh, fuck 'em
+2015-06-18 10:41:54	rdm	kk
+2015-06-22 20:04:57	rdm	are we logging kafka offset for a pipeline run anywhere?
+2015-06-22 20:06:54	rdm	(it looks like we are for green... hmm...)
+2015-06-22 20:58:22	walexander	we are -- in working/from_kafka we put the offset file into a folder for the next hour
+2015-06-22 20:58:54	walexander	any reason you're interested?
+2015-06-22 20:59:11	rdm	databus-755
+2015-06-22 20:59:38	rdm	wants me to detect when kafka offset delta between runs exceeds a threshold
+2015-06-22 20:59:51	rdm	tracking it like this makes it possible to do sanely
+2015-06-22 21:01:38	walexander	tracking it like ... ?
+2015-06-22 21:02:11	rdm	so, for example, I could look at
+2015-06-22 21:02:12	rdm	s3://databus-production/green.prod/working/2015_05_23/01_00/kafka/offsets.json
+2015-06-22 21:02:26	rdm	or maybe a smaller set of files to see recent offsets
+2015-06-22 21:03:42	rdm	I sort of have to ignore that the most recent one I can plausibly test probably will not exist... but that sort of stuff i can fiddle with after I've got it basically working
+2015-06-22 21:05:44	walexander	the offset will exist before any job attempts to process using that offset 
+2015-06-22 21:05:50	walexander	if that helps 
+2015-06-22 21:06:13	rdm	yeah, any understanding i can get helps
+2015-06-22 21:08:32	walexander	i just merged the `sentry` branch into master
+2015-06-22 21:08:55	rdm	nice
+2015-06-22 21:09:25	rdm	(i think i saw that in #databus
+2015-06-22 21:10:12	walexander	use the adp/defs/pipeline_sentry.json to run a task that calculates the deltas for the latest offset
+2015-06-22 21:10:21	rdm	(and I've got it pulled now)
+2015-06-22 21:11:09	rdm	that's got a lot of stuff in it... I'll need to digest it
+2015-06-22 21:11:20	walexander	don't need to worry about what's in it now really 
+2015-06-22 21:11:37	rdm	is an instance of this thing running?
+2015-06-22 21:11:40	walexander	yes
+2015-06-22 21:11:54	walexander	https://console.aws.amazon.com/datapipeline/home?region=us-east-1#ExecutionDetailsPlace:pipelineId=df-076586216LXCCQ2LKC5K&show=latest
+2015-06-22 21:12:19	walexander	it's feeding http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard
+2015-06-22 21:12:57	rdm	Ah... that's the source of the kafka counts?
+2015-06-22 21:12:57	walexander	which is comparing event counts from kafka -> hive -> redshift
+2015-06-22 21:13:28	walexander	that's just ingesting the `report_c` files generated by the hadoop-event-processor job 
+2015-06-22 21:14:05	walexander	and doing a `select count(*) FROM ... WHERE import_ds = '...'` against hive and redshift, then importing all three counts into `work.import_counts`
+2015-06-22 21:14:28	walexander	`that` being the pipeline_sentry pipeline
+2015-06-22 21:14:36	walexander	the tableau workbook is just reading that tabl e
+2015-06-22 21:15:12	rdm	kk... I guess we'll want to build an analog of that workbook in looker if we sign that deal with them
+2015-06-22 21:15:30	walexander	at some point 
+2015-06-22 21:15:41	walexander	i sent you an invite to `opsgenie.com`
+2015-06-22 21:16:22	walexander	pipeline_sentry runs this script https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-22 21:16:25	rdm	it says you are jas... this invite is just me, i take it? it wants me to reset my password
+2015-06-22 21:16:59	walexander	if that script fails, it sends email to opsgenie which opens a ticket
+2015-06-22 21:17:58	walexander	there's an open ticket in there now for 1000am today -- due to the redshift counts not matching the hive ones (caused by adx import) 
+2015-06-22 21:19:36	rdm	that'll happen every day, I guess, until we decide how we want to fix that
+2015-06-22 21:19:58	walexander	yeah, working on it 
+2015-06-22 21:20:29	rdm	I should be able to read the code well enough to figure out what's going on
+2015-06-22 21:21:16	walexander	if your script exits non-zero, it'll run the `onFail` action defined in the pipeline
+2015-06-22 21:22:31	walexander	if we use the same subject line as the `sns_failure_notification` https://github.com/beanstock/data-pipeline/blob/master/adp/defs/pipeline_sentry.json#L30
+2015-06-22 21:22:44	rdm	hmm... so alerts can't include any information from the script? or would a prefix of stdout or stderr be useful?
+2015-06-22 21:23:16	rdm	Or should that subject be a url maybe... hmm...
+2015-06-22 21:23:16	walexander	it's lame, but no -- just what's available to the pipeline itself
+2015-06-22 21:23:21	rdm	figures
+2015-06-22 21:23:31	walexander	put the urls' in the message, the subject should be the same 
+2015-06-22 21:24:07	walexander	opsgenie's set up to parse the `import_ds` from the subject and use that as the "key" 
+2015-06-22 21:24:08	rdm	it would be a constant, that url - like the tableau page
+2015-06-22 21:24:16	rdm	ah! ok
+2015-06-22 21:24:30	walexander	that way, an `onsuccess` message will clear the status
+2015-06-22 21:24:54	rdm	onsuccess from a rerun of the pipeline?
+2015-06-22 21:24:57	walexander	you can just put a link to the s3:// log location
+2015-06-22 21:25:06	walexander	right, or another attempt
+2015-06-23 11:57:04	walexander	do you have admin user password to redshift-qa-1
+2015-06-23 14:28:58	rdm	sry, just noticed this - i do
+2015-06-23 14:29:22	rdm	or at least now it's the same as production
+2015-06-23 14:30:26	walexander	i changed it
+2015-06-23 14:30:54	rdm	makes sense
+2015-06-23 14:34:08	rdm	do you have any favorite jira references which suggest tests for data-pipeline's adp/ directory?
+2015-06-23 14:35:42	rdm	I mean... a lot of that winds up being tested at deployment time, which is the whole reason for  the blue/green ...
+2015-06-23 14:36:27	walexander	i'm not worried about testing adp/ 
+2015-06-23 14:36:52	rdm	kk, I'll disable the autofail I've got in there as a placeholder
+2015-06-23 14:36:55	walexander	not much possible beyond the blue/green stuff
+2015-06-23 14:38:05	rdm	but before I push that out to github, there's the "blue/green" switch issue. Is there some way that autodeploy can know which color is "prod" so that it can [tear down if needed and] deploy the other
+2015-06-23 14:42:36	rdm	I guess a dns query would make sense - just need to decide on what name to query
+2015-06-23 14:42:56	rdm	cold be as simple as a cname lookup?
+2015-06-23 14:44:10	walexander	that's a good question
+2015-06-23 14:44:44	walexander	i think we'll need to maintain that value somewhere to indicate the non-live environment
+2015-06-23 15:11:20	walexander	Or we could just use a blue and a green branch in github 
+2015-06-23 15:12:18	rdm	hmm... so either (a) deploy to master would deploy a 'master' pipeline, or (b) only green and blue branches would autodeploy
+2015-06-23 15:12:54	rdm	I guess we could make that happen using a test on branch name
+2015-06-23 15:18:24	walexander	yeah, master could just be copy of whatever is live -- circle can be set up to only run against certain branches if we want
+2015-06-23 15:19:44	walexander	we can maintain the `blue` vs `green` as an environment variable in the circle.yml (and `git rebase` into those instead of merging) 
+2015-06-23 15:20:36	rdm	what advantage do we get from enforced rebase, here?
+2015-06-23 15:21:16	walexander	the circle.yml can be different between the two branches -- not a big deal 
+2015-06-24 17:43:38	walexander	where did you implement those changes to the publisher payment calculation?
+2015-06-24 18:06:36	walexander	Ping 
+2015-06-24 18:06:57	rdm	that was in mart.v_measures_h
+2015-06-24 18:09:04	rdm	Also...
+2015-06-24 18:09:08	rdm	ddl/sql/V2.0.5__import_counts.sql does not work in postgres, because distkey is redshift only.   The only ways I can see to resolve this are (a) remove distkey from definition [presumably inefficient] or (b) use a different definition for postgres and redshift - probably best thing there is to replace the sql file(s) with something which generates that text and update references accordingly
+2015-06-24 18:09:55	walexander	You can remove the distkey 
+2015-06-24 18:10:04	rdm	ok! that makes it easy
+2015-06-24 18:10:37	walexander	Relative to the 11bn rows in f_* tables, that one is tiny
+2015-06-24 18:10:55	rdm	yeah
+2015-06-24 18:11:12	walexander	Do we have any tests around pub payment yet?
+2015-06-24 18:11:18	rdm	we should probably have an index on event_dttm, also, in the f_* tables
+2015-06-24 18:11:40	rdm	We do have a couple, but not for the mixed with threshold nor for mixed without threshold
+2015-06-24 18:12:24	rdm	(the last two scenarios in DATABUS-761 were publisher payment scenarios)
+2015-06-24 18:12:28	walexander	Kk, regarding the index on event dttm -- isn't the event dttm the sort key or something ?
+2015-06-24 18:13:01	rdm	we're pretty much always using order by 1 with event_dttm being column 1, if that is what you mean?
+2015-06-24 18:13:39	walexander	I believe the sort key specified in schema is what redshift uses to order the data on disk
+2015-06-24 18:14:00	rdm	and I think I remember seeing an index on it in some incarnation of some redshift database, but I haven't been seeing anything recently... but maybe I'm not recognizing sort keys?
+2015-06-24 18:14:35	walexander	Yeah, not sure if psql shows them. Have to query the pg catalog tables 
+2015-06-24 18:15:11	walexander	Adding a where event dttm predicate definitely improves qiery performance 
+2015-06-24 18:19:53	rdm	\di is not showing any indices on f_* tables other than f_site_status
+2015-06-24 18:20:15	rdm	apparently our only indices in prod are primary key indices
+2015-06-24 18:20:40	rdm	so it's some other mechanism making event_dttm queries faster
+2015-06-24 18:25:13	rdm	maybe it's because pipeline uses analyze after every run?
+2015-06-24 18:27:53	rdm	hmm... and it is a 'sortkey' - I wonder where that gets declared?
+2015-06-24 19:10:32	walexander	i see in the 1.1transition folder there is code to sync payment rules and terms
+2015-06-24 19:10:40	walexander	but is there anything to sync the rest of the dimensions?
+2015-06-24 20:25:44	rdm	i could write that, but i have not
+2015-06-24 20:25:52	rdm	it's a fairly straightforward process
+2015-06-24 20:26:29	rdm	didn't see any problems with the others - which suggests they don't get updated all that often and the existing helix code was good enough
+2015-06-24 20:42:00	rdm	though there is something of an issue - matching redshift schema up with helix schema
+2015-06-24 21:01:06	walexander	Why is that?
+2015-06-24 21:01:21	rdm	different table names, different column structures
+2015-06-24 21:04:01	rdm	I did a draft ad_size routine - needs testing - a couple #FIXME comments in it
+2015-06-24 21:05:48	rdm	probably doesn't make sense to update d_country from helix, since there's no corresponding table there, and that's probably more driven by "political accidents" than our sales team
+2015-06-24 21:07:32	rdm	d_depth another one that's probably best treated as constant
+2015-06-24 21:08:11	rdm	same for d_device_type
+2015-06-24 21:08:43	rdm	and for d_fold_position
+2015-06-24 21:10:06	rdm	d_payment_term I'm not touching - if that goes bad, we've already got d_paymentterm and d_paymentrule which are normalized
+2015-06-24 21:21:20	rdm	so basically - after leaving out some other obvious ones, that leaves placement+sitesection_placement+sitesection -> d_placement,    ??? -> d_platform,   publisher -> d_publisher,   sitesection+????  -> d_section, and site -> d_site
+2015-06-24 21:23:00	rdm	I'm not completely sure what should go in for the ??? bits - for sections it might be the sitesection_arch_v5 that we need
+2015-06-29 07:53:01	rdm	It seems to me.. with the kafka count alert thing... we could use it like it is - as long as adx import is on schedule - so just have a config for when it comes in, and invert the test once a day. This way if we get schedule drift, it will go off for not showing up (and maybe go off again at a different time of the day for showing up).
+2015-06-29 07:55:55	rdm	But that also suggests we should have another set of alerts based on counts from further upstream? The cloudx proxy could aggregate its own sums - might mean we get an alert when it's restarted? Don't want too many alerts going off but a few here and there let us know that the system is working... (And if we can't get the adx proxy wired for sum alerts next month, we can make the downstream side of the alert sensitive to adx load id, or its absence?)
+2015-06-29 07:58:28	rdm	I'm giving you databus-716 since I don't think I should be addressing it in 1.1 and if you want me to tackle it in 2.0 I'll need soe guidance...
+2015-06-29 08:02:40	rdm	And I gave databus-750 to jas (since he needs to put some more thought into that one)
+2015-06-29 08:03:00	rdm	that leaves me with databus-755 which is this alerting thing - I could use some hints or guidance there, also
+2015-06-30 19:50:23	rdm	on green, "android" gets rolled up into chrome. But shouldn't mobile and desktop be kept separate? I mean if we are going to track browser_name at all...
+2015-07-02 12:45:09	rdm	Hmm...
+2015-07-02 12:45:25	rdm	my opsgenie account is suspended - did you do that?
+2015-07-06 13:01:04	walexander	Hey man I won't be able to make today's training so start without me 
+2015-06-16 13:02:21	rdm	for circle ci... we'll need a postgres instance, I imagine
+2015-06-16 13:02:34	walexander	two more things: 1) get circle to install postgresql on the machine that's running tests
+2015-06-16 13:02:58	walexander	and 2) have circle run the tests without `vagrant` sections 
+2015-06-16 13:03:14	walexander	for the first, you can create a circle.yml file and add a `dependencies:` section
+2015-06-16 13:03:17	walexander	https://circleci.com/docs/installing-custom-software
+2015-06-16 13:03:48	walexander	and then, https://circleci.com/docs/manually#databases
+2015-06-16 13:04:30	rdm	Hmm... I'm going to also need to mention the stuff I installed through pip
+2015-06-16 13:04:51	walexander	right  -- put those in separate sections
+2015-06-16 13:05:45	walexander	``` 
+2015-06-16 13:05:45		dependencies: 
+2015-06-16 13:05:45		     postgres:
+2015-06-16 13:05:45		           sudo apt-get install postgresql92
+2015-06-16 13:05:45		    hindsight: 
+2015-06-16 13:05:45		           sudo pip install hindsight
+2015-06-16 13:05:45		````
+2015-06-16 13:05:51	rdm	does that stuff run in the root of the project?
+2015-06-16 13:05:58	rdm	(thinking of doing a requirements.txt for pip...)
+2015-06-16 13:06:04	walexander	yes
+2015-06-16 13:06:12	rdm	kk, nice
+2015-06-16 13:06:32	walexander	it's an ubuntu 12.04 instance
+2015-06-16 13:07:28	walexander	if you need to, you can get ssh access tot he build server by clicking on Rebuild ``` with ssh``` button 
+2015-06-16 13:07:34	walexander	https://circleci.com/gh/beanstock/data-pipeline/59
+2015-06-16 13:08:40	rdm	Ok, I hit that... I don't see any ssh creds - I guess it's going to feed me stuff via the browser..
+2015-06-16 13:08:51	rdm	ah, I see them...
+2015-06-16 13:10:56	rdm	kk, nice, I'll exercise that once I've handled the obvious issues
+2015-06-16 13:11:20	rdm	It wants to do an npm test right now - we using any node stuff in this project?
+2015-06-16 13:11:51	walexander	there's a package.json and that's what it detects
+2015-06-16 13:12:54	rdm	package.json specifies make test but the makefile is in ddl... so, should be instead: `cd ddl && make test` I think?
+2015-06-16 13:13:16	walexander	i originally thought we could have a Makefile at the top level 
+2015-06-16 13:14:38	walexander	the `deploy/install` is really for the `adp/` folder -- was thinking we could move `deploy` into `adp/deploy` and have the `adp/Makefile` run `adp/deploy/install`, `adp/deploy/test` etc.
+2015-06-16 13:14:53	rdm	We can... easy enough to have it delegate targets however -- do `test:` `    cd ddl && make test` for example - it depends on what level of control you want at each level
+2015-06-16 13:15:30	rdm	so if make test needs to delegate to makefiles in multiple directories, you list them out like you want
+2015-06-16 13:15:31	walexander	I just want `make test` run at all three levels `/; /adp; and /ddl` to run the tests 
+2015-06-16 13:15:47	rdm	Easy enough
+2015-06-16 13:16:24	rdm	though for now the tests specific to the top level is an empty list and delegating to the others won't change that - gotta supply them
+2015-06-16 13:17:34	walexander	can the top-level `make test` simply run the tests for both `ddl` and `adp`
+2015-06-16 13:17:35	walexander	?
+2015-06-16 13:17:39	rdm	sure
+2015-06-16 13:17:53	rdm	does it matter which order they get run in?
+2015-06-16 13:17:58	walexander	nope
+2015-06-16 13:18:22	rdm	kk, that's even easier
+2015-06-16 13:18:23	walexander	for the depencies: I think it's okay if we install postgresql via the circle.yml and not worry about vagrant 
+2015-06-16 13:18:41	rdm	kk
+2015-06-16 13:18:43	walexander	but for the `pip` deps, probably makes sense to install those via `npm`
+2015-06-16 13:19:13	walexander	in `package.json` you can specify a `scripts: { preinstall: "pre-install-script" } ` 
+2015-06-16 13:19:54	walexander	that way, `npm install` will install those automatically and we won'ptt need to add them to the `circle.yml`
+2015-06-16 13:21:00	rdm	Hmm... so vagrant vs. local postgres server will be external to npm install... probably deserves a sentence in the readme or something once I get it working...
+2015-06-16 13:21:58	walexander	separate question:  I need to do like a pivot table in redshift 
+2015-06-16 13:22:45	walexander	have a table like: ```
+2015-06-16 13:22:45		type  |date    |totals
+2015-06-16 13:22:45		foo     |1/1/1 |5
+2015-06-16 13:22:45		bar     |1/1/1 | 7
+2015-06-16 13:22:45		```
+2015-06-16 13:24:01	walexander	and what I want is a query that returns ```
+2015-06-16 13:24:01		date    |foo     |bar
+2015-06-16 13:24:01		1/1/1 |8          | 7 
+2015-06-16 13:24:01		```
+2015-06-16 13:24:34	rdm	I presume the foo/bar stuff is dynamic? so need something to do an initial query to find those values and then generate and run the resulting select
+2015-06-16 13:25:19	rdm	supposedly the csvkit that I'm using for the gherkin stuff supports pivoting
+2015-06-16 13:25:31	rdm	oh, no, that's pandas
+2015-06-16 13:25:36	rdm	that supports pivoting
+2015-06-16 13:26:14	rdm	Or easy enough to write the code to do it - about the same complexity one way or the other
+2015-06-16 13:26:24	walexander	basically something like ```SELECT date, sum(foo), sum(bar) FROM (  select date, CASE type WHEN 'foo' THEN totals ELSE 0 END, CASE type WHEN 'bar' THEN totals ELSE 0 END ) ```
+2015-06-16 13:26:46	rdm	yeah
+2015-06-16 13:27:12	walexander	but probably not possible to make that dynamic in redshift at least
+2015-06-16 13:27:20	walexander	?
+2015-06-16 13:27:51	rdm	yeah, redshift doesn't even give us stored procedures and everything needs to drive it from the outside
+2015-06-16 13:28:17	walexander	yeah -- and doesn't support `crosstab` like postgres does
+2015-06-16 13:28:49	rdm	yeah.. doesn't fit their pricing model, I guess...
+2015-06-18 10:02:25	rdm	Does it seem reasonable to use http://lab.beanstock.com for https://beanstockmedia.atlassian.net/browse/DATABUS-754 (if so, I'll need login creds - if not, I need to decide between pasting that into helix or spinning up a new server for this purpose)
+2015-06-18 10:15:12	walexander	no, don't worry about that one -- we'll use tableau for that
+2015-06-18 10:15:46	walexander	can you takee a look at this: https://github.com/cucumber/cucumber-js
+2015-06-18 10:16:01	walexander	and see if that's easily used for parsing the gherkin
+2015-06-18 10:40:43	rdm	Should I care about https://robots.thoughtbot.com/writing-better-cucumber-scenarios-or-why-were
+2015-06-18 10:41:45	rdm	(which basically says "don't structure data")
+2015-06-18 10:41:51	walexander	eh, fuck 'em
+2015-06-18 10:41:54	rdm	kk
+2015-06-22 20:04:57	rdm	are we logging kafka offset for a pipeline run anywhere?
+2015-06-22 20:06:54	rdm	(it looks like we are for green... hmm...)
+2015-06-22 20:58:22	walexander	we are -- in working/from_kafka we put the offset file into a folder for the next hour
+2015-06-22 20:58:54	walexander	any reason you're interested?
+2015-06-22 20:59:11	rdm	databus-755
+2015-06-22 20:59:38	rdm	wants me to detect when kafka offset delta between runs exceeds a threshold
+2015-06-22 20:59:51	rdm	tracking it like this makes it possible to do sanely
+2015-06-22 21:01:38	walexander	tracking it like ... ?
+2015-06-22 21:02:11	rdm	so, for example, I could look at
+2015-06-22 21:02:12	rdm	s3://databus-production/green.prod/working/2015_05_23/01_00/kafka/offsets.json
+2015-06-22 21:02:26	rdm	or maybe a smaller set of files to see recent offsets
+2015-06-22 21:03:42	rdm	I sort of have to ignore that the most recent one I can plausibly test probably will not exist... but that sort of stuff i can fiddle with after I've got it basically working
+2015-06-22 21:05:44	walexander	the offset will exist before any job attempts to process using that offset 
+2015-06-22 21:05:50	walexander	if that helps 
+2015-06-22 21:06:13	rdm	yeah, any understanding i can get helps
+2015-06-22 21:08:32	walexander	i just merged the `sentry` branch into master
+2015-06-22 21:08:55	rdm	nice
+2015-06-22 21:09:25	rdm	(i think i saw that in #databus
+2015-06-22 21:10:12	walexander	use the adp/defs/pipeline_sentry.json to run a task that calculates the deltas for the latest offset
+2015-06-22 21:10:21	rdm	(and I've got it pulled now)
+2015-06-22 21:11:09	rdm	that's got a lot of stuff in it... I'll need to digest it
+2015-06-22 21:11:20	walexander	don't need to worry about what's in it now really 
+2015-06-22 21:11:37	rdm	is an instance of this thing running?
+2015-06-22 21:11:40	walexander	yes
+2015-06-22 21:11:54	walexander	https://console.aws.amazon.com/datapipeline/home?region=us-east-1#ExecutionDetailsPlace:pipelineId=df-076586216LXCCQ2LKC5K&show=latest
+2015-06-22 21:12:19	walexander	it's feeding http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard
+2015-06-22 21:12:57	rdm	Ah... that's the source of the kafka counts?
+2015-06-22 21:12:57	walexander	which is comparing event counts from kafka -> hive -> redshift
+2015-06-22 21:13:28	walexander	that's just ingesting the `report_c` files generated by the hadoop-event-processor job 
+2015-06-22 21:14:05	walexander	and doing a `select count(*) FROM ... WHERE import_ds = '...'` against hive and redshift, then importing all three counts into `work.import_counts`
+2015-06-22 21:14:28	walexander	`that` being the pipeline_sentry pipeline
+2015-06-22 21:14:36	walexander	the tableau workbook is just reading that tabl e
+2015-06-22 21:15:12	rdm	kk... I guess we'll want to build an analog of that workbook in looker if we sign that deal with them
+2015-06-22 21:15:30	walexander	at some point 
+2015-06-22 21:15:41	walexander	i sent you an invite to `opsgenie.com`
+2015-06-22 21:16:22	walexander	pipeline_sentry runs this script https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-22 21:16:25	rdm	it says you are jas... this invite is just me, i take it? it wants me to reset my password
+2015-06-22 21:16:59	walexander	if that script fails, it sends email to opsgenie which opens a ticket
+2015-06-22 21:17:58	walexander	there's an open ticket in there now for 1000am today -- due to the redshift counts not matching the hive ones (caused by adx import) 
+2015-06-22 21:19:36	rdm	that'll happen every day, I guess, until we decide how we want to fix that
+2015-06-22 21:19:58	walexander	yeah, working on it 
+2015-06-22 21:20:29	rdm	I should be able to read the code well enough to figure out what's going on
+2015-06-22 21:21:16	walexander	if your script exits non-zero, it'll run the `onFail` action defined in the pipeline
+2015-06-22 21:22:31	walexander	if we use the same subject line as the `sns_failure_notification` https://github.com/beanstock/data-pipeline/blob/master/adp/defs/pipeline_sentry.json#L30
+2015-06-22 21:22:44	rdm	hmm... so alerts can't include any information from the script? or would a prefix of stdout or stderr be useful?
+2015-06-22 21:23:16	rdm	Or should that subject be a url maybe... hmm...
+2015-06-22 21:23:16	walexander	it's lame, but no -- just what's available to the pipeline itself
+2015-06-22 21:23:21	rdm	figures
+2015-06-22 21:23:31	walexander	put the urls' in the message, the subject should be the same 
+2015-06-22 21:24:07	walexander	opsgenie's set up to parse the `import_ds` from the subject and use that as the "key" 
+2015-06-22 21:24:08	rdm	it would be a constant, that url - like the tableau page
+2015-06-22 21:24:16	rdm	ah! ok
+2015-06-22 21:24:30	walexander	that way, an `onsuccess` message will clear the status
+2015-06-22 21:24:54	rdm	onsuccess from a rerun of the pipeline?
+2015-06-22 21:24:57	walexander	you can just put a link to the s3:// log location
+2015-06-22 21:25:06	walexander	right, or another attempt
+2015-06-23 11:57:04	walexander	do you have admin user password to redshift-qa-1
+2015-06-23 14:28:58	rdm	sry, just noticed this - i do
+2015-06-23 14:29:22	rdm	or at least now it's the same as production
+2015-06-23 14:30:26	walexander	i changed it
+2015-06-23 14:30:54	rdm	makes sense
+2015-06-23 14:34:08	rdm	do you have any favorite jira references which suggest tests for data-pipeline's adp/ directory?
+2015-06-23 14:35:42	rdm	I mean... a lot of that winds up being tested at deployment time, which is the whole reason for  the blue/green ...
+2015-06-23 14:36:27	walexander	i'm not worried about testing adp/ 
+2015-06-23 14:36:52	rdm	kk, I'll disable the autofail I've got in there as a placeholder
+2015-06-23 14:36:55	walexander	not much possible beyond the blue/green stuff
+2015-06-23 14:38:05	rdm	but before I push that out to github, there's the "blue/green" switch issue. Is there some way that autodeploy can know which color is "prod" so that it can [tear down if needed and] deploy the other
+2015-06-23 14:42:36	rdm	I guess a dns query would make sense - just need to decide on what name to query
+2015-06-23 14:42:56	rdm	cold be as simple as a cname lookup?
+2015-06-23 14:44:10	walexander	that's a good question
+2015-06-23 14:44:44	walexander	i think we'll need to maintain that value somewhere to indicate the non-live environment
+2015-06-23 15:11:20	walexander	Or we could just use a blue and a green branch in github 
+2015-06-23 15:12:18	rdm	hmm... so either (a) deploy to master would deploy a 'master' pipeline, or (b) only green and blue branches would autodeploy
+2015-06-23 15:12:54	rdm	I guess we could make that happen using a test on branch name
+2015-06-23 15:18:24	walexander	yeah, master could just be copy of whatever is live -- circle can be set up to only run against certain branches if we want
+2015-06-23 15:19:44	walexander	we can maintain the `blue` vs `green` as an environment variable in the circle.yml (and `git rebase` into those instead of merging) 
+2015-06-23 15:20:36	rdm	what advantage do we get from enforced rebase, here?
+2015-06-23 15:21:16	walexander	the circle.yml can be different between the two branches -- not a big deal 
+2015-06-24 17:43:38	walexander	where did you implement those changes to the publisher payment calculation?
+2015-06-24 18:06:36	walexander	Ping 
+2015-06-24 18:06:57	rdm	that was in mart.v_measures_h
+2015-06-24 18:09:04	rdm	Also...
+2015-06-24 18:09:08	rdm	ddl/sql/V2.0.5__import_counts.sql does not work in postgres, because distkey is redshift only.   The only ways I can see to resolve this are (a) remove distkey from definition [presumably inefficient] or (b) use a different definition for postgres and redshift - probably best thing there is to replace the sql file(s) with something which generates that text and update references accordingly
+2015-06-24 18:09:55	walexander	You can remove the distkey 
+2015-06-24 18:10:04	rdm	ok! that makes it easy
+2015-06-24 18:10:37	walexander	Relative to the 11bn rows in f_* tables, that one is tiny
+2015-06-24 18:10:55	rdm	yeah
+2015-06-24 18:11:12	walexander	Do we have any tests around pub payment yet?
+2015-06-24 18:11:18	rdm	we should probably have an index on event_dttm, also, in the f_* tables
+2015-06-24 18:11:40	rdm	We do have a couple, but not for the mixed with threshold nor for mixed without threshold
+2015-06-24 18:12:24	rdm	(the last two scenarios in DATABUS-761 were publisher payment scenarios)
+2015-06-24 18:12:28	walexander	Kk, regarding the index on event dttm -- isn't the event dttm the sort key or something ?
+2015-06-24 18:13:01	rdm	we're pretty much always using order by 1 with event_dttm being column 1, if that is what you mean?
+2015-06-24 18:13:39	walexander	I believe the sort key specified in schema is what redshift uses to order the data on disk
+2015-06-24 18:14:00	rdm	and I think I remember seeing an index on it in some incarnation of some redshift database, but I haven't been seeing anything recently... but maybe I'm not recognizing sort keys?
+2015-06-24 18:14:35	walexander	Yeah, not sure if psql shows them. Have to query the pg catalog tables 
+2015-06-24 18:15:11	walexander	Adding a where event dttm predicate definitely improves qiery performance 
+2015-06-24 18:19:53	rdm	\di is not showing any indices on f_* tables other than f_site_status
+2015-06-24 18:20:15	rdm	apparently our only indices in prod are primary key indices
+2015-06-24 18:20:40	rdm	so it's some other mechanism making event_dttm queries faster
+2015-06-24 18:25:13	rdm	maybe it's because pipeline uses analyze after every run?
+2015-06-24 18:27:53	rdm	hmm... and it is a 'sortkey' - I wonder where that gets declared?
+2015-06-24 19:10:32	walexander	i see in the 1.1transition folder there is code to sync payment rules and terms
+2015-06-24 19:10:40	walexander	but is there anything to sync the rest of the dimensions?
+2015-06-24 20:25:44	rdm	i could write that, but i have not
+2015-06-24 20:25:52	rdm	it's a fairly straightforward process
+2015-06-24 20:26:29	rdm	didn't see any problems with the others - which suggests they don't get updated all that often and the existing helix code was good enough
+2015-06-24 20:42:00	rdm	though there is something of an issue - matching redshift schema up with helix schema
+2015-06-24 21:01:06	walexander	Why is that?
+2015-06-24 21:01:21	rdm	different table names, different column structures
+2015-06-24 21:04:01	rdm	I did a draft ad_size routine - needs testing - a couple #FIXME comments in it
+2015-06-24 21:05:48	rdm	probably doesn't make sense to update d_country from helix, since there's no corresponding table there, and that's probably more driven by "political accidents" than our sales team
+2015-06-24 21:07:32	rdm	d_depth another one that's probably best treated as constant
+2015-06-24 21:08:11	rdm	same for d_device_type
+2015-06-24 21:08:43	rdm	and for d_fold_position
+2015-06-24 21:10:06	rdm	d_payment_term I'm not touching - if that goes bad, we've already got d_paymentterm and d_paymentrule which are normalized
+2015-06-24 21:21:20	rdm	so basically - after leaving out some other obvious ones, that leaves placement+sitesection_placement+sitesection -> d_placement,    ??? -> d_platform,   publisher -> d_publisher,   sitesection+????  -> d_section, and site -> d_site
+2015-06-24 21:23:00	rdm	I'm not completely sure what should go in for the ??? bits - for sections it might be the sitesection_arch_v5 that we need
+2015-06-29 07:53:01	rdm	It seems to me.. with the kafka count alert thing... we could use it like it is - as long as adx import is on schedule - so just have a config for when it comes in, and invert the test once a day. This way if we get schedule drift, it will go off for not showing up (and maybe go off again at a different time of the day for showing up).
+2015-06-29 07:55:55	rdm	But that also suggests we should have another set of alerts based on counts from further upstream? The cloudx proxy could aggregate its own sums - might mean we get an alert when it's restarted? Don't want too many alerts going off but a few here and there let us know that the system is working... (And if we can't get the adx proxy wired for sum alerts next month, we can make the downstream side of the alert sensitive to adx load id, or its absence?)
+2015-06-29 07:58:28	rdm	I'm giving you databus-716 since I don't think I should be addressing it in 1.1 and if you want me to tackle it in 2.0 I'll need soe guidance...
+2015-06-29 08:02:40	rdm	And I gave databus-750 to jas (since he needs to put some more thought into that one)
+2015-06-29 08:03:00	rdm	that leaves me with databus-755 which is this alerting thing - I could use some hints or guidance there, also
+2015-06-30 19:50:23	rdm	on green, "android" gets rolled up into chrome. But shouldn't mobile and desktop be kept separate? I mean if we are going to track browser_name at all...
+2015-07-02 12:45:09	rdm	Hmm...
+2015-07-02 12:45:25	rdm	my opsgenie account is suspended - did you do that?
+2015-07-06 13:01:04	walexander	Hey man I won't be able to make today's training so start without me 
+2015-06-16 13:02:21	rdm	for circle ci... we'll need a postgres instance, I imagine
+2015-06-16 13:02:34	walexander	two more things: 1) get circle to install postgresql on the machine that's running tests
+2015-06-16 13:02:58	walexander	and 2) have circle run the tests without `vagrant` sections 
+2015-06-16 13:03:14	walexander	for the first, you can create a circle.yml file and add a `dependencies:` section
+2015-06-16 13:03:17	walexander	https://circleci.com/docs/installing-custom-software
+2015-06-16 13:03:48	walexander	and then, https://circleci.com/docs/manually#databases
+2015-06-16 13:04:30	rdm	Hmm... I'm going to also need to mention the stuff I installed through pip
+2015-06-16 13:04:51	walexander	right  -- put those in separate sections
+2015-06-16 13:05:45	walexander	``` 
+2015-06-16 13:05:45		dependencies: 
+2015-06-16 13:05:45		     postgres:
+2015-06-16 13:05:45		           sudo apt-get install postgresql92
+2015-06-16 13:05:45		    hindsight: 
+2015-06-16 13:05:45		           sudo pip install hindsight
+2015-06-16 13:05:45		````
+2015-06-16 13:05:51	rdm	does that stuff run in the root of the project?
+2015-06-16 13:05:58	rdm	(thinking of doing a requirements.txt for pip...)
+2015-06-16 13:06:04	walexander	yes
+2015-06-16 13:06:12	rdm	kk, nice
+2015-06-16 13:06:32	walexander	it's an ubuntu 12.04 instance
+2015-06-16 13:07:28	walexander	if you need to, you can get ssh access tot he build server by clicking on Rebuild ``` with ssh``` button 
+2015-06-16 13:07:34	walexander	https://circleci.com/gh/beanstock/data-pipeline/59
+2015-06-16 13:08:40	rdm	Ok, I hit that... I don't see any ssh creds - I guess it's going to feed me stuff via the browser..
+2015-06-16 13:08:51	rdm	ah, I see them...
+2015-06-16 13:10:56	rdm	kk, nice, I'll exercise that once I've handled the obvious issues
+2015-06-16 13:11:20	rdm	It wants to do an npm test right now - we using any node stuff in this project?
+2015-06-16 13:11:51	walexander	there's a package.json and that's what it detects
+2015-06-16 13:12:54	rdm	package.json specifies make test but the makefile is in ddl... so, should be instead: `cd ddl && make test` I think?
+2015-06-16 13:13:16	walexander	i originally thought we could have a Makefile at the top level 
+2015-06-16 13:14:38	walexander	the `deploy/install` is really for the `adp/` folder -- was thinking we could move `deploy` into `adp/deploy` and have the `adp/Makefile` run `adp/deploy/install`, `adp/deploy/test` etc.
+2015-06-16 13:14:53	rdm	We can... easy enough to have it delegate targets however -- do `test:` `    cd ddl && make test` for example - it depends on what level of control you want at each level
+2015-06-16 13:15:30	rdm	so if make test needs to delegate to makefiles in multiple directories, you list them out like you want
+2015-06-16 13:15:31	walexander	I just want `make test` run at all three levels `/; /adp; and /ddl` to run the tests 
+2015-06-16 13:15:47	rdm	Easy enough
+2015-06-16 13:16:24	rdm	though for now the tests specific to the top level is an empty list and delegating to the others won't change that - gotta supply them
+2015-06-16 13:17:34	walexander	can the top-level `make test` simply run the tests for both `ddl` and `adp`
+2015-06-16 13:17:35	walexander	?
+2015-06-16 13:17:39	rdm	sure
+2015-06-16 13:17:53	rdm	does it matter which order they get run in?
+2015-06-16 13:17:58	walexander	nope
+2015-06-16 13:18:22	rdm	kk, that's even easier
+2015-06-16 13:18:23	walexander	for the depencies: I think it's okay if we install postgresql via the circle.yml and not worry about vagrant 
+2015-06-16 13:18:41	rdm	kk
+2015-06-16 13:18:43	walexander	but for the `pip` deps, probably makes sense to install those via `npm`
+2015-06-16 13:19:13	walexander	in `package.json` you can specify a `scripts: { preinstall: "pre-install-script" } ` 
+2015-06-16 13:19:54	walexander	that way, `npm install` will install those automatically and we won'ptt need to add them to the `circle.yml`
+2015-06-16 13:21:00	rdm	Hmm... so vagrant vs. local postgres server will be external to npm install... probably deserves a sentence in the readme or something once I get it working...
+2015-06-16 13:21:58	walexander	separate question:  I need to do like a pivot table in redshift 
+2015-06-16 13:22:45	walexander	have a table like: ```
+2015-06-16 13:22:45		type  |date    |totals
+2015-06-16 13:22:45		foo     |1/1/1 |5
+2015-06-16 13:22:45		foo     |1/1/1 | 3
+2015-06-16 13:22:45		bar     |1/1/1 | 7
+2015-06-16 13:22:45		```
+2015-06-16 13:24:01	walexander	and what I want is a query that returns ```
+2015-06-16 13:24:01		date    |foo     |bar
+2015-06-16 13:24:01		1/1/1   |8          | 7 
+2015-06-16 13:24:01		```
+2015-06-16 13:24:34	rdm	I presume the foo/bar stuff is dynamic? so need something to do an initial query to find those values and then generate and run the resulting select
+2015-06-16 13:25:19	rdm	supposedly the csvkit that I'm using for the gherkin stuff supports pivoting
+2015-06-16 13:25:31	rdm	oh, no, that's pandas
+2015-06-16 13:25:36	rdm	that supports pivoting
+2015-06-16 13:26:14	rdm	Or easy enough to write the code to do it - about the same complexity one way or the other
+2015-06-16 13:26:24	walexander	basically something like ```SELECT date, sum(foo), sum(bar) FROM (  select date, CASE type WHEN 'foo' THEN totals ELSE 0 END, CASE type WHEN 'bar' THEN totals ELSE 0 END ) ```
+2015-06-16 13:26:46	rdm	yeah
+2015-06-16 13:27:12	walexander	but probably not possible to make that dynamic in redshift at least
+2015-06-16 13:27:20	walexander	?
+2015-06-16 13:27:51	rdm	yeah, redshift doesn't even give us stored procedures and everything needs to drive it from the outside
+2015-06-16 13:28:17	walexander	yeah -- and doesn't support `crosstab` like postgres does
+2015-06-16 13:28:49	rdm	yeah.. doesn't fit their pricing model, I guess...
+2015-06-18 10:02:25	rdm	Does it seem reasonable to use http://lab.beanstock.com for https://beanstockmedia.atlassian.net/browse/DATABUS-754 (if so, I'll need login creds - if not, I need to decide between pasting that into helix or spinning up a new server for this purpose)
+2015-06-18 10:15:12	walexander	no, don't worry about that one -- we'll use tableau for that
+2015-06-18 10:15:46	walexander	can you takee a look at this: https://github.com/cucumber/cucumber-js --- GitHub: cucumber/cucumber-js
+2015-06-18 10:16:01	walexander	and see if that's easily used for parsing the gherkin
+2015-06-18 10:40:43	rdm	Should I care about https://robots.thoughtbot.com/writing-better-cucumber-scenarios-or-why-were --- Writing Better Cucumber Scenarios; or, Why We're Deprecating FactoryGirl's Cucumber Steps
+2015-06-18 10:41:45	rdm	(which basically says "don't structure data")
+2015-06-18 10:41:51	walexander	eh, fuck 'em
+2015-06-18 10:41:54	rdm	kk
+2015-06-22 13:59:50	rdm	https://circleci.com/gh/beanstock/data-pipeline/73 -- what kind of tests should we build out for adp/ in data-pipeline repository? --- Hosted Continuous Integration for web applications. Set up your application for testing in one click, on the fastest testing platform on the internet.
+2015-06-22 14:29:17	walexander	There are some tests that run via `npm test`
+2015-06-22 14:30:11	rdm	i think i wrote them... but they don't really accomplish anything for adp/ yet because I do not know what should be tested there
+2015-06-22 14:30:41	walexander	I  wrote the adp/ ones 
+2015-06-22 14:30:54	rdm	hmm... maybe I trashed them then.. hmm...
+2015-06-22 14:31:20	walexander	They don't do much -- just make sure all the parameters are specified in the values 
+2015-06-22 14:31:54	rdm	I think those are in ddl/
+2015-06-22 14:32:54	rdm	hmm... adp looks like it might be related to the 1.1 post-release fixes
+2015-06-22 14:33:24	rdm	(just trying to wrap my head around where this is supposed to be going...)
+2015-06-22 20:04:57	rdm	are we logging kafka offset for a pipeline run anywhere?
+2015-06-22 20:06:54	rdm	(it looks like we are for green... hmm...)
+2015-06-22 20:58:22	walexander	we are -- in working/from_kafka we put the offset file into a folder for the next run
+2015-06-22 20:58:54	walexander	any reason you're interested?
+2015-06-22 20:59:11	rdm	databus-755
+2015-06-22 20:59:38	rdm	wants me to detect when kafka offset delta between runs exceeds a threshold
+2015-06-22 20:59:51	rdm	tracking it like this makes it possible to do sanely
+2015-06-22 21:01:38	walexander	tracking it like ... ?
+2015-06-22 21:02:11	rdm	so, for example, I could look at
+2015-06-22 21:02:12	rdm	s3://databus-production/green.prod/working/2015_05_23/01_00/kafka/offsets.json
+2015-06-22 21:02:26	rdm	or maybe a smaller set of files to see recent offsets
+2015-06-22 21:03:42	rdm	I sort of have to ignore that the most recent one I can plausibly test probably will not exist... but that sort of stuff i can fiddle with after I've got it basically working
+2015-06-22 21:05:44	walexander	the offset will exist before any job attempts to process using that offset 
+2015-06-22 21:05:50	walexander	if that helps 
+2015-06-22 21:06:13	rdm	yeah, any understanding i can get helps
+2015-06-22 21:08:32	walexander	i just merged the `sentry` branch into master
+2015-06-22 21:08:55	rdm	nice
+2015-06-22 21:09:25	rdm	(i think i saw that in #databus
+2015-06-22 21:10:12	walexander	use the adp/defs/pipeline_sentry.json to run a task that calculates the deltas for the latest offset
+2015-06-22 21:10:21	rdm	(and I've got it pulled now)
+2015-06-22 21:11:09	rdm	that's got a lot of stuff in it... I'll need to digest it
+2015-06-22 21:11:20	walexander	don't need to worry about what's in it now really 
+2015-06-22 21:11:37	rdm	is an instance of this thing running?
+2015-06-22 21:11:40	walexander	yes
+2015-06-22 21:11:54	walexander	https://console.aws.amazon.com/datapipeline/home?region=us-east-1#ExecutionDetailsPlace:pipelineId=df-076586216LXCCQ2LKC5K&show=latest
+2015-06-22 21:12:19	walexander	it's feeding http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard
+2015-06-22 21:12:57	rdm	Ah... that's the source of the kafka counts?
+2015-06-22 21:12:57	walexander	which is comparing event counts from kafka -> hive -> redshift
+2015-06-22 21:13:28	walexander	that's just ingesting the `report_c` files generated by the hadoop-event-processor job 
+2015-06-22 21:14:05	walexander	and doing a `select count(*) FROM ... WHERE import_ds = '...'` against hive and redshift, then importing all three counts into `work.import_counts`
+2015-06-22 21:14:28	walexander	`that` being the pipeline_sentry pipeline
+2015-06-22 21:14:36	walexander	the tableau workbook is just reading that tabl e
+2015-06-22 21:15:12	rdm	kk... I guess we'll want to build an analog of that workbook in looker if we sign that deal with them
+2015-06-22 21:15:30	walexander	at some point 
+2015-06-22 21:15:41	walexander	i sent you an invite to http://opsgenie.com
+2015-06-22 21:16:22	walexander	pipeline_sentry runs this script https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-22 21:16:25	rdm	it says you are jas... this invite is just me, i take it? it wants me to reset my password
+2015-06-22 21:16:59	walexander	if that script fails, it sends email to opsgenie which opens a ticket
+2015-06-22 21:17:58	walexander	there's an open ticket in there now for 1000am today -- due to the redshift counts not matching the hive ones (caused by adx import) 
+2015-06-22 21:19:36	rdm	that'll happen every day, I guess, until we decide how we want to fix that
+2015-06-22 21:19:58	walexander	yeah, working on it 
+2015-06-22 21:20:29	rdm	I should be able to read the code well enough to figure out what's going on
+2015-06-22 21:21:16	walexander	if your script exits non-zero, it'll run the `onFail` action defined in the pipeline
+2015-06-22 21:22:31	walexander	if we use the same subject line as the `sns_failure_notification` https://github.com/beanstock/data-pipeline/blob/master/adp/defs/pipeline_sentry.json#L30
+2015-06-22 21:22:44	rdm	hmm... so alerts can't include any information from the script? or would a prefix of stdout or stderr be useful?
+2015-06-22 21:23:16	rdm	Or should that subject be a url maybe... hmm...
+2015-06-22 21:23:16	walexander	it's lame, but no -- just what's available to the pipeline itself
+2015-06-22 21:23:21	rdm	figures
+2015-06-22 21:23:31	walexander	put the urls' in the message, the subject should be the same 
+2015-06-22 21:24:07	walexander	opsgenie's set up to parse the `import_ds` from the subject and use that as the "key" 
+2015-06-22 21:24:08	rdm	it would be a constant, that url - like the tableau page
+2015-06-22 21:24:16	rdm	ah! ok
+2015-06-22 21:24:30	walexander	that way, an `onsuccess` message will clear the status
+2015-06-22 21:24:54	rdm	onsuccess from a rerun of the pipeline?
+2015-06-22 21:24:57	walexander	you can just put a link to the s3:// log location
+2015-06-22 21:25:06	walexander	right, or another attempt
+2015-06-23 11:57:04	walexander	do you have admin user password to redshift-qa-1
+2015-06-23 14:28:58	rdm	sry, just noticed this - i do
+2015-06-23 14:29:22	rdm	or at least now it's the same as production
+2015-06-23 14:30:26	walexander	i changed it
+2015-06-23 14:30:54	rdm	makes sense
+2015-06-23 14:34:08	rdm	do you have any favorite jira references which suggest tests for data-pipeline's adp/ directory?
+2015-06-23 14:35:42	rdm	I mean... a lot of that winds up being tested at deployment time, which is the whole reason for  the blue/green ...
+2015-06-23 14:36:27	walexander	i'm not worried about testing adp/ 
+2015-06-23 14:36:52	rdm	kk, I'll disable the autofail I've got in there as a placeholder
+2015-06-23 14:36:55	walexander	not much possible beyond the blue/green stuff
+2015-06-23 14:38:05	rdm	but before I push that out to github, there's the "blue/green" switch issue. Is there some way that autodeploy can know which color is "prod" so that it can [tear down if needed and] deploy the other
+2015-06-23 14:42:36	rdm	I guess a dns query would make sense - just need to decide on what name to query
+2015-06-23 14:42:56	rdm	cold be as simple as a cname lookup?
+2015-06-23 14:44:10	walexander	that's a good question
+2015-06-23 14:44:44	walexander	i think we'll need to maintain that value somewhere to indicate the non-live environment
+2015-06-23 15:11:20	walexander	Or we could just use a blue and a green branch in github 
+2015-06-23 15:12:18	rdm	hmm... so either (a) deploy to master would deploy a 'master' pipeline, or (b) only green and blue branches would autodeploy?
+2015-06-23 15:12:54	rdm	I guess we could make that happen using a test on branch name
+2015-06-23 15:18:24	walexander	yeah, master could just be copy of whatever is live -- circle can be set up to only run against certain branches if we want
+2015-06-23 15:19:44	walexander	we can maintain the `blue` vs `green` as an environment variable in the circle.yml (and `git rebase` into those instead of merging) 
+2015-06-23 15:20:36	rdm	what advantage do we get from enforced rebase, here?
+2015-06-23 15:21:16	walexander	the circle.yml can be different between the two branches -- not a big deal 
+2015-06-24 17:43:38	walexander	where did you implement those changes to the publisher payment calculation?
+2015-06-24 18:06:36	walexander	Ping 
+2015-06-24 18:06:57	rdm	that was in mart.v_measures_h
+2015-06-24 18:09:04	rdm	Also...
+2015-06-24 18:09:08	rdm	ddl/sql/V2.0.5__import_counts.sql does not work in postgres, because distkey is redshift only.   The only ways I can see to resolve this are (a) remove distkey from definition [presumably inefficient] or (b) use a different definition for postgres and redshift - probably best thing there is to replace the sql file(s) with something which generates that text and update references accordingly?
+2015-06-24 18:09:55	walexander	You can remove the distkey 
+2015-06-24 18:10:04	rdm	ok! that makes it easy
+2015-06-24 18:10:37	walexander	Relative to the 11bn rows in f_* tables, that one is tiny
+2015-06-24 18:10:55	rdm	yeah
+2015-06-24 18:11:12	walexander	Do we have any tests around pub payment yet?
+2015-06-24 18:11:18	rdm	we should probably have an index on event_dttm, also, in the f_* tables
+2015-06-24 18:11:40	rdm	We do have a couple, but not for the mixed with threshold nor for mixed without threshold
+2015-06-24 18:12:24	rdm	(the last two scenarios in DATABUS-761 were publisher payment scenarios)
+2015-06-24 18:12:28	walexander	Kk, regarding the index on event dttm -- isn't the event dttm the sort key or something ?
+2015-06-24 18:13:01	rdm	we're pretty much always using `order by 1` with event_dttm being column 1, if that is what you mean?
+2015-06-24 18:13:39	walexander	I believe the sort key specified in schema is what redshift uses to order the data on disk
+2015-06-24 18:14:00	rdm	and I think I remember seeing an index on it in some incarnation of some redshift database, but I haven't been seeing anything recently... but maybe I'm not recognizing sort keys?
+2015-06-24 18:14:35	walexander	Yeah, not sure if psql shows them. Have to query the pg catalog tables 
+2015-06-24 18:15:11	walexander	Adding a where event dttm predicate definitely improves qiery performance 
+2015-06-24 18:19:53	rdm	\di is not showing any indices on f_* tables other than f_site_status
+2015-06-24 18:20:15	rdm	apparently our only indices in prod are primary key indices
+2015-06-24 18:20:40	rdm	so it's some other mechanism making event_dttm queries faster
+2015-06-24 18:25:13	rdm	maybe it's because pipeline uses analyze after every run?
+2015-06-24 18:27:53	rdm	hmm... and it is a 'sortkey' - I wonder where that gets declared?
+2015-06-24 19:10:32	walexander	i see in the 1.1transition folder there is code to sync payment rules and terms
+2015-06-24 19:10:40	walexander	but is there anything to sync the rest of the dimensions?
+2015-06-24 20:25:44	rdm	i could write that, but i have not
+2015-06-24 20:25:52	rdm	it's a fairly straightforward process
+2015-06-24 20:26:29	rdm	didn't see any problems with the others - which suggests they don't get updated all that often and the existing helix code was good enough
+2015-06-24 20:42:00	rdm	though there is something of an issue - matching redshift schema up with helix schema
+2015-06-24 21:01:06	walexander	Why is that?
+2015-06-24 21:01:21	rdm	different table names, different column structures
+2015-06-24 21:04:01	rdm	I did a draft ad_size routine - needs testing - a couple #FIXME comments in it
+2015-06-24 21:05:48	rdm	probably doesn't make sense to update d_country from helix, since there's no corresponding table there, and that's probably more driven by "political accidents" than our sales team
+2015-06-24 21:07:32	rdm	d_depth another one that's probably best treated as constant
+2015-06-24 21:08:11	rdm	same for d_device_type
+2015-06-24 21:08:43	rdm	and for d_fold_position
+2015-06-24 21:10:06	rdm	d_payment_term I'm not touching - if that goes bad, we've already got d_paymentterm and d_paymentrule which are normalized
+2015-06-24 21:21:20	rdm	so basically - after leaving out some other obvious ones, that leaves placement+sitesection_placement+sitesection -> d_placement,    ??? -> d_platform,   publisher -> d_publisher,   sitesection+????  -> d_section, and site -> d_site
+2015-06-24 21:23:00	rdm	I'm not completely sure what should go in for the ??? bits - for sections it might be the sitesection_arch_v5 that we need
+2015-06-29 07:53:01	rdm	It seems to me.. with the kafka count alert thing... we could use it like it is - as long as adx import is on schedule - so just have a config for when it comes in, and invert the test once a day. This way if we get schedule drift, it will go off for not showing up (and maybe go off again at a different time of the day for showing up).
+2015-06-29 07:55:55	rdm	But that also suggests we should have another set of alerts based on counts from further upstream? The cloudx proxy could aggregate its own sums - might mean we get an alert when it's restarted? Don't want too many alerts going off but a few here and there let us know that the system is working... (And if we can't get the adx proxy wired for sum alerts next month, we can make the downstream side of the alert sensitive to adx load id, or its absence?)
+2015-06-29 07:58:28	rdm	I'm giving you databus-716 since I don't think I should be addressing it in 1.1 and if you want me to tackle it in 2.0 I'll need some guidance...
+2015-06-29 08:02:40	rdm	And I gave databus-750 to jas (since he needs to put some more thought into that one)
+2015-06-29 08:03:00	rdm	that leaves me with databus-755 which is this alerting thing - I could use some hints or guidance there, also
+2015-06-30 19:50:23	rdm	on green, "android" gets rolled up into chrome. But shouldn't mobile and desktop be kept separate? I mean if we are going to track browser_name at all...
+2015-07-02 12:45:09	rdm	Hmm...
+2015-07-02 12:45:25	rdm	my opsgenie account is suspended - did you do that?
+2015-07-06 13:01:04	walexander	Hey man I won't be able to make today's training so start without me 

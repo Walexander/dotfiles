@@ -1,0 +1,920 @@
+2015-06-12 14:30:03	jwong	thats a nice touch
+2015-06-12 14:30:12	jwong	organize it better
+2015-06-12 14:30:16	rdm	and then the tables I want - calling them "feats" for lack of a better name
+2015-06-12 14:30:46	rdm	probably should use a better name - i already confused myself in my initial quips with you
+2015-06-12 14:31:11	rdm	maybe just "table"...
+2015-06-12 14:31:12	jwong	so each scenario prescribes its own table?
+2015-06-12 14:31:16	jwong	table(s)
+2015-06-12 14:31:58	rdm	yeah... they relate to the gherkin text (which is semi-formalized - but for our purposes I think I'd rather have someone manually convert those to test cases - going full automated would miss out good possibilities for technical review)
+2015-06-12 14:33:12	jwong	right.. this is pretty cool
+2015-06-12 14:33:23	rdm	My current todo on this line of thinking looks like: (1) think about names, (2) forget about it, just come up with something I can live with, (3) import tables to pg_unit db, (4) write tests
+2015-06-12 14:33:44	rdm	:innocent:
+2015-06-12 14:34:46	jwong	refreshing to know im not the only one who spends time on naming
+2015-06-12 14:34:54	rdm	heh... you know the saying
+2015-06-12 14:35:03	rdm	The two hardest problems in computer science are:
+2015-06-12 14:35:07	rdm	(1) naming
+2015-06-12 14:35:13	rdm	(2) cache management
+2015-06-12 14:35:18	rdm	(3) off-by-one errors
+2015-06-12 14:35:30	jwong	LOL dude thats 3 things
+2015-06-12 14:35:36	rdm	exactly :wink:
+2015-06-12 14:35:45	jwong	lulz
+2015-06-12 15:09:41	walexander	@jas are we explicitly excluding mobile devices from these buys on meetme and gamefaqs?
+2015-06-12 16:12:55	jas	yes, I think so
+2015-06-12 16:26:16	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/a22516f|1 new commit> by Will Alexander
+2015-06-12 16:26:21	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/7ccb5ff32a5f...cafc870209cc|3 new commits> by Will Alexander
+2015-06-14 18:56:58	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/d29347d|1 new commit> by Raul Miller
+2015-06-14 18:58:04	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/54|#54>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-14 18:58:04		 - provide boring but concise table names (<https://github.com/beanstock/data-pipeline/commit/d29347d432624cdcc50db5ddebaa24872a752c04|d29347d> by Raul Miller)
+2015-06-15 08:24:25	rdm	tableau issues this morning. (1) tableau is telling me that a redshift server is failing (and does not identify which server is failing). Looking at aws console helixdwh-2-qa is in a "hardware failure" state, but none of the current scheduled tasks use that database (we used to use it for the spotx stuff, but I turned that off some time ago). So either we've got an intermittent issue here (possibly one which was fixed by someone from beanstock or aws?) or we've got a lingering configuration issue where some part of tableau holds onto configuration information which is no longer value [these possibilities are not mutually exclusive]. (2) tableau sign-in page declares: One or more of your licenses will expire on Jun 13, 2015 11:59 PM, which was last saturday. [there's also a chance that the refresh failures are somehow related to this licensing issue]
+2015-06-15 08:34:09	rdm	Ah.... it is almost certainly all about the licensing. Windows Application log on the tableau server says reap extracts is failing because localhost is refusing connections.
+2015-06-15 08:34:42	rdm	@akwok @jas we no longer have a functioning tableau server because the license has expired.
+2015-06-15 10:39:14	walexander	the license is valid -- wher are you seeing messages about the license?
+2015-06-15 10:47:28	walexander	@rdm i activated the license on the tableau server
+2015-06-15 10:47:33	walexander	it's good to 2016
+2015-06-15 10:52:23	walexander	@rdm getting this error when attempting to refresh ProdData: "No extracts to refresh" 
+2015-06-15 10:55:19	walexander	any changes made to that recently?
+2015-06-15 11:06:08	walexander	@rdm did a `tabadmin restart` and 
+2015-06-15 11:06:17	walexander	it is now refreshing teh extract 
+2015-06-15 11:33:13	rdm	restart makes sense
+2015-06-15 11:57:41	rdm	ProdData extract finishing also helping - I've kicked off the other two "8am" extracts - I expect that that will prevent most of the "no extract" errors.
+2015-06-15 12:07:02	walexander	great
+2015-06-15 12:07:30	walexander	`tabadmin status -v` was showing all services as running before 
+2015-06-15 12:07:47	walexander	so, consider that output suspicious
+2015-06-15 12:25:25	rdm	they were running but yeah - license expiration intentionally breaks things such that "running" fails.
+2015-06-15 14:04:36	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5c703a1|1 new commit> by Raul Miller
+2015-06-15 14:07:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/55|#55>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:07:05		 - bring feature tables into our database (<https://github.com/beanstock/data-pipeline/commit/5c703a1d17d2c064f32b84a16fa97040c56e0e39|5c703a1> by Raul Miller)
+2015-06-15 14:21:28	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|3 new commits> by Raul Miller
+2015-06-15 14:22:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/56|#56>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:22:41		 - eliminate need for quoted table names (<https://github.com/beanstock/data-pipeline/commit/207cbb9636f6a61234bdb9aad9d3b831c0e5f6f5|207cbb9> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|2 more>
+2015-06-15 19:20:02	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|4 new commits> by Raul Miller
+2015-06-15 19:21:08	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/57|#57>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 19:21:08		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|3 more>
+2015-06-15 19:21:49	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|10 new commits> by Raul Miller
+2015-06-15 19:23:10	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/58|#58>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-15 19:23:10		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|9 more>
+2015-06-16 09:23:56	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/0ad8a93|1 new commit> by Raul Miller
+2015-06-16 09:25:19	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/commit/a18a966|1 new commit> by Raul Miller
+2015-06-16 09:28:45	-jira-	Raul Miller completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-760 --- 
+2015-06-16 12:10:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/268863b|1 new commit> by Raul Miller
+2015-06-16 12:12:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/59|#59>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-16 12:12:05		 - Allow DB_PORT (and DB_HOST) to be set in env (<https://github.com/beanstock/data-pipeline/commit/268863b4c77f8d7fd384d9f1ae51dedebdbf30a0|268863b> by Raul Miller)
+2015-06-16 13:30:54	walexander	Will be joining the call five min late
+2015-06-16 14:32:21	walexander	@pato @rdm i moved our stand up to tomorrow
+2015-06-16 14:32:55	pato	Ok
+2015-06-16 14:40:44	walexander	@rdm the redshift cluster currently in hardware failure( helixdwh-2-qa ) : is that yours?  if not needed, can you delete?
+2015-06-16 14:41:00	rdm	I'll delete
+2015-06-16 16:36:20	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-764 --- 
+2015-06-17 12:16:15	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|4 new commits> by Raul Miller
+2015-06-17 12:19:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/61|#61>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:19:40		 - circleci comes with postgres preinstalled (<https://github.com/beanstock/data-pipeline/commit/28f92e56f278f3f3679ca2f2510f5a4bef90e3aa|28f92e5> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|3 more>
+2015-06-17 12:29:35	pato	@walexander Did you delete the dev-cluster Redshift database?
+2015-06-17 12:37:00	walexander	I think so -- but would have been awhile ago 
+2015-06-17 12:37:18	walexander	I think @rdm deleted the -2-qa one yesterday 
+2015-06-17 12:37:22	rdm	yeah
+2015-06-17 12:37:48	rdm	but that helixdwh-2-qa cluster, and only that cluster
+2015-06-17 12:38:26	pato	@walexander a while ago meaning a couple of days ago?
+2015-06-17 12:40:19	walexander	the dev clusters? nah, like weeks ago 
+2015-06-17 12:40:32	walexander	something broken?
+2015-06-17 12:43:26	pato	The sandbox helix-console was pointing to that cluster so now it obviously can’t connect, but I’m not certain what does that break
+2015-06-17 12:45:45	walexander	the `push` replication service
+2015-06-17 12:49:39	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|2 new commits> by Raul Miller
+2015-06-17 12:52:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/63|#63>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:52:33		 - database init and so on.. (<https://github.com/beanstock/data-pipeline/commit/edc06bb504b11301732e136252d26b7871031a8d|edc06bb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|1 more>
+2015-06-17 13:07:53	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|2 new commits> by Raul Miller
+2015-06-17 13:09:01	pato	Ok
+2015-06-17 13:09:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/65|#65>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:09:12		 - need more recent pgtap than what ubuntu 12 has (<https://github.com/beanstock/data-pipeline/commit/d571ddb4d9ac039f3587b40f89ab8547068af0d5|d571ddb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|1 more>
+2015-06-17 13:09:38	pato	We will eventually have just one non-production HC and one Redshift, right?
+2015-06-17 13:40:47	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/b0c0e08|1 new commit> by Raul Miller
+2015-06-17 13:43:44	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/67|#67>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:43:44		 - various circleci related fixes (<https://github.com/beanstock/data-pipeline/commit/b0c0e08492284b1d96952bd8f7adf22c012acfb4|b0c0e08> by Raul Miller)
+2015-06-17 13:50:36	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/4f5dbe4|1 new commit> by Raul Miller
+2015-06-17 13:53:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/68|#68>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:53:40		 - notes about differences between circleci docs and current  behavior (<https://github.com/beanstock/data-pipeline/commit/4f5dbe4029afd2c9745a79f71d58d6ad57ff9434|4f5dbe4> by Raul Miller)
+2015-06-17 14:01:46	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/d1aa587|1 new commit> by Raul Miller
+2015-06-17 14:04:34	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/70|#70>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 14:04:34		 - really use flyway circleci.conf in circleci (<https://github.com/beanstock/data-pipeline/commit/d1aa58714c5a180fd9ac74b47ef1ce66a00d4e6c|d1aa587> by Raul Miller)
+2015-06-17 14:12:36	rdm	Now that is the right kind of failure -- fails because the tests are failing as opposed to failing because the tests cannot be run
+2015-06-17 14:30:21	walexander	@pato @rdm let's start call in five minutes
+2015-06-17 14:31:58	pato	@walexander Ok
+2015-06-17 19:10:03	-B04UX08BS-	--- [databus-proxy] Branch "wip/CX-762" was force-pushed to <https://github.com/beanstock/databus-proxy/commit/bc141f13c94fc76a81155b64a33ffbbe83394d3e|bc141f1> by jsnwng. <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|Compare changes>
+2015-06-17 19:10:04	-B04UX08BS-	--- [databus-proxy:wip/CX-762] <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|6 new commits> by Haisheng.Wu
+2015-06-17 19:26:25	-B04UX08BS-	--- [beanstock/databus-proxy] Pull request closed: <https://github.com/beanstock/databus-proxy/pull/11|#11 Wip/cx 762> by <https://github.com/jsnwng|jsnwng>
+2015-06-17 19:26:25	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/a18a96653991...8e6d2c9c71d7|7 new commits> by Haisheng.Wu and 1 others
+2015-06-18 09:53:53	rdm	DATABUS-754 wants me to set up a pipeline monitoring dashboard, so I need to think about where that fits.
+2015-06-18 09:54:16	rdm	So I took a look at our currently active web servers. Here's what I see:
+2015-06-18 09:54:35	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06GNNLBU/-.tsv
+2015-06-18 09:55:41	rdm	I'm thinking that, of those, the lab server is probably the best candidate for the initial implementation. But I'm open to suggestions.
+2015-06-18 10:17:13	walexander	@rdm  i assigned 754 to myself.  going to do the dashboard in tableau 
+2015-06-18 10:17:41	rdm	kk, looking at cucumber
+2015-06-18 13:30:47	walexander	Going to be a few minutes late to the est meeting -- start without me and I'll catch up
+2015-06-18 13:31:04	rdm	I'm the only one there right now
+2015-06-18 13:43:13	walexander	@jas i added the `filled` table 
+2015-06-18 13:44:15	walexander	I created a saved query that takes the table name and schema version as parameters: http://hive.prod.beanstock.net:8888/beeswax/execute/design/33#query
+2015-06-18 13:44:33	walexander	table name = filled, schema = current
+2015-06-18 13:44:43	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-765 --- 
+2015-06-18 13:48:41	jas	thanks
+2015-06-18 13:48:53	jas	BTW, I do not have access to that hive link
+2015-06-18 13:49:05	jas	Only superusers and admin are allowed to read this document.
+2015-06-18 14:08:53	walexander	oic, sorry 
+2015-06-18 14:09:02	walexander	i was using a different user name
+2015-06-18 14:09:03	walexander	one sec
+2015-06-18 14:10:19	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/design/112#query
+2015-06-18 14:10:46	walexander	but, you should see the `filled` table now 
+2015-06-18 16:40:29	jas	Cannot connect: connection refused: Java::Default::PSQLException: The connection attempt failed.
+2015-06-18 16:40:36	jas	is the QA database down?
+2015-06-18 16:40:39	jas	for Looker?
+2015-06-18 16:40:45	jas	@walexander @rdm
+2015-06-18 16:41:09	jas	i was in a Looker demo with the team
+2015-06-18 16:41:23	walexander	what db name is it using?
+2015-06-18 16:41:28	rdm	Hmm... looker is currently pointed at helixdwh-2-qa
+2015-06-18 16:41:34	rdm	which has been down a few days
+2015-06-18 16:41:45	jas	ok great, so can we bring it up?
+2015-06-18 16:41:57	walexander	eh, not sure 
+2015-06-18 16:42:01	rdm	might be easier to point it at a different db
+2015-06-18 16:42:07	jas	which DB?
+2015-06-18 16:42:11	rdm	just need one that looker can reach
+2015-06-18 16:42:23	walexander	does the redshift-qa-1 where dfp reports are bbeing pushed? 
+2015-06-18 16:43:04	jas	should I use that one then?
+2015-06-18 16:44:07	walexander	see if it has the imported DFP reports first, but yeah use that if it does
+2015-06-19 14:37:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/91b65b0|1 new commit> by Raul Miller
+2015-06-19 14:40:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/72|#72>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-19 14:40:41		 - flesh out the tests... (<https://github.com/beanstock/data-pipeline/commit/91b65b0629ff210efa10abbc0b68de63aa65b9ff|91b65b0> by Raul Miller)
+2015-06-19 14:57:12	walexander	@pato @rdm I cancelled today's stand up. I'll sync up with you individually today and/or monday
+2015-06-19 14:57:20	pato	Ok
+2015-06-19 14:57:23	rdm	ok
+2015-06-19 21:10:45	walexander	@rdm @jas @akwok here is the databus status dashboard
+2015-06-19 21:10:48	walexander	http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/Dashboard1#1
+2015-06-19 21:11:36	akwok	thanks
+2015-06-19 21:12:05	walexander	you can see we have a couple of dates where redshift has more events than the others
+2015-06-21 11:57:36	rdm	Hmm... looking at the importds values for only impression/request discrepancies, the hours with discrepancies look like this:
+2015-06-21 11:57:50	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KR22DQ/-.csv
+2015-06-21 11:58:53	rdm	The 2015-06-08 discrepancies are something of a special case because of structural problems in the tags on the counts. For the rest of them, it's basically just one hour every day.
+2015-06-21 11:59:41	rdm	Is it possible that the adx import isn't making it into the hive counts? (That seems wrong, because kafka should be showing adx import, but that might be an instrumentation issue??)
+2015-06-21 12:28:54	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KRC97A/-.csv and commented: Here's what redshift adx insert looks like on green... it sort of correlates but sort of does not for stuff preceding the 8th. 
+2015-06-22 13:55:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5246ce8|1 new commit> by Raul Miller
+2015-06-22 14:50:14	walexander	the problem is that kafka and hive are only counting events 
+2015-06-22 14:50:39	walexander	and redshift counts facts -- the adx import sends one event for multiple facts 
+2015-06-22 21:08:08	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|17 new commits> by Will Alexander
+2015-06-22 21:10:12	-B02QBKC2X-	--- Failed:  Walexander's build (<https://circleci.com/gh/beanstock/data-pipeline/74|#74>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-22 21:10:12		 - add sql scripts to process event counts (<https://github.com/beanstock/data-pipeline/commit/4972c88bf8ec100a14420d7c03679f6a4ab9a93b|4972c88> by Walexander) and <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|16 more>
+2015-06-23 16:00:03	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/compare/0ad8a93cb6a5...16fc2828bc6f|7 new commits> by Will Alexander
+2015-06-24 15:01:19	-jira-	Pato Arvizu completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-676 --- 
+2015-06-24 15:23:26	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|2 new commits> by Raul Miller
+2015-06-24 15:25:28	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/75|#75>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 15:25:28		 - more and better testing (<https://github.com/beanstock/data-pipeline/commit/e42c28b60c2e27ab7b0b0a75e4b8439240cd435c|e42c28b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|1 more>
+2015-06-24 21:03:31	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|2 new commits> by Raul Miller
+2015-06-24 21:05:22	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/76|#76>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 21:05:22		 - update ad_size dimension in redshift from helix (<https://github.com/beanstock/data-pipeline/commit/7e4101d7d06c69e7d02ac732e8527d36aa974d30|7e4101d> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|1 more>
+2015-06-25 12:51:52	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/0f9ee95|1 new commit> by Raul Miller
+2015-06-25 12:53:54	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/77|#77>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 12:53:54		 - bugfixes for d_ad_size import (<https://github.com/beanstock/data-pipeline/commit/0f9ee9504a67d4406406b23989c57f6bc846d109|0f9ee95> by Raul Miller)
+2015-06-25 13:20:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|9 new commits> by Raul Miller
+2015-06-25 13:23:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/78|#78>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:23:12		 - bump version (<https://github.com/beanstock/data-pipeline/commit/c1f59015a4705c24024719607d2ae8d6245978a3|c1f5901> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|8 more>
+2015-06-25 13:25:16	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/c028b56|1 new commit> by Raul Miller
+2015-06-25 13:27:14	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/79|#79>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:27:14		 - fix adp tests (<https://github.com/beanstock/data-pipeline/commit/c028b56cfc7c79d51b7c79baf36df3cdcd48f3c2|c028b56> by Raul Miller)
+2015-06-30 09:45:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/80|#80>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue|blue>)
+2015-06-30 09:45:55		 - redshift has some strange bugs (<https://github.com/beanstock/data-pipeline/commit/9126c23bcee65aabe97bf215e425aec790e9b050|9126c23> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/d409691ac1df^...9126c23bcee6|4 more>
+2015-06-30 09:55:18	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|6 new commits> by Raul Miller
+2015-06-30 09:57:48	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/81|#81>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 09:57:48		 - support install from top level make (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|5 more>
+2015-06-30 10:00:23	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/82|#82>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:00:23		 -  (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by )
+2015-06-30 10:19:31	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:19:45	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:21:20	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/83|#83>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:21:20		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/84|#84>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:23:37		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:23:56	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:26:13	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/85|#85>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:26:13		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:28:35	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/86|#86>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:28:35		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:33:46	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/48dcfa6|1 new commit> by Raul Miller
+2015-06-30 10:36:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/87|#87>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:36:33		 - deploy for real (and fail on missing files) (<https://github.com/beanstock/data-pipeline/commit/48dcfa6196e6815d9b3556845134047f5a49abef|48dcfa6> by Raul Miller)
+2015-06-30 10:55:34	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|3 new commits> by Raul Miller
+2015-06-30 10:59:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/88|#88>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:59:37		 - avoid OSX problem with sed -i (<https://github.com/beanstock/data-pipeline/commit/57e36816594e257061ef750a94742f43de3fa80a|57e3681> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|2 more>
+2015-06-30 12:23:13	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|5 new commits> by Raul Miller
+2015-06-30 12:26:18	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/89|#89>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 12:26:18		 - clean up some noise... (<https://github.com/beanstock/data-pipeline/commit/511f4d847cf770463c0cf3c60ddfc1aa867b84f7|511f4d8> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|4 more>
+2015-06-30 13:05:48	rdm	Very strange - the command which is failing in circleci is different from the text in github
+2015-06-30 13:18:12	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/c69df15|1 new commit> by Raul Miller
+2015-06-30 13:20:58	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/91|#91>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:20:58		 - address app_dir issue in deploy/functions (<https://github.com/beanstock/data-pipeline/commit/c69df15b99c874c3606a647f9a34ef20bf6cedcf|c69df15> by Raul Miller)
+2015-06-30 13:25:43	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/f6d4de8|1 new commit> by Raul Miller
+2015-06-30 13:27:47	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/92|#92>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:27:47		 - remove bashism (<https://github.com/beanstock/data-pipeline/commit/f6d4de8b0e443e6979841b2e30b8202a22cbfba5|f6d4de8> by Raul Miller)
+2015-06-30 13:28:32	rdm	Hmm....
+2015-06-30 13:59:48	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/6810a53|1 new commit> by Raul Miller
+2015-06-30 14:02:18	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/93|#93>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 14:02:18		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller)
+2015-06-30 14:35:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|12 new commits> by Raul Miller
+2015-06-30 14:38:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/94|#94>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 14:38:55		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|11 more>
+2015-07-02 13:02:19	-B02QBKC2X-	--- Failed:  patoarvizu's build (<https://circleci.com/gh/beanstock/data-pipeline/95|#95>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/cookbook-integration|cookbook-integration>)
+2015-07-02 13:02:19		 - Provisioning local postgres db via vagrant + Chef (<https://github.com/beanstock/data-pipeline/commit/d77c05e80c37014255072ae9ebb8011e0b01ace5|d77c05e> by patoarvizu)
+2015-07-02 13:03:05	rdm	yep, failed on the color safety check - looks good
+2015-07-02 13:04:37	pato	Ok, cool
+2015-07-06 18:09:20	rdm	looker development session tomorrow overlaps with databus daily standup
+2015-07-06 18:10:02	rdm	(unless we end looker early, which is possible, but not guaranteed)
+2015-07-06 18:30:53	jas	i guess you should adjust the internal meeting if possible
+2015-07-06 18:31:16	rdm	it's pato and will and i - we'll work out something
+2015-06-12 14:30:03	jwong	thats a nice touch
+2015-06-12 14:30:12	jwong	organize it better
+2015-06-12 14:30:16	rdm	and then the tables I want - calling them "feats" for lack of a better name
+2015-06-12 14:30:46	rdm	probably should use a better name - i already confused myself in my initial quips with you
+2015-06-12 14:31:11	rdm	maybe just "table"...
+2015-06-12 14:31:12	jwong	so each scenario prescribes its own table?
+2015-06-12 14:31:16	jwong	table(s)
+2015-06-12 14:31:58	rdm	yeah... they relate to the gherkin text (which is semi-formalized - but for our purposes I think I'd rather have someone manually convert those to test cases - going full automated would miss out good possibilities for technical review)
+2015-06-12 14:33:12	jwong	right.. this is pretty cool
+2015-06-12 14:33:23	rdm	My current todo on this line of thinking looks like: (1) think about names, (2) forget about it, just come up with something I can live with, (3) import tables to pg_unit db, (4) write tests
+2015-06-12 14:33:44	rdm	:innocent:
+2015-06-12 14:34:46	jwong	refreshing to know im not the only one who spends time on naming
+2015-06-12 14:34:54	rdm	heh... you know the saying
+2015-06-12 14:35:03	rdm	The two hardest problems in computer science are:
+2015-06-12 14:35:07	rdm	(1) naming
+2015-06-12 14:35:13	rdm	(2) cache management
+2015-06-12 14:35:18	rdm	(3) off-by-one errors
+2015-06-12 14:35:30	jwong	LOL dude thats 3 things
+2015-06-12 14:35:36	rdm	exactly :wink:
+2015-06-12 14:35:45	jwong	lulz
+2015-06-12 15:09:41	walexander	@jas are we explicitly excluding mobile devices from these buys on meetme and gamefaqs?
+2015-06-12 16:12:55	jas	yes, I think so
+2015-06-12 16:26:16	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/a22516f|1 new commit> by Will Alexander
+2015-06-12 16:26:21	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/7ccb5ff32a5f...cafc870209cc|3 new commits> by Will Alexander
+2015-06-14 18:56:58	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/d29347d|1 new commit> by Raul Miller
+2015-06-14 18:58:04	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/54|#54>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-14 18:58:04		 - provide boring but concise table names (<https://github.com/beanstock/data-pipeline/commit/d29347d432624cdcc50db5ddebaa24872a752c04|d29347d> by Raul Miller)
+2015-06-15 08:24:25	rdm	tableau issues this morning. (1) tableau is telling me that a redshift server is failing (and does not identify which server is failing). Looking at aws console helixdwh-2-qa is in a "hardware failure" state, but none of the current scheduled tasks use that database (we used to use it for the spotx stuff, but I turned that off some time ago). So either we've got an intermittent issue here (possibly one which was fixed by someone from beanstock or aws?) or we've got a lingering configuration issue where some part of tableau holds onto configuration information which is no longer value [these possibilities are not mutually exclusive]. (2) tableau sign-in page declares: One or more of your licenses will expire on Jun 13, 2015 11:59 PM, which was last saturday. [there's also a chance that the refresh failures are somehow related to this licensing issue]
+2015-06-15 08:34:09	rdm	Ah.... it is almost certainly all about the licensing. Windows Application log on the tableau server says reap extracts is failing because localhost is refusing connections.
+2015-06-15 08:34:42	rdm	@akwok @jas we no longer have a functioning tableau server because the license has expired.
+2015-06-15 10:39:14	walexander	the license is valid -- wher are you seeing messages about the license?
+2015-06-15 10:47:28	walexander	@rdm i activated the license on the tableau server
+2015-06-15 10:47:33	walexander	it's good to 2016
+2015-06-15 10:52:23	walexander	@rdm getting this error when attempting to refresh ProdData: "No extracts to refresh" 
+2015-06-15 10:55:19	walexander	any changes made to that recently?
+2015-06-15 11:06:08	walexander	@rdm did a `tabadmin restart` and 
+2015-06-15 11:06:17	walexander	it is now refreshing teh extract 
+2015-06-15 11:33:13	rdm	restart makes sense
+2015-06-15 11:57:41	rdm	ProdData extract finishing also helping - I've kicked off the other two "8am" extracts - I expect that that will prevent most of the "no extract" errors.
+2015-06-15 12:07:02	walexander	great
+2015-06-15 12:07:30	walexander	`tabadmin status -v` was showing all services as running before 
+2015-06-15 12:07:47	walexander	so, consider that output suspicious
+2015-06-15 12:25:25	rdm	they were running but yeah - license expiration intentionally breaks things such that "running" fails.
+2015-06-15 14:04:36	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5c703a1|1 new commit> by Raul Miller
+2015-06-15 14:07:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/55|#55>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:07:05		 - bring feature tables into our database (<https://github.com/beanstock/data-pipeline/commit/5c703a1d17d2c064f32b84a16fa97040c56e0e39|5c703a1> by Raul Miller)
+2015-06-15 14:21:28	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|3 new commits> by Raul Miller
+2015-06-15 14:22:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/56|#56>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:22:41		 - eliminate need for quoted table names (<https://github.com/beanstock/data-pipeline/commit/207cbb9636f6a61234bdb9aad9d3b831c0e5f6f5|207cbb9> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|2 more>
+2015-06-15 19:20:02	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|4 new commits> by Raul Miller
+2015-06-15 19:21:08	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/57|#57>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 19:21:08		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|3 more>
+2015-06-15 19:21:49	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|10 new commits> by Raul Miller
+2015-06-15 19:23:10	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/58|#58>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-15 19:23:10		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|9 more>
+2015-06-16 09:23:56	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/0ad8a93|1 new commit> by Raul Miller
+2015-06-16 09:25:19	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/commit/a18a966|1 new commit> by Raul Miller
+2015-06-16 09:28:45	-jira-	Raul Miller completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-760 --- 
+2015-06-16 12:10:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/268863b|1 new commit> by Raul Miller
+2015-06-16 12:12:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/59|#59>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-16 12:12:05		 - Allow DB_PORT (and DB_HOST) to be set in env (<https://github.com/beanstock/data-pipeline/commit/268863b4c77f8d7fd384d9f1ae51dedebdbf30a0|268863b> by Raul Miller)
+2015-06-16 13:30:54	walexander	Will be joining the call five min late
+2015-06-16 14:32:21	walexander	@pato @rdm i moved our stand up to tomorrow
+2015-06-16 14:32:55	pato	Ok
+2015-06-16 14:40:44	walexander	@rdm the redshift cluster currently in hardware failure( helixdwh-2-qa ) : is that yours?  if not needed, can you delete?
+2015-06-16 14:41:00	rdm	I'll delete
+2015-06-16 16:36:20	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-764 --- 
+2015-06-17 12:16:15	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|4 new commits> by Raul Miller
+2015-06-17 12:19:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/61|#61>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:19:40		 - circleci comes with postgres preinstalled (<https://github.com/beanstock/data-pipeline/commit/28f92e56f278f3f3679ca2f2510f5a4bef90e3aa|28f92e5> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|3 more>
+2015-06-17 12:29:35	pato	@walexander Did you delete the dev-cluster Redshift database?
+2015-06-17 12:37:00	walexander	I think so -- but would have been awhile ago 
+2015-06-17 12:37:18	walexander	I think @rdm deleted the -2-qa one yesterday 
+2015-06-17 12:37:22	rdm	yeah
+2015-06-17 12:37:48	rdm	but that helixdwh-2-qa cluster, and only that cluster
+2015-06-17 12:38:26	pato	@walexander a while ago meaning a couple of days ago?
+2015-06-17 12:40:19	walexander	the dev clusters? nah, like weeks ago 
+2015-06-17 12:40:32	walexander	something broken?
+2015-06-17 12:43:26	pato	The sandbox helix-console was pointing to that cluster so now it obviously can’t connect, but I’m not certain what does that break
+2015-06-17 12:45:45	walexander	the `push` replication service
+2015-06-17 12:49:39	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|2 new commits> by Raul Miller
+2015-06-17 12:52:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/63|#63>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:52:33		 - database init and so on.. (<https://github.com/beanstock/data-pipeline/commit/edc06bb504b11301732e136252d26b7871031a8d|edc06bb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|1 more>
+2015-06-17 13:07:53	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|2 new commits> by Raul Miller
+2015-06-17 13:09:01	pato	Ok
+2015-06-17 13:09:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/65|#65>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:09:12		 - need more recent pgtap than what ubuntu 12 has (<https://github.com/beanstock/data-pipeline/commit/d571ddb4d9ac039f3587b40f89ab8547068af0d5|d571ddb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|1 more>
+2015-06-17 13:09:38	pato	We will eventually have just one non-production HC and one Redshift, right?
+2015-06-17 13:40:47	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/b0c0e08|1 new commit> by Raul Miller
+2015-06-17 13:43:44	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/67|#67>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:43:44		 - various circleci related fixes (<https://github.com/beanstock/data-pipeline/commit/b0c0e08492284b1d96952bd8f7adf22c012acfb4|b0c0e08> by Raul Miller)
+2015-06-17 13:50:36	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/4f5dbe4|1 new commit> by Raul Miller
+2015-06-17 13:53:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/68|#68>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:53:40		 - notes about differences between circleci docs and current  behavior (<https://github.com/beanstock/data-pipeline/commit/4f5dbe4029afd2c9745a79f71d58d6ad57ff9434|4f5dbe4> by Raul Miller)
+2015-06-17 14:01:46	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/d1aa587|1 new commit> by Raul Miller
+2015-06-17 14:04:34	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/70|#70>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 14:04:34		 - really use flyway circleci.conf in circleci (<https://github.com/beanstock/data-pipeline/commit/d1aa58714c5a180fd9ac74b47ef1ce66a00d4e6c|d1aa587> by Raul Miller)
+2015-06-17 14:12:36	rdm	Now that is the right kind of failure -- fails because the tests are failing as opposed to failing because the tests cannot be run
+2015-06-17 14:30:21	walexander	@pato @rdm let's start call in five minutes
+2015-06-17 14:31:58	pato	@walexander Ok
+2015-06-17 19:10:03	-B04UX08BS-	--- [databus-proxy] Branch "wip/CX-762" was force-pushed to <https://github.com/beanstock/databus-proxy/commit/bc141f13c94fc76a81155b64a33ffbbe83394d3e|bc141f1> by jsnwng. <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|Compare changes>
+2015-06-17 19:10:04	-B04UX08BS-	--- [databus-proxy:wip/CX-762] <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|6 new commits> by Haisheng.Wu
+2015-06-17 19:26:25	-B04UX08BS-	--- [beanstock/databus-proxy] Pull request closed: <https://github.com/beanstock/databus-proxy/pull/11|#11 Wip/cx 762> by <https://github.com/jsnwng|jsnwng>
+2015-06-17 19:26:25	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/a18a96653991...8e6d2c9c71d7|7 new commits> by Haisheng.Wu and 1 others
+2015-06-18 09:53:53	rdm	DATABUS-754 wants me to set up a pipeline monitoring dashboard, so I need to think about where that fits.
+2015-06-18 09:54:16	rdm	So I took a look at our currently active web servers. Here's what I see:
+2015-06-18 09:54:35	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06GNNLBU/-.tsv
+2015-06-18 09:55:41	rdm	I'm thinking that, of those, the lab server is probably the best candidate for the initial implementation. But I'm open to suggestions.
+2015-06-18 10:17:13	walexander	@rdm  i assigned 754 to myself.  going to do the dashboard in tableau 
+2015-06-18 10:17:41	rdm	kk, looking at cucumber
+2015-06-18 13:30:47	walexander	Going to be a few minutes late to the est meeting -- start without me and I'll catch up
+2015-06-18 13:31:04	rdm	I'm the only one there right now
+2015-06-18 13:43:13	walexander	@jas i added the `filled` table 
+2015-06-18 13:44:15	walexander	I created a saved query that takes the table name and schema version as parameters: http://hive.prod.beanstock.net:8888/beeswax/execute/design/33#query
+2015-06-18 13:44:33	walexander	table name = filled, schema = current
+2015-06-18 13:44:43	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-765 --- 
+2015-06-18 13:48:41	jas	thanks
+2015-06-18 13:48:53	jas	BTW, I do not have access to that hive link
+2015-06-18 13:49:05	jas	Only superusers and admin are allowed to read this document.
+2015-06-18 14:08:53	walexander	oic, sorry 
+2015-06-18 14:09:02	walexander	i was using a different user name
+2015-06-18 14:09:03	walexander	one sec
+2015-06-18 14:10:19	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/design/112#query
+2015-06-18 14:10:46	walexander	but, you should see the `filled` table now 
+2015-06-18 16:40:29	jas	Cannot connect: connection refused: Java::Default::PSQLException: The connection attempt failed.
+2015-06-18 16:40:36	jas	is the QA database down?
+2015-06-18 16:40:39	jas	for Looker?
+2015-06-18 16:40:45	jas	@walexander @rdm
+2015-06-18 16:41:09	jas	i was in a Looker demo with the team
+2015-06-18 16:41:23	walexander	what db name is it using?
+2015-06-18 16:41:28	rdm	Hmm... looker is currently pointed at helixdwh-2-qa
+2015-06-18 16:41:34	rdm	which has been down a few days
+2015-06-18 16:41:45	jas	ok great, so can we bring it up?
+2015-06-18 16:41:57	walexander	eh, not sure 
+2015-06-18 16:42:01	rdm	might be easier to point it at a different db
+2015-06-18 16:42:07	jas	which DB?
+2015-06-18 16:42:11	rdm	just need one that looker can reach
+2015-06-18 16:42:23	walexander	does the redshift-qa-1 where dfp reports are bbeing pushed? 
+2015-06-18 16:43:04	jas	should I use that one then?
+2015-06-18 16:44:07	walexander	see if it has the imported DFP reports first, but yeah use that if it does
+2015-06-19 14:37:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/91b65b0|1 new commit> by Raul Miller
+2015-06-19 14:40:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/72|#72>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-19 14:40:41		 - flesh out the tests... (<https://github.com/beanstock/data-pipeline/commit/91b65b0629ff210efa10abbc0b68de63aa65b9ff|91b65b0> by Raul Miller)
+2015-06-19 14:57:12	walexander	@pato @rdm I cancelled today's stand up. I'll sync up with you individually today and/or monday
+2015-06-19 14:57:20	pato	Ok
+2015-06-19 14:57:23	rdm	ok
+2015-06-19 21:10:45	walexander	@rdm @jas @akwok here is the databus status dashboard
+2015-06-19 21:10:48	walexander	http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/Dashboard1#1
+2015-06-19 21:11:36	akwok	thanks
+2015-06-19 21:12:05	walexander	you can see we have a couple of dates where redshift has more events than the others
+2015-06-21 11:57:36	rdm	Hmm... looking at the importds values for only impression/request discrepancies, the hours with discrepancies look like this:
+2015-06-21 11:57:50	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KR22DQ/-.csv
+2015-06-21 11:58:53	rdm	The 2015-06-08 discrepancies are something of a special case because of structural problems in the tags on the counts. For the rest of them, it's basically just one hour every day.
+2015-06-21 11:59:41	rdm	Is it possible that the adx import isn't making it into the hive counts? (That seems wrong, because kafka should be showing adx import, but that might be an instrumentation issue??)
+2015-06-21 12:28:54	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KRC97A/-.csv and commented: Here's what redshift adx insert looks like on green... it sort of correlates but sort of does not for stuff preceding the 8th. 
+2015-06-22 13:55:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5246ce8|1 new commit> by Raul Miller
+2015-06-22 14:50:14	walexander	the problem is that kafka and hive are only counting events 
+2015-06-22 14:50:39	walexander	and redshift counts facts -- the adx import sends one event for multiple facts 
+2015-06-22 21:08:08	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|17 new commits> by Will Alexander
+2015-06-22 21:10:12	-B02QBKC2X-	--- Failed:  Walexander's build (<https://circleci.com/gh/beanstock/data-pipeline/74|#74>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-22 21:10:12		 - add sql scripts to process event counts (<https://github.com/beanstock/data-pipeline/commit/4972c88bf8ec100a14420d7c03679f6a4ab9a93b|4972c88> by Walexander) and <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|16 more>
+2015-06-23 16:00:03	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/compare/0ad8a93cb6a5...16fc2828bc6f|7 new commits> by Will Alexander
+2015-06-24 15:01:19	-jira-	Pato Arvizu completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-676 --- 
+2015-06-24 15:23:26	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|2 new commits> by Raul Miller
+2015-06-24 15:25:28	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/75|#75>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 15:25:28		 - more and better testing (<https://github.com/beanstock/data-pipeline/commit/e42c28b60c2e27ab7b0b0a75e4b8439240cd435c|e42c28b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|1 more>
+2015-06-24 21:03:31	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|2 new commits> by Raul Miller
+2015-06-24 21:05:22	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/76|#76>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 21:05:22		 - update ad_size dimension in redshift from helix (<https://github.com/beanstock/data-pipeline/commit/7e4101d7d06c69e7d02ac732e8527d36aa974d30|7e4101d> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|1 more>
+2015-06-25 12:51:52	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/0f9ee95|1 new commit> by Raul Miller
+2015-06-25 12:53:54	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/77|#77>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 12:53:54		 - bugfixes for d_ad_size import (<https://github.com/beanstock/data-pipeline/commit/0f9ee9504a67d4406406b23989c57f6bc846d109|0f9ee95> by Raul Miller)
+2015-06-25 13:20:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|9 new commits> by Raul Miller
+2015-06-25 13:23:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/78|#78>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:23:12		 - bump version (<https://github.com/beanstock/data-pipeline/commit/c1f59015a4705c24024719607d2ae8d6245978a3|c1f5901> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|8 more>
+2015-06-25 13:25:16	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/c028b56|1 new commit> by Raul Miller
+2015-06-25 13:27:14	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/79|#79>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:27:14		 - fix adp tests (<https://github.com/beanstock/data-pipeline/commit/c028b56cfc7c79d51b7c79baf36df3cdcd48f3c2|c028b56> by Raul Miller)
+2015-06-30 09:45:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/80|#80>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue|blue>)
+2015-06-30 09:45:55		 - redshift has some strange bugs (<https://github.com/beanstock/data-pipeline/commit/9126c23bcee65aabe97bf215e425aec790e9b050|9126c23> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/d409691ac1df^...9126c23bcee6|4 more>
+2015-06-30 09:55:18	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|6 new commits> by Raul Miller
+2015-06-30 09:57:48	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/81|#81>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 09:57:48		 - support install from top level make (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|5 more>
+2015-06-30 10:00:23	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/82|#82>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:00:23		 -  (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by )
+2015-06-30 10:19:31	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:19:45	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:21:20	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/83|#83>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:21:20		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/84|#84>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:23:37		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:23:56	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:26:13	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/85|#85>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:26:13		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:28:35	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/86|#86>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:28:35		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:33:46	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/48dcfa6|1 new commit> by Raul Miller
+2015-06-30 10:36:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/87|#87>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:36:33		 - deploy for real (and fail on missing files) (<https://github.com/beanstock/data-pipeline/commit/48dcfa6196e6815d9b3556845134047f5a49abef|48dcfa6> by Raul Miller)
+2015-06-30 10:55:34	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|3 new commits> by Raul Miller
+2015-06-30 10:59:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/88|#88>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:59:37		 - avoid OSX problem with sed -i (<https://github.com/beanstock/data-pipeline/commit/57e36816594e257061ef750a94742f43de3fa80a|57e3681> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|2 more>
+2015-06-30 12:23:13	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|5 new commits> by Raul Miller
+2015-06-30 12:26:18	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/89|#89>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 12:26:18		 - clean up some noise... (<https://github.com/beanstock/data-pipeline/commit/511f4d847cf770463c0cf3c60ddfc1aa867b84f7|511f4d8> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|4 more>
+2015-06-30 13:05:48	rdm	Very strange - the command which is failing in circleci is different from the text in github
+2015-06-30 13:18:12	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/c69df15|1 new commit> by Raul Miller
+2015-06-30 13:20:58	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/91|#91>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:20:58		 - address app_dir issue in deploy/functions (<https://github.com/beanstock/data-pipeline/commit/c69df15b99c874c3606a647f9a34ef20bf6cedcf|c69df15> by Raul Miller)
+2015-06-30 13:25:43	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/f6d4de8|1 new commit> by Raul Miller
+2015-06-30 13:27:47	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/92|#92>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:27:47		 - remove bashism (<https://github.com/beanstock/data-pipeline/commit/f6d4de8b0e443e6979841b2e30b8202a22cbfba5|f6d4de8> by Raul Miller)
+2015-06-30 13:28:32	rdm	Hmm....
+2015-06-30 13:59:48	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/6810a53|1 new commit> by Raul Miller
+2015-06-30 14:02:18	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/93|#93>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 14:02:18		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller)
+2015-06-30 14:35:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|12 new commits> by Raul Miller
+2015-06-30 14:38:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/94|#94>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 14:38:55		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|11 more>
+2015-07-02 13:02:19	-B02QBKC2X-	--- Failed:  patoarvizu's build (<https://circleci.com/gh/beanstock/data-pipeline/95|#95>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/cookbook-integration|cookbook-integration>)
+2015-07-02 13:02:19		 - Provisioning local postgres db via vagrant + Chef (<https://github.com/beanstock/data-pipeline/commit/d77c05e80c37014255072ae9ebb8011e0b01ace5|d77c05e> by patoarvizu)
+2015-07-02 13:03:05	rdm	yep, failed on the color safety check - looks good
+2015-07-02 13:04:37	pato	Ok, cool
+2015-07-06 18:09:20	rdm	looker development session tomorrow overlaps with databus daily standup
+2015-07-06 18:10:02	rdm	(unless we end looker early, which is possible, but not guaranteed)
+2015-07-06 18:30:53	jas	i guess you should adjust the internal meeting if possible
+2015-07-06 18:31:16	rdm	it's pato and will and i - we'll work out something
+2015-06-12 14:30:03	jwong	thats a nice touch
+2015-06-12 14:30:12	jwong	organize it better
+2015-06-12 14:30:16	rdm	and then the tables I want - calling them "feats" for lack of a better name
+2015-06-12 14:30:46	rdm	probably should use a better name - i already confused myself in my initial quips with you
+2015-06-12 14:31:11	rdm	maybe just "table"...
+2015-06-12 14:31:12	jwong	so each scenario prescribes its own table?
+2015-06-12 14:31:16	jwong	table(s)
+2015-06-12 14:31:58	rdm	yeah... they relate to the gherkin text (which is semi-formalized - but for our purposes I think I'd rather have someone manually convert those to test cases - going full automated would miss out good possibilities for technical review)
+2015-06-12 14:33:12	jwong	right.. this is pretty cool
+2015-06-12 14:33:23	rdm	My current todo on this line of thinking looks like: (1) think about names, (2) forget about it, just come up with something I can live with, (3) import tables to pg_unit db, (4) write tests
+2015-06-12 14:33:44	rdm	:innocent:
+2015-06-12 14:34:46	jwong	refreshing to know im not the only one who spends time on naming
+2015-06-12 14:34:54	rdm	heh... you know the saying
+2015-06-12 14:35:03	rdm	The two hardest problems in computer science are:
+2015-06-12 14:35:07	rdm	(1) naming
+2015-06-12 14:35:13	rdm	(2) cache management
+2015-06-12 14:35:18	rdm	(3) off-by-one errors
+2015-06-12 14:35:30	jwong	LOL dude thats 3 things
+2015-06-12 14:35:36	rdm	exactly :wink:
+2015-06-12 14:35:45	jwong	lulz
+2015-06-12 15:09:41	walexander	@jas are we explicitly excluding mobile devices from these buys on meetme and gamefaqs?
+2015-06-12 16:12:55	jas	yes, I think so
+2015-06-12 16:26:16	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/a22516f|1 new commit> by Will Alexander
+2015-06-12 16:26:21	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/7ccb5ff32a5f...cafc870209cc|3 new commits> by Will Alexander
+2015-06-14 18:56:58	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/d29347d|1 new commit> by Raul Miller
+2015-06-14 18:58:04	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/54|#54>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-14 18:58:04		 - provide boring but concise table names (<https://github.com/beanstock/data-pipeline/commit/d29347d432624cdcc50db5ddebaa24872a752c04|d29347d> by Raul Miller)
+2015-06-15 08:24:25	rdm	tableau issues this morning. (1) tableau is telling me that a redshift server is failing (and does not identify which server is failing). Looking at aws console helixdwh-2-qa is in a "hardware failure" state, but none of the current scheduled tasks use that database (we used to use it for the spotx stuff, but I turned that off some time ago). So either we've got an intermittent issue here (possibly one which was fixed by someone from beanstock or aws?) or we've got a lingering configuration issue where some part of tableau holds onto configuration information which is no longer value [these possibilities are not mutually exclusive]. (2) tableau sign-in page declares: One or more of your licenses will expire on Jun 13, 2015 11:59 PM, which was last saturday. [there's also a chance that the refresh failures are somehow related to this licensing issue]
+2015-06-15 08:34:09	rdm	Ah.... it is almost certainly all about the licensing. Windows Application log on the tableau server says reap extracts is failing because localhost is refusing connections.
+2015-06-15 08:34:42	rdm	@akwok @jas we no longer have a functioning tableau server because the license has expired.
+2015-06-15 10:39:14	walexander	the license is valid -- wher are you seeing messages about the license?
+2015-06-15 10:47:28	walexander	@rdm i activated the license on the tableau server
+2015-06-15 10:47:33	walexander	it's good to 2016
+2015-06-15 10:52:23	walexander	@rdm getting this error when attempting to refresh ProdData: "No extracts to refresh" 
+2015-06-15 10:55:19	walexander	any changes made to that recently?
+2015-06-15 11:06:08	walexander	@rdm did a `tabadmin restart` and 
+2015-06-15 11:06:17	walexander	it is now refreshing teh extract 
+2015-06-15 11:33:13	rdm	restart makes sense
+2015-06-15 11:57:41	rdm	ProdData extract finishing also helping - I've kicked off the other two "8am" extracts - I expect that that will prevent most of the "no extract" errors.
+2015-06-15 12:07:02	walexander	great
+2015-06-15 12:07:30	walexander	`tabadmin status -v` was showing all services as running before 
+2015-06-15 12:07:47	walexander	so, consider that output suspicious
+2015-06-15 12:25:25	rdm	they were running but yeah - license expiration intentionally breaks things such that "running" fails.
+2015-06-15 14:04:36	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5c703a1|1 new commit> by Raul Miller
+2015-06-15 14:07:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/55|#55>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:07:05		 - bring feature tables into our database (<https://github.com/beanstock/data-pipeline/commit/5c703a1d17d2c064f32b84a16fa97040c56e0e39|5c703a1> by Raul Miller)
+2015-06-15 14:21:28	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|3 new commits> by Raul Miller
+2015-06-15 14:22:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/56|#56>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:22:41		 - eliminate need for quoted table names (<https://github.com/beanstock/data-pipeline/commit/207cbb9636f6a61234bdb9aad9d3b831c0e5f6f5|207cbb9> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|2 more>
+2015-06-15 19:20:02	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|4 new commits> by Raul Miller
+2015-06-15 19:21:08	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/57|#57>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 19:21:08		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|3 more>
+2015-06-15 19:21:49	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|10 new commits> by Raul Miller
+2015-06-15 19:23:10	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/58|#58>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-15 19:23:10		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|9 more>
+2015-06-16 09:23:56	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/0ad8a93|1 new commit> by Raul Miller
+2015-06-16 09:25:19	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/commit/a18a966|1 new commit> by Raul Miller
+2015-06-16 09:28:45	-jira-	Raul Miller completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-760 --- 
+2015-06-16 12:10:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/268863b|1 new commit> by Raul Miller
+2015-06-16 12:12:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/59|#59>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-16 12:12:05		 - Allow DB_PORT (and DB_HOST) to be set in env (<https://github.com/beanstock/data-pipeline/commit/268863b4c77f8d7fd384d9f1ae51dedebdbf30a0|268863b> by Raul Miller)
+2015-06-16 13:30:54	walexander	Will be joining the call five min late
+2015-06-16 14:32:21	walexander	@pato @rdm i moved our stand up to tomorrow
+2015-06-16 14:32:55	pato	Ok
+2015-06-16 14:40:44	walexander	@rdm the redshift cluster currently in hardware failure( helixdwh-2-qa ) : is that yours?  if not needed, can you delete?
+2015-06-16 14:41:00	rdm	I'll delete
+2015-06-16 16:36:20	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-764 --- 
+2015-06-17 12:16:15	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|4 new commits> by Raul Miller
+2015-06-17 12:19:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/61|#61>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:19:40		 - circleci comes with postgres preinstalled (<https://github.com/beanstock/data-pipeline/commit/28f92e56f278f3f3679ca2f2510f5a4bef90e3aa|28f92e5> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|3 more>
+2015-06-17 12:29:35	pato	@walexander Did you delete the dev-cluster Redshift database?
+2015-06-17 12:37:00	walexander	I think so -- but would have been awhile ago 
+2015-06-17 12:37:18	walexander	I think @rdm deleted the -2-qa one yesterday 
+2015-06-17 12:37:22	rdm	yeah
+2015-06-17 12:37:48	rdm	but that helixdwh-2-qa cluster, and only that cluster
+2015-06-17 12:38:26	pato	@walexander a while ago meaning a couple of days ago?
+2015-06-17 12:40:19	walexander	the dev clusters? nah, like weeks ago 
+2015-06-17 12:40:32	walexander	something broken?
+2015-06-17 12:43:26	pato	The sandbox helix-console was pointing to that cluster so now it obviously can’t connect, but I’m not certain what does that break
+2015-06-17 12:45:45	walexander	the `push` replication service
+2015-06-17 12:49:39	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|2 new commits> by Raul Miller
+2015-06-17 12:52:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/63|#63>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:52:33		 - database init and so on.. (<https://github.com/beanstock/data-pipeline/commit/edc06bb504b11301732e136252d26b7871031a8d|edc06bb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|1 more>
+2015-06-17 13:07:53	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|2 new commits> by Raul Miller
+2015-06-17 13:09:01	pato	Ok
+2015-06-17 13:09:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/65|#65>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:09:12		 - need more recent pgtap than what ubuntu 12 has (<https://github.com/beanstock/data-pipeline/commit/d571ddb4d9ac039f3587b40f89ab8547068af0d5|d571ddb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|1 more>
+2015-06-17 13:09:38	pato	We will eventually have just one non-production HC and one Redshift, right?
+2015-06-17 13:40:47	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/b0c0e08|1 new commit> by Raul Miller
+2015-06-17 13:43:44	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/67|#67>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:43:44		 - various circleci related fixes (<https://github.com/beanstock/data-pipeline/commit/b0c0e08492284b1d96952bd8f7adf22c012acfb4|b0c0e08> by Raul Miller)
+2015-06-17 13:50:36	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/4f5dbe4|1 new commit> by Raul Miller
+2015-06-17 13:53:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/68|#68>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:53:40		 - notes about differences between circleci docs and current  behavior (<https://github.com/beanstock/data-pipeline/commit/4f5dbe4029afd2c9745a79f71d58d6ad57ff9434|4f5dbe4> by Raul Miller)
+2015-06-17 14:01:46	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/d1aa587|1 new commit> by Raul Miller
+2015-06-17 14:04:34	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/70|#70>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 14:04:34		 - really use flyway circleci.conf in circleci (<https://github.com/beanstock/data-pipeline/commit/d1aa58714c5a180fd9ac74b47ef1ce66a00d4e6c|d1aa587> by Raul Miller)
+2015-06-17 14:12:36	rdm	Now that is the right kind of failure -- fails because the tests are failing as opposed to failing because the tests cannot be run
+2015-06-17 14:30:21	walexander	@pato @rdm let's start call in five minutes
+2015-06-17 14:31:58	pato	@walexander Ok
+2015-06-17 19:10:03	-B04UX08BS-	--- [databus-proxy] Branch "wip/CX-762" was force-pushed to <https://github.com/beanstock/databus-proxy/commit/bc141f13c94fc76a81155b64a33ffbbe83394d3e|bc141f1> by jsnwng. <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|Compare changes>
+2015-06-17 19:10:04	-B04UX08BS-	--- [databus-proxy:wip/CX-762] <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|6 new commits> by Haisheng.Wu
+2015-06-17 19:26:25	-B04UX08BS-	--- [beanstock/databus-proxy] Pull request closed: <https://github.com/beanstock/databus-proxy/pull/11|#11 Wip/cx 762> by <https://github.com/jsnwng|jsnwng>
+2015-06-17 19:26:25	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/a18a96653991...8e6d2c9c71d7|7 new commits> by Haisheng.Wu and 1 others
+2015-06-18 09:53:53	rdm	DATABUS-754 wants me to set up a pipeline monitoring dashboard, so I need to think about where that fits.
+2015-06-18 09:54:16	rdm	So I took a look at our currently active web servers. Here's what I see:
+2015-06-18 09:54:35	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06GNNLBU/-.tsv
+2015-06-18 09:55:41	rdm	I'm thinking that, of those, the lab server is probably the best candidate for the initial implementation. But I'm open to suggestions.
+2015-06-18 10:17:13	walexander	@rdm  i assigned 754 to myself.  going to do the dashboard in tableau 
+2015-06-18 10:17:41	rdm	kk, looking at cucumber
+2015-06-18 13:30:47	walexander	Going to be a few minutes late to the est meeting -- start without me and I'll catch up
+2015-06-18 13:31:04	rdm	I'm the only one there right now
+2015-06-18 13:43:13	walexander	@jas i added the `filled` table 
+2015-06-18 13:44:15	walexander	I created a saved query that takes the table name and schema version as parameters: http://hive.prod.beanstock.net:8888/beeswax/execute/design/33#query
+2015-06-18 13:44:33	walexander	table name = filled, schema = current
+2015-06-18 13:44:43	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-765 --- 
+2015-06-18 13:48:41	jas	thanks
+2015-06-18 13:48:53	jas	BTW, I do not have access to that hive link
+2015-06-18 13:49:05	jas	Only superusers and admin are allowed to read this document.
+2015-06-18 14:08:53	walexander	oic, sorry 
+2015-06-18 14:09:02	walexander	i was using a different user name
+2015-06-18 14:09:03	walexander	one sec
+2015-06-18 14:10:19	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/design/112#query
+2015-06-18 14:10:46	walexander	but, you should see the `filled` table now 
+2015-06-18 16:40:29	jas	Cannot connect: connection refused: Java::Default::PSQLException: The connection attempt failed.
+2015-06-18 16:40:36	jas	is the QA database down?
+2015-06-18 16:40:39	jas	for Looker?
+2015-06-18 16:40:45	jas	@walexander @rdm
+2015-06-18 16:41:09	jas	i was in a Looker demo with the team
+2015-06-18 16:41:23	walexander	what db name is it using?
+2015-06-18 16:41:28	rdm	Hmm... looker is currently pointed at helixdwh-2-qa
+2015-06-18 16:41:34	rdm	which has been down a few days
+2015-06-18 16:41:45	jas	ok great, so can we bring it up?
+2015-06-18 16:41:57	walexander	eh, not sure 
+2015-06-18 16:42:01	rdm	might be easier to point it at a different db
+2015-06-18 16:42:07	jas	which DB?
+2015-06-18 16:42:11	rdm	just need one that looker can reach
+2015-06-18 16:42:23	walexander	does the redshift-qa-1 where dfp reports are bbeing pushed? 
+2015-06-18 16:43:04	jas	should I use that one then?
+2015-06-18 16:44:07	walexander	see if it has the imported DFP reports first, but yeah use that if it does
+2015-06-19 14:37:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/91b65b0|1 new commit> by Raul Miller
+2015-06-19 14:40:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/72|#72>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-19 14:40:41		 - flesh out the tests... (<https://github.com/beanstock/data-pipeline/commit/91b65b0629ff210efa10abbc0b68de63aa65b9ff|91b65b0> by Raul Miller)
+2015-06-19 14:57:12	walexander	@pato @rdm I cancelled today's stand up. I'll sync up with you individually today and/or monday
+2015-06-19 14:57:20	pato	Ok
+2015-06-19 14:57:23	rdm	ok
+2015-06-19 21:10:45	walexander	@rdm @jas @akwok here is the databus status dashboard
+2015-06-19 21:10:48	walexander	http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/Dashboard1#1
+2015-06-19 21:11:36	akwok	thanks
+2015-06-19 21:12:05	walexander	you can see we have a couple of dates where redshift has more events than the others
+2015-06-21 11:57:36	rdm	Hmm... looking at the importds values for only impression/request discrepancies, the hours with discrepancies look like this:
+2015-06-21 11:57:50	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KR22DQ/-.csv
+2015-06-21 11:58:53	rdm	The 2015-06-08 discrepancies are something of a special case because of structural problems in the tags on the counts. For the rest of them, it's basically just one hour every day.
+2015-06-21 11:59:41	rdm	Is it possible that the adx import isn't making it into the hive counts? (That seems wrong, because kafka should be showing adx import, but that might be an instrumentation issue??)
+2015-06-21 12:28:54	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KRC97A/-.csv and commented: Here's what redshift adx insert looks like on green... it sort of correlates but sort of does not for stuff preceding the 8th. 
+2015-06-22 13:55:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5246ce8|1 new commit> by Raul Miller
+2015-06-22 14:50:14	walexander	the problem is that kafka and hive are only counting events 
+2015-06-22 14:50:39	walexander	and redshift counts facts -- the adx import sends one event for multiple facts 
+2015-06-22 21:08:08	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|17 new commits> by Will Alexander
+2015-06-22 21:10:12	-B02QBKC2X-	--- Failed:  Walexander's build (<https://circleci.com/gh/beanstock/data-pipeline/74|#74>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-22 21:10:12		 - add sql scripts to process event counts (<https://github.com/beanstock/data-pipeline/commit/4972c88bf8ec100a14420d7c03679f6a4ab9a93b|4972c88> by Walexander) and <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|16 more>
+2015-06-23 16:00:03	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/compare/0ad8a93cb6a5...16fc2828bc6f|7 new commits> by Will Alexander
+2015-06-24 15:01:19	-jira-	Pato Arvizu completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-676 --- 
+2015-06-24 15:23:26	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|2 new commits> by Raul Miller
+2015-06-24 15:25:28	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/75|#75>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 15:25:28		 - more and better testing (<https://github.com/beanstock/data-pipeline/commit/e42c28b60c2e27ab7b0b0a75e4b8439240cd435c|e42c28b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|1 more>
+2015-06-24 21:03:31	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|2 new commits> by Raul Miller
+2015-06-24 21:05:22	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/76|#76>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 21:05:22		 - update ad_size dimension in redshift from helix (<https://github.com/beanstock/data-pipeline/commit/7e4101d7d06c69e7d02ac732e8527d36aa974d30|7e4101d> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|1 more>
+2015-06-25 12:51:52	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/0f9ee95|1 new commit> by Raul Miller
+2015-06-25 12:53:54	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/77|#77>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 12:53:54		 - bugfixes for d_ad_size import (<https://github.com/beanstock/data-pipeline/commit/0f9ee9504a67d4406406b23989c57f6bc846d109|0f9ee95> by Raul Miller)
+2015-06-25 13:20:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|9 new commits> by Raul Miller
+2015-06-25 13:23:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/78|#78>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:23:12		 - bump version (<https://github.com/beanstock/data-pipeline/commit/c1f59015a4705c24024719607d2ae8d6245978a3|c1f5901> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|8 more>
+2015-06-25 13:25:16	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/c028b56|1 new commit> by Raul Miller
+2015-06-25 13:27:14	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/79|#79>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:27:14		 - fix adp tests (<https://github.com/beanstock/data-pipeline/commit/c028b56cfc7c79d51b7c79baf36df3cdcd48f3c2|c028b56> by Raul Miller)
+2015-06-30 09:45:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/80|#80>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue|blue>)
+2015-06-30 09:45:55		 - redshift has some strange bugs (<https://github.com/beanstock/data-pipeline/commit/9126c23bcee65aabe97bf215e425aec790e9b050|9126c23> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/d409691ac1df^...9126c23bcee6|4 more>
+2015-06-30 09:55:18	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|6 new commits> by Raul Miller
+2015-06-30 09:57:48	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/81|#81>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 09:57:48		 - support install from top level make (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|5 more>
+2015-06-30 10:00:23	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/82|#82>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:00:23		 -  (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by )
+2015-06-30 10:19:31	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:19:45	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:21:20	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/83|#83>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:21:20		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/84|#84>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:23:37		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:23:56	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:26:13	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/85|#85>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:26:13		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:28:35	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/86|#86>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:28:35		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:33:46	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/48dcfa6|1 new commit> by Raul Miller
+2015-06-30 10:36:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/87|#87>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:36:33		 - deploy for real (and fail on missing files) (<https://github.com/beanstock/data-pipeline/commit/48dcfa6196e6815d9b3556845134047f5a49abef|48dcfa6> by Raul Miller)
+2015-06-30 10:55:34	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|3 new commits> by Raul Miller
+2015-06-30 10:59:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/88|#88>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:59:37		 - avoid OSX problem with sed -i (<https://github.com/beanstock/data-pipeline/commit/57e36816594e257061ef750a94742f43de3fa80a|57e3681> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|2 more>
+2015-06-30 12:23:13	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|5 new commits> by Raul Miller
+2015-06-30 12:26:18	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/89|#89>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 12:26:18		 - clean up some noise... (<https://github.com/beanstock/data-pipeline/commit/511f4d847cf770463c0cf3c60ddfc1aa867b84f7|511f4d8> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|4 more>
+2015-06-30 13:05:48	rdm	Very strange - the command which is failing in circleci is different from the text in github
+2015-06-30 13:18:12	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/c69df15|1 new commit> by Raul Miller
+2015-06-30 13:20:58	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/91|#91>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:20:58		 - address app_dir issue in deploy/functions (<https://github.com/beanstock/data-pipeline/commit/c69df15b99c874c3606a647f9a34ef20bf6cedcf|c69df15> by Raul Miller)
+2015-06-30 13:25:43	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/f6d4de8|1 new commit> by Raul Miller
+2015-06-30 13:27:47	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/92|#92>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:27:47		 - remove bashism (<https://github.com/beanstock/data-pipeline/commit/f6d4de8b0e443e6979841b2e30b8202a22cbfba5|f6d4de8> by Raul Miller)
+2015-06-30 13:28:32	rdm	Hmm....
+2015-06-30 13:59:48	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/6810a53|1 new commit> by Raul Miller
+2015-06-30 14:02:18	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/93|#93>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 14:02:18		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller)
+2015-06-30 14:35:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|12 new commits> by Raul Miller
+2015-06-30 14:38:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/94|#94>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 14:38:55		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|11 more>
+2015-07-02 13:02:19	-B02QBKC2X-	--- Failed:  patoarvizu's build (<https://circleci.com/gh/beanstock/data-pipeline/95|#95>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/cookbook-integration|cookbook-integration>)
+2015-07-02 13:02:19		 - Provisioning local postgres db via vagrant + Chef (<https://github.com/beanstock/data-pipeline/commit/d77c05e80c37014255072ae9ebb8011e0b01ace5|d77c05e> by patoarvizu)
+2015-07-02 13:03:05	rdm	yep, failed on the color safety check - looks good
+2015-07-02 13:04:37	pato	Ok, cool
+2015-07-06 18:09:20	rdm	looker development session tomorrow overlaps with databus daily standup
+2015-07-06 18:10:02	rdm	(unless we end looker early, which is possible, but not guaranteed)
+2015-07-06 18:30:53	jas	i guess you should adjust the internal meeting if possible
+2015-07-06 18:31:16	rdm	it's pato and will and i - we'll work out something
+2015-06-12 14:29:46	rdm	and that DATABUS-761 goes inside that - can have multiple tickets describing a feature
+2015-06-12 14:29:51	jwong	cool that u added that databus folder in between
+2015-06-12 14:29:55	rdm	then it's scenarios inside the ticket
+2015-06-12 14:29:56	jwong	yeah
+2015-06-12 14:30:03	jwong	thats a nice touch
+2015-06-12 14:30:12	jwong	organize it better
+2015-06-12 14:30:16	rdm	and then the tables I want - calling them "feats" for lack of a better name
+2015-06-12 14:30:46	rdm	probably should use a better name - i already confused myself in my initial quips with you
+2015-06-12 14:31:11	rdm	maybe just "table"...
+2015-06-12 14:31:12	jwong	so each scenario prescribes its own table?
+2015-06-12 14:31:16	jwong	table(s)
+2015-06-12 14:31:58	rdm	yeah... they relate to the gherkin text (which is semi-formalized - but for our purposes I think I'd rather have someone manually convert those to test cases - going full automated would miss out good possibilities for technical review)
+2015-06-12 14:33:12	jwong	right.. this is pretty cool
+2015-06-12 14:33:23	rdm	My current todo on this line of thinking looks like: (1) think about names, (2) forget about it, just come up with something I can live with, (3) import tables to pg_unit db, (4) write tests
+2015-06-12 14:33:44	rdm	:innocent:
+2015-06-12 14:34:46	jwong	refreshing to know im not the only one who spends time on naming
+2015-06-12 14:34:54	rdm	heh... you know the saying
+2015-06-12 14:35:03	rdm	The two hardest problems in computer science are:
+2015-06-12 14:35:07	rdm	(1) naming
+2015-06-12 14:35:13	rdm	(2) cache management
+2015-06-12 14:35:18	rdm	(3) off-by-one errors
+2015-06-12 14:35:30	jwong	LOL dude thats 3 things
+2015-06-12 14:35:36	rdm	exactly :sunglasses:
+2015-06-12 14:35:45	jwong	lulz
+2015-06-12 15:09:41	walexander	@jas are we explicitly excluding mobile devices from these buys on meetme and gamefaqs?
+2015-06-12 16:12:55	jas	yes, I think so
+2015-06-12 16:26:16	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/a22516f|1 new commit> by Will Alexander
+2015-06-12 16:26:21	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/7ccb5ff32a5f...cafc870209cc|3 new commits> by Will Alexander
+2015-06-14 18:56:58	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/d29347d|1 new commit> by Raul Miller
+2015-06-14 18:58:04	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/54|#54>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-14 18:58:04		 - provide boring but concise table names (<https://github.com/beanstock/data-pipeline/commit/d29347d432624cdcc50db5ddebaa24872a752c04|d29347d> by Raul Miller)
+2015-06-15 08:24:25	rdm	tableau issues this morning. (1) tableau is telling me that a redshift server is failing (and does not identify which server is failing). Looking at aws console helixdwh-2-qa is in a "hardware failure" state, but none of the current scheduled tasks use that database (we used to use it for the spotx stuff, but I turned that off some time ago). So either we've got an intermittent issue here (possibly one which was fixed by someone from beanstock or aws?) or we've got a lingering configuration issue where some part of tableau holds onto configuration information which is no longer value [these possibilities are not mutually exclusive .. but I also don't have enough information to know if either is factually valid]. (2) tableau sign-in page declares: One or more of your licenses will expire on Jun 13, 2015 11:59 PM, which was last saturday. [there's also a chance that the refresh failures are somehow related to this licensing issue]
+2015-06-15 08:34:09	rdm	Ah.... it is almost certainly all about the licensing. Windows Application log on the tableau server says reap extracts is failing because localhost is refusing connections.
+2015-06-15 08:34:42	rdm	@akwok @jas we no longer have a functioning tableau server because the license has expired.
+2015-06-15 10:39:14	walexander	the license is valid -- wher are you seeing messages about the license?
+2015-06-15 10:47:28	walexander	@rdm i activated the license on the tableau server
+2015-06-15 10:47:33	walexander	it's good to 2016
+2015-06-15 10:52:23	walexander	@rdm getting this error when attempting to refresh ProdData: "No extracts to refresh" 
+2015-06-15 10:55:19	walexander	any changes made to that recently?
+2015-06-15 11:06:08	walexander	@rdm did a `tabadmin restart` and 
+2015-06-15 11:06:17	walexander	it is now refreshing the extract 
+2015-06-15 11:33:13	rdm	restart makes sense
+2015-06-15 11:57:41	rdm	ProdData extract finishing also helping - I've kicked off the other two "8am" extracts - I expect that that will prevent most of the "no extract" errors.
+2015-06-15 12:07:02	walexander	great
+2015-06-15 12:07:30	walexander	`tabadmin status -v` was showing all services as running before 
+2015-06-15 12:07:47	walexander	so, consider that output suspicious
+2015-06-15 12:25:25	rdm	they were running but yeah - license expiration intentionally breaks things such that "running" fails.
+2015-06-15 14:04:36	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5c703a1|1 new commit> by Raul Miller
+2015-06-15 14:07:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/55|#55>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:07:05		 - bring feature tables into our database (<https://github.com/beanstock/data-pipeline/commit/5c703a1d17d2c064f32b84a16fa97040c56e0e39|5c703a1> by Raul Miller)
+2015-06-15 14:21:28	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|3 new commits> by Raul Miller
+2015-06-15 14:22:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/56|#56>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 14:22:41		 - eliminate need for quoted table names (<https://github.com/beanstock/data-pipeline/commit/207cbb9636f6a61234bdb9aad9d3b831c0e5f6f5|207cbb9> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/5c703a1d17d2...207cbb9636f6|2 more>
+2015-06-15 19:20:02	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|4 new commits> by Raul Miller
+2015-06-15 19:21:08	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/57|#57>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-15 19:21:08		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/207cbb9636f6...9652cf203bf8|3 more>
+2015-06-15 19:21:49	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|10 new commits> by Raul Miller
+2015-06-15 19:23:10	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/58|#58>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-15 19:23:10		 - change tests to use the gherkin extracted tables (<https://github.com/beanstock/data-pipeline/commit/9652cf203bf838a47dc5a54eb07b90178cba2240|9652cf2> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4f8dabc8624d...9652cf203bf8|9 more>
+2015-06-16 09:23:56	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/commit/0ad8a93|1 new commit> by Raul Miller
+2015-06-16 09:25:19	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/commit/a18a966|1 new commit> by Raul Miller
+2015-06-16 09:28:45	-jira-	Raul Miller completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-760 --- 
+2015-06-16 12:10:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/268863b|1 new commit> by Raul Miller
+2015-06-16 12:12:05	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/59|#59>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-16 12:12:05		 - Allow DB_PORT (and DB_HOST) to be set in env (<https://github.com/beanstock/data-pipeline/commit/268863b4c77f8d7fd384d9f1ae51dedebdbf30a0|268863b> by Raul Miller)
+2015-06-16 13:30:54	walexander	Will be joining the call five min late
+2015-06-16 14:32:21	walexander	@pato @rdm i moved our stand up to tomorrow
+2015-06-16 14:32:55	pato	Ok
+2015-06-16 14:40:44	walexander	@rdm the redshift cluster currently in hardware failure( helixdwh-2-qa ) : is that yours?  if not needed, can you delete?
+2015-06-16 14:41:00	rdm	I'll delete
+2015-06-16 16:36:20	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-764 --- 
+2015-06-17 12:16:15	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|4 new commits> by Raul Miller
+2015-06-17 12:19:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/61|#61>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:19:40		 - circleci comes with postgres preinstalled (<https://github.com/beanstock/data-pipeline/commit/28f92e56f278f3f3679ca2f2510f5a4bef90e3aa|28f92e5> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/268863b4c77f...28f92e56f278|3 more>
+2015-06-17 12:29:35	pato	@walexander Did you delete the dev-cluster Redshift database?
+2015-06-17 12:37:00	walexander	I think so -- but would have been awhile ago 
+2015-06-17 12:37:18	walexander	I think @rdm deleted the -2-qa one yesterday 
+2015-06-17 12:37:22	rdm	yeah
+2015-06-17 12:37:48	rdm	but that helixdwh-2-qa cluster, and only that cluster
+2015-06-17 12:38:26	pato	@walexander a while ago meaning a couple of days ago?
+2015-06-17 12:40:19	walexander	the dev clusters? nah, like weeks ago 
+2015-06-17 12:40:32	walexander	something broken?
+2015-06-17 12:43:26	pato	The sandbox helix-console was pointing to that cluster so now it obviously can’t connect, but I’m not certain what does that break
+2015-06-17 12:45:45	walexander	the `push` replication service
+2015-06-17 12:49:39	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|2 new commits> by Raul Miller
+2015-06-17 12:52:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/63|#63>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 12:52:33		 - database init and so on.. (<https://github.com/beanstock/data-pipeline/commit/edc06bb504b11301732e136252d26b7871031a8d|edc06bb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/28f92e56f278...edc06bb504b1|1 more>
+2015-06-17 13:07:53	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|2 new commits> by Raul Miller
+2015-06-17 13:09:01	pato	Ok
+2015-06-17 13:09:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/65|#65>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:09:12		 - need more recent pgtap than what ubuntu 12 has (<https://github.com/beanstock/data-pipeline/commit/d571ddb4d9ac039f3587b40f89ab8547068af0d5|d571ddb> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/edc06bb504b1...d571ddb4d9ac|1 more>
+2015-06-17 13:09:38	pato	We will eventually have just one non-production HC and one Redshift, right?
+2015-06-17 13:40:47	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/b0c0e08|1 new commit> by Raul Miller
+2015-06-17 13:43:44	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/67|#67>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:43:44		 - various circleci related fixes (<https://github.com/beanstock/data-pipeline/commit/b0c0e08492284b1d96952bd8f7adf22c012acfb4|b0c0e08> by Raul Miller)
+2015-06-17 13:50:36	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/4f5dbe4|1 new commit> by Raul Miller
+2015-06-17 13:53:40	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/68|#68>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 13:53:40		 - notes about differences between circleci docs and current  behavior (<https://github.com/beanstock/data-pipeline/commit/4f5dbe4029afd2c9745a79f71d58d6ad57ff9434|4f5dbe4> by Raul Miller)
+2015-06-17 14:01:46	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/d1aa587|1 new commit> by Raul Miller
+2015-06-17 14:04:34	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/70|#70>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-17 14:04:34		 - really use flyway circleci.conf in circleci (<https://github.com/beanstock/data-pipeline/commit/d1aa58714c5a180fd9ac74b47ef1ce66a00d4e6c|d1aa587> by Raul Miller)
+2015-06-17 14:12:36	rdm	Now that is the right kind of failure -- fails because the tests are failing as opposed to failing because the tests cannot be run
+2015-06-17 14:30:21	walexander	@pato @rdm let's start call in five minutes
+2015-06-17 14:31:58	pato	@walexander Ok
+2015-06-17 19:10:03	-B04UX08BS-	--- [databus-proxy] Branch "wip/CX-762" was force-pushed to <https://github.com/beanstock/databus-proxy/commit/bc141f13c94fc76a81155b64a33ffbbe83394d3e|bc141f1> by jsnwng. <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|Compare changes>
+2015-06-17 19:10:04	-B04UX08BS-	--- [databus-proxy:wip/CX-762] <https://github.com/beanstock/databus-proxy/compare/00f3db233a15...bc141f13c94f|6 new commits> by Haisheng.Wu
+2015-06-17 19:26:25	-B04UX08BS-	--- [beanstock/databus-proxy] Pull request closed: <https://github.com/beanstock/databus-proxy/pull/11|#11 Wip/cx 762> by <https://github.com/jsnwng|jsnwng>
+2015-06-17 19:26:25	-B04UX08BS-	--- [databus-proxy:develop] <https://github.com/beanstock/databus-proxy/compare/a18a96653991...8e6d2c9c71d7|7 new commits> by Haisheng.Wu and 1 others
+2015-06-18 09:53:53	rdm	DATABUS-754 wants me to set up a pipeline monitoring dashboard, so I need to think about where that fits.
+2015-06-18 09:54:16	rdm	So I took a look at our currently active web servers. Here's what I see:
+2015-06-18 09:54:35	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06GNNLBU/-.tsv
+2015-06-18 09:55:41	rdm	I'm thinking that, of those, the lab server is probably the best candidate for the initial implementation. But I'm open to suggestions.
+2015-06-18 10:17:13	walexander	@rdm  i assigned 754 to myself.  going to do the dashboard in tableau 
+2015-06-18 10:17:41	rdm	kk, looking at cucumber
+2015-06-18 13:30:47	walexander	Going to be a few minutes late to the est meeting -- start without me and I'll catch up
+2015-06-18 13:31:04	rdm	I'm the only one there right now
+2015-06-18 13:43:13	walexander	@jas i added the `filled` table 
+2015-06-18 13:44:15	walexander	I created a saved query that takes the table name and schema version as parameters: http://hive.prod.beanstock.net:8888/beeswax/execute/design/33#query
+2015-06-18 13:44:33	walexander	table name = filled, schema = current
+2015-06-18 13:44:43	-jira-	Jasanjot Singh created Bug https://beanstockmedia.atlassian.net/browse/DATABUS-765 --- 
+2015-06-18 13:48:41	jas	thanks
+2015-06-18 13:48:53	jas	BTW, I do not have access to that hive link
+2015-06-18 13:49:05	jas	Only superusers and admin are allowed to read this document.
+2015-06-18 14:08:53	walexander	oic, sorry 
+2015-06-18 14:09:02	walexander	i was using a different user name
+2015-06-18 14:09:03	walexander	one sec
+2015-06-18 14:10:19	walexander	http://hive.prod.beanstock.net:8888/beeswax/execute/design/112#query
+2015-06-18 14:10:46	walexander	but, you should see the `filled` table now 
+2015-06-18 16:40:29	jas	Cannot connect: connection refused: Java::Default::PSQLException: The connection attempt failed.
+2015-06-18 16:40:36	jas	is the QA database down?
+2015-06-18 16:40:39	jas	for Looker?
+2015-06-18 16:40:45	jas	@walexander @rdm
+2015-06-18 16:41:09	jas	i was in a Looker demo with the team
+2015-06-18 16:41:23	walexander	what db name is it using?
+2015-06-18 16:41:28	rdm	Hmm... looker is currently pointed at helixdwh-2-qa
+2015-06-18 16:41:34	rdm	which has been down a few days
+2015-06-18 16:41:45	jas	ok great, so can we bring it up?
+2015-06-18 16:41:57	walexander	eh, not sure 
+2015-06-18 16:42:01	rdm	might be easier to point it at a different db
+2015-06-18 16:42:07	jas	which DB?
+2015-06-18 16:42:11	rdm	just need one that looker can reach
+2015-06-18 16:42:23	walexander	is the redshift-qa-1 where dfp reports are bbeing pushed? 
+2015-06-18 16:43:04	jas	should I use that one then?
+2015-06-18 16:44:07	walexander	see if it has the imported DFP reports first, but yeah use that if it does
+2015-06-19 11:55:05	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/compare/9652cf203bf8...1977152551dd|17 new commits> by Raul Miller
+2015-06-19 11:58:10	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/71|#71>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-19 11:58:10		 - use test data table for DATABUS-761 scenario 4 (<https://github.com/beanstock/data-pipeline/commit/1977152551dd7b3375a2b9f3ef5353ebb0e3b56c|1977152> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/9652cf203bf8...1977152551dd|16 more>
+2015-06-19 14:37:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/91b65b0|1 new commit> by Raul Miller
+2015-06-19 14:40:41	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/72|#72>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-19 14:40:41		 - flesh out the tests... (<https://github.com/beanstock/data-pipeline/commit/91b65b0629ff210efa10abbc0b68de63aa65b9ff|91b65b0> by Raul Miller)
+2015-06-19 14:57:12	walexander	@pato @rdm I cancelled today's stand up. I'll sync up with you individually today and/or monday
+2015-06-19 14:57:20	pato	Ok
+2015-06-19 14:57:23	rdm	ok
+2015-06-19 21:10:45	walexander	@rdm @jas @akwok here is the databus status dashboard
+2015-06-19 21:10:48	walexander	http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/Dashboard1#1
+2015-06-19 21:11:36	akwok	thanks
+2015-06-19 21:12:05	walexander	you can see we have a couple of dates where redshift has more events than the others
+2015-06-21 11:57:36	rdm	Hmm... looking at the importds values for only impression/request discrepancies, the hours with discrepancies look like this:
+2015-06-21 11:57:50	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KR22DQ/-.csv
+2015-06-21 11:58:53	rdm	The 2015-06-08 discrepancies are something of a special case because of structural problems in the tags on the counts. For the rest of them, it's basically just one hour every day.
+2015-06-21 11:59:41	rdm	Is it possible that the adx import isn't making it into the hive counts? (That seems wrong, because kafka should be showing adx import, but that might be an instrumentation issue??)
+2015-06-21 12:28:54	rdm	@rdm uploaded a file: https://beanstock.slack.com/files/rdm/F06KRC97A/-.csv and commented: Here's what redshift adx insert looks like on green... it sort of correlates but sort of does not for stuff preceding the 8th. 
+2015-06-22 13:55:17	-B04UX08BS-	--- [data-pipeline:rdm-draft] <https://github.com/beanstock/data-pipeline/commit/5246ce8|1 new commit> by Raul Miller
+2015-06-22 13:57:57	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/73|#73>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/rdm-draft|rdm-draft>)
+2015-06-22 13:57:57		 - flesh out the test (<https://github.com/beanstock/data-pipeline/commit/5246ce8e132cdb5bdbb378a799e486489463c8aa|5246ce8> by Raul Miller)
+2015-06-22 14:50:14	walexander	the problem is that kafka and hive are only counting events 
+2015-06-22 14:50:39	walexander	and redshift counts facts -- the adx import sends one event for multiple facts 
+2015-06-22 21:08:08	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|17 new commits> by Will Alexander
+2015-06-22 21:10:12	-B02QBKC2X-	--- Failed:  Walexander's build (<https://circleci.com/gh/beanstock/data-pipeline/74|#74>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-22 21:10:12		 - add sql scripts to process event counts (<https://github.com/beanstock/data-pipeline/commit/4972c88bf8ec100a14420d7c03679f6a4ab9a93b|4972c88> by Walexander) and <https://github.com/beanstock/data-pipeline/compare/d1aa58714c5a...4972c88bf8ec|16 more>
+2015-06-23 16:00:03	-B04UX08BS-	--- [databus-proxy:master] <https://github.com/beanstock/databus-proxy/compare/0ad8a93cb6a5...16fc2828bc6f|7 new commits> by Will Alexander
+2015-06-24 15:01:19	-jira-	Pato Arvizu completed Dev Ops Task https://beanstockmedia.atlassian.net/browse/DATABUS-676 --- 
+2015-06-24 15:23:26	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|2 new commits> by Raul Miller
+2015-06-24 15:25:28	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/75|#75>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 15:25:28		 - more and better testing (<https://github.com/beanstock/data-pipeline/commit/e42c28b60c2e27ab7b0b0a75e4b8439240cd435c|e42c28b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/4972c88bf8ec...e42c28b60c2e|1 more>
+2015-06-24 21:03:31	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|2 new commits> by Raul Miller
+2015-06-24 21:05:22	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/76|#76>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-24 21:05:22		 - update ad_size dimension in redshift from helix (<https://github.com/beanstock/data-pipeline/commit/7e4101d7d06c69e7d02ac732e8527d36aa974d30|7e4101d> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/e42c28b60c2e...7e4101d7d06c|1 more>
+2015-06-25 12:51:52	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/0f9ee95|1 new commit> by Raul Miller
+2015-06-25 12:53:54	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/77|#77>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 12:53:54		 - bugfixes for d_ad_size import (<https://github.com/beanstock/data-pipeline/commit/0f9ee9504a67d4406406b23989c57f6bc846d109|0f9ee95> by Raul Miller)
+2015-06-25 13:20:54	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|9 new commits> by Raul Miller
+2015-06-25 13:23:12	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/78|#78>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:23:12		 - bump version (<https://github.com/beanstock/data-pipeline/commit/c1f59015a4705c24024719607d2ae8d6245978a3|c1f5901> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/0f9ee9504a67...c1f59015a470|8 more>
+2015-06-25 13:25:16	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/c028b56|1 new commit> by Raul Miller
+2015-06-25 13:27:14	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/79|#79>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-25 13:27:14		 - fix adp tests (<https://github.com/beanstock/data-pipeline/commit/c028b56cfc7c79d51b7c79baf36df3cdcd48f3c2|c028b56> by Raul Miller)
+2015-06-30 09:45:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/80|#80>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue|blue>)
+2015-06-30 09:45:55		 - redshift has some strange bugs (<https://github.com/beanstock/data-pipeline/commit/9126c23bcee65aabe97bf215e425aec790e9b050|9126c23> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/d409691ac1df^...9126c23bcee6|4 more>
+2015-06-30 09:55:18	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|6 new commits> by Raul Miller
+2015-06-30 09:57:48	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/81|#81>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 09:57:48		 - support install from top level make (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/c028b56cfc7c...7466c4b11587|5 more>
+2015-06-30 10:00:23	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/82|#82>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:00:23		 -  (<https://github.com/beanstock/data-pipeline/commit/7466c4b11587279371bdeabba4708bf1c6e8739b|7466c4b> by )
+2015-06-30 10:19:31	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:19:45	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|2 new commits> by Raul Miller
+2015-06-30 10:21:20	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/83|#83>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:21:20		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/84|#84>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:23:37		 - more polish (<https://github.com/beanstock/data-pipeline/commit/722006082107349ffd48f83bd0d1b7d53b945123|7220060> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/7466c4b11587...722006082107|1 more>
+2015-06-30 10:23:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:23:56	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/29d519e|1 new commit> by Raul Miller
+2015-06-30 10:26:13	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/85|#85>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 10:26:13		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:28:35	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/86|#86>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:28:35		 - change label on makefile invocation back to "test" (<https://github.com/beanstock/data-pipeline/commit/29d519efb849cecb4825f84ebabc33cfb15a4b52|29d519e> by Raul Miller)
+2015-06-30 10:33:46	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/48dcfa6|1 new commit> by Raul Miller
+2015-06-30 10:36:33	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/87|#87>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:36:33		 - deploy for real (and fail on missing files) (<https://github.com/beanstock/data-pipeline/commit/48dcfa6196e6815d9b3556845134047f5a49abef|48dcfa6> by Raul Miller)
+2015-06-30 10:55:34	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|3 new commits> by Raul Miller
+2015-06-30 10:59:37	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/88|#88>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 10:59:37		 - avoid OSX problem with sed -i (<https://github.com/beanstock/data-pipeline/commit/57e36816594e257061ef750a94742f43de3fa80a|57e3681> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/48dcfa6196e6...57e36816594e|2 more>
+2015-06-30 12:23:13	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|5 new commits> by Raul Miller
+2015-06-30 12:26:18	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/89|#89>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 12:26:18		 - clean up some noise... (<https://github.com/beanstock/data-pipeline/commit/511f4d847cf770463c0cf3c60ddfc1aa867b84f7|511f4d8> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/57e36816594e...511f4d847cf7|4 more>
+2015-06-30 13:18:12	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/c69df15|1 new commit> by Raul Miller
+2015-06-30 13:20:58	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/91|#91>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:20:58		 - address app_dir issue in deploy/functions (<https://github.com/beanstock/data-pipeline/commit/c69df15b99c874c3606a647f9a34ef20bf6cedcf|c69df15> by Raul Miller)
+2015-06-30 13:25:43	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/f6d4de8|1 new commit> by Raul Miller
+2015-06-30 13:27:47	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/92|#92>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 13:27:47		 - remove bashism (<https://github.com/beanstock/data-pipeline/commit/f6d4de8b0e443e6979841b2e30b8202a22cbfba5|f6d4de8> by Raul Miller)
+2015-06-30 13:28:32	rdm	Hmm....
+2015-06-30 13:59:48	-B04UX08BS-	--- [data-pipeline:blue.prod] <https://github.com/beanstock/data-pipeline/commit/6810a53|1 new commit> by Raul Miller
+2015-06-30 14:02:18	-B02QBKC2X-	--- Fixed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/93|#93>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/blue.prod|blue.prod>)
+2015-06-30 14:02:18		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller)
+2015-06-30 14:35:42	-B04UX08BS-	--- [data-pipeline:master] <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|12 new commits> by Raul Miller
+2015-06-30 14:38:55	-B02QBKC2X-	--- Failed:  rdm's build (<https://circleci.com/gh/beanstock/data-pipeline/94|#94>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/master|master>)
+2015-06-30 14:38:55		 - circleci doesn't know about aws regions (<https://github.com/beanstock/data-pipeline/commit/6810a5348d7b86bd78ff1ed75cfc79e77133b913|6810a53> by Raul Miller) and <https://github.com/beanstock/data-pipeline/compare/29d519efb849...6810a5348d7b|11 more>
+2015-07-02 13:02:19	-B02QBKC2X-	--- Failed:  patoarvizu's build (<https://circleci.com/gh/beanstock/data-pipeline/95|#95>; push in <https://circleci.com/gh/beanstock/data-pipeline|beanstock/data-pipeline> (<https://circleci.com/gh/beanstock/data-pipeline/tree/cookbook-integration|cookbook-integration>)
+2015-07-02 13:02:19		 - Provisioning local postgres db via vagrant + Chef (<https://github.com/beanstock/data-pipeline/commit/d77c05e80c37014255072ae9ebb8011e0b01ace5|d77c05e> by patoarvizu)
+2015-07-02 13:03:05	rdm	yep, failed on the color safety check - looks good
+2015-07-02 13:04:37	pato	Ok, cool
+2015-07-06 18:09:20	rdm	looker development session tomorrow overlaps with databus daily standup
+2015-07-06 18:10:02	rdm	(unless we end looker early, which is possible, but not guaranteed)
+2015-07-06 18:30:53	jas	i guess you should adjust the internal meeting if possible
+2015-07-06 18:31:16	rdm	it's pato and will and i - we'll work out something

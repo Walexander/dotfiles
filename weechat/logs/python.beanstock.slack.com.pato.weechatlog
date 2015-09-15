@@ -1,0 +1,135 @@
+2015-05-13 16:18:32	walexander	-----BEGIN PGP MESSAGE-----
+2015-05-13 16:18:32	walexander	Version: GnuPG/MacGPG2 v2
+2015-05-13 16:18:32	walexander	hQEMAwhBhl0cNAvzAQgAi6J6c1n3+pwv4Sz76xEpvlVCjHjjgOr5GZQFQYkn3lcR
+2015-05-13 16:18:32	walexander	MOpq3HlcfOlqP4uksksgIIMJ0LeUTuCjPGhv2SdngjdPN0HF7MG6O7Uxoo+aKIGT
+2015-05-13 16:18:32	walexander	076+SR3vnmqWMQCb8dfI0ufFqx9ahEx9KzCnOffA1S8SiSoKfvpvsFEWxwmviENK
+2015-05-13 16:18:32	walexander	eGum1q2FhAARZ9djjLtay7b//Onxry9SUZkjtjnkxiJQ+FL+wpv9FOxOK8LGMvx/
+2015-05-13 16:18:32	walexander	DjVwLunT/knF0TNe+rF2QY8FsqNEGjuSmTwzW4d8AgaIAGsJHgTaTe9q2HY1Hh1r
+2015-05-13 16:18:32	walexander	4fmuG/q/oDBmdAu2SZ6iSR66L8ZK1RdtQD4N2HQ0SNLpAV59iYWuVVmZVxv5WVI1
+2015-05-13 16:18:32	walexander	Ukn+eJ7aDNjpVEMmhXhOmJKOkb5pbzQ6T+aOg45M1v2yGt4ZJp4JnaWePuqO+dWE
+2015-05-13 16:18:32	walexander	mpjIWTGYVwNgd3SMaXAhnwJ5kLiUKht8PGtTKD6Ndwi6N7qk1tDYarJUXe1PVYbe
+2015-05-13 16:18:32	walexander	OjZWtYNt/XqKLnuoioZvIga5/QaZ+xEX9C3OBdmGdQ1+yROFWZKmZrQJqHY7thfA
+2015-05-13 16:18:32	walexander	ezMR8bBHAj/9zWF0f3AIuw9B3I9fHgTLUtg5zBW5Xrz+3pdw9fcVW4dXK/1gTRZY
+2015-05-13 16:18:32	walexander	ivT81zhn+3NhL756IGglG6iOWKVr6+TnXmdeH7IuM8rGKpZ3pgVt+v11gPfDT4jU
+2015-05-13 16:18:32	walexander	kQeqiFd3uH5954czQUQcLg0NkIhHUHlAbYQ6aUQgab9B5DwJjPpiagDsrX9tfAAP
+2015-05-13 16:18:32	walexander	d5SdlHJihoCfGN8Qtl0B0KcyGo40xwLZbOHcuIe3wNKjMshZUWtzUjOgpDs2e9tX
+2015-05-13 16:18:32	walexander	PH9gaqx95Prsxrc2R7SC+54Tj1rTWjRtwF2Y8h+EtWfWB4GzeFX9jbiiUWkfcOuo
+2015-05-13 16:18:32	walexander	DiRXNuHLj97XfCYAFaJjkviaAUngup8OK6tQTeYKR6XEoxL9Wg/7pBqLTyb/U3ga
+2015-05-13 16:18:32	walexander	JEnafq6fQmdGTjKfwftLb8M8mJxegycebdGpKowwaYOJo8LxI2SlBqyEayQSN18u
+2015-05-13 16:18:32	walexander	z5gSqqYiou0EQ3Dc+5jD+m+WSP4fOzWwNKhDK5yQjfJrGChVi/+ThLZxPuDJPAWs
+2015-05-13 16:49:38	pato	Thanks
+2015-05-13 16:56:31	pato	Mmhh I think it might be incomplete, It’s missing the ---END… part
+2015-05-13 16:56:45	pato	Also, can you send it as a snippet? It’s easier to copy/paste
+2015-05-13 17:11:44	walexander	damn , kk 
+2015-05-13 17:14:54	walexander	@walexander uploaded a file: https://beanstock.slack.com/files/walexander/F04RL2NKA/ci_beanstock_pgp.txt
+2015-05-13 17:29:22	pato	Thanks
+2015-06-10 15:36:26	walexander	Do you know what special fastly feature onswipe uses?
+2015-06-10 15:36:51	walexander	I remember there was some thing that fastly did that was unique but can't remember what
+2015-06-10 15:40:45	pato	No, Paul evaluated that, maybe Ben remembers
+2015-06-10 15:41:06	walexander	he around? not showing as online
+2015-06-10 15:41:42	pato	No, he’s in Europe so he probably already signed off
+2015-06-16 14:48:06	walexander	do you know what these ec2 nodes called `jenkins-vagrant-node` are? 
+2015-06-16 14:49:30	pato	I think those are boxes launched by the Jenkins job that generates the DataPipeline artifacts. It’s supposed to also bring them down but it probably failed because it could get to that.
+2015-06-16 14:49:34	pato	They can be deleted
+2015-06-16 14:49:46	walexander	ah, gotcha -- kk
+2015-06-16 15:01:06	walexander	youy able to join this call? 
+2015-06-16 15:02:38	pato	Yeah, one sec
+2015-06-18 12:58:47	pato	Hey, did you say you want to shrink the elastic search clusters to two nodes that are master, data and client? Because I think that we can do two larger data nodes and have a couple of smaller (like m3.medium) master and client nodes for stability. I’ve already done the work to manage them with a spot-instance auto-scaling group so it’ll be very low cost. I’m thinking less than $100 per month.
+2015-06-18 13:20:33	walexander	oh, great news
+2015-06-18 13:20:41	walexander	yeah, let's do that then
+2015-06-18 13:23:32	pato	Cool
+2015-05-13 16:18:32	walexander	-----BEGIN PGP MESSAGE-----
+2015-05-13 16:18:32	walexander	Version: GnuPG/MacGPG2 v2
+2015-05-13 16:18:32	walexander	hQEMAwhBhl0cNAvzAQgAi6J6c1n3+pwv4Sz76xEpvlVCjHjjgOr5GZQFQYkn3lcR
+2015-05-13 16:18:32	walexander	MOpq3HlcfOlqP4uksksgIIMJ0LeUTuCjPGhv2SdngjdPN0HF7MG6O7Uxoo+aKIGT
+2015-05-13 16:18:32	walexander	076+SR3vnmqWMQCb8dfI0ufFqx9ahEx9KzCnOffA1S8SiSoKfvpvsFEWxwmviENK
+2015-05-13 16:18:32	walexander	eGum1q2FhAARZ9djjLtay7b//Onxry9SUZkjtjnkxiJQ+FL+wpv9FOxOK8LGMvx/
+2015-05-13 16:18:32	walexander	DjVwLunT/knF0TNe+rF2QY8FsqNEGjuSmTwzW4d8AgaIAGsJHgTaTe9q2HY1Hh1r
+2015-05-13 16:18:32	walexander	4fmuG/q/oDBmdAu2SZ6iSR66L8ZK1RdtQD4N2HQ0SNLpAV59iYWuVVmZVxv5WVI1
+2015-05-13 16:18:32	walexander	Ukn+eJ7aDNjpVEMmhXhOmJKOkb5pbzQ6T+aOg45M1v2yGt4ZJp4JnaWePuqO+dWE
+2015-05-13 16:18:32	walexander	mpjIWTGYVwNgd3SMaXAhnwJ5kLiUKht8PGtTKD6Ndwi6N7qk1tDYarJUXe1PVYbe
+2015-05-13 16:18:32	walexander	OjZWtYNt/XqKLnuoioZvIga5/QaZ+xEX9C3OBdmGdQ1+yROFWZKmZrQJqHY7thfA
+2015-05-13 16:18:32	walexander	ezMR8bBHAj/9zWF0f3AIuw9B3I9fHgTLUtg5zBW5Xrz+3pdw9fcVW4dXK/1gTRZY
+2015-05-13 16:18:32	walexander	ivT81zhn+3NhL756IGglG6iOWKVr6+TnXmdeH7IuM8rGKpZ3pgVt+v11gPfDT4jU
+2015-05-13 16:18:32	walexander	kQeqiFd3uH5954czQUQcLg0NkIhHUHlAbYQ6aUQgab9B5DwJjPpiagDsrX9tfAAP
+2015-05-13 16:18:32	walexander	d5SdlHJihoCfGN8Qtl0B0KcyGo40xwLZbOHcuIe3wNKjMshZUWtzUjOgpDs2e9tX
+2015-05-13 16:18:32	walexander	PH9gaqx95Prsxrc2R7SC+54Tj1rTWjRtwF2Y8h+EtWfWB4GzeFX9jbiiUWkfcOuo
+2015-05-13 16:18:32	walexander	DiRXNuHLj97XfCYAFaJjkviaAUngup8OK6tQTeYKR6XEoxL9Wg/7pBqLTyb/U3ga
+2015-05-13 16:18:32	walexander	JEnafq6fQmdGTjKfwftLb8M8mJxegycebdGpKowwaYOJo8LxI2SlBqyEayQSN18u
+2015-05-13 16:18:32	walexander	z5gSqqYiou0EQ3Dc+5jD+m+WSP4fOzWwNKhDK5yQjfJrGChVi/+ThLZxPuDJPAWs
+2015-05-13 16:49:38	pato	Thanks
+2015-05-13 16:56:31	pato	Mmhh I think it might be incomplete, It’s missing the ---END… part
+2015-05-13 16:56:45	pato	Also, can you send it as a snippet? It’s easier to copy/paste
+2015-05-13 17:11:44	walexander	damn , kk 
+2015-05-13 17:14:54	walexander	@walexander uploaded a file: https://beanstock.slack.com/files/walexander/F04RL2NKA/ci_beanstock_pgp.txt
+2015-05-13 17:29:22	pato	Thanks
+2015-06-10 15:36:26	walexander	Do you know what special fastly feature onswipe uses?
+2015-06-10 15:36:51	walexander	I remember there was some thing that fastly did that was unique but can't remember what
+2015-06-10 15:40:45	pato	No, Paul evaluated that, maybe Ben remembers
+2015-06-10 15:41:06	walexander	he around? not showing as online
+2015-06-10 15:41:42	pato	No, he’s in Europe so he probably already signed off
+2015-06-16 14:48:06	walexander	do you know what these ec2 nodes called `jenkins-vagrant-node` are? 
+2015-06-16 14:49:30	pato	I think those are boxes launched by the Jenkins job that generates the DataPipeline artifacts. It’s supposed to also bring them down but it probably failed because it could get to that.
+2015-06-16 14:49:34	pato	They can be deleted
+2015-06-16 14:49:46	walexander	ah, gotcha -- kk
+2015-06-16 15:01:06	walexander	youy able to join this call? 
+2015-06-16 15:02:38	pato	Yeah, one sec
+2015-06-18 12:58:47	pato	Hey, did you say you want to shrink the elastic search clusters to two nodes that are master, data and client? Because I think that we can do two larger data nodes and have a couple of smaller (like m3.medium) master and client nodes for stability. I’ve already done the work to manage them with a spot-instance auto-scaling group so it’ll be very low cost. I’m thinking less than $100 per month.
+2015-06-18 13:20:33	walexander	oh, great news
+2015-06-18 13:20:41	walexander	yeah, let's do that then
+2015-06-18 13:23:32	pato	Cool
+2015-05-13 16:18:32	walexander	-----BEGIN PGP MESSAGE-----
+2015-05-13 16:18:32	walexander	Version: GnuPG/MacGPG2 v2
+2015-05-13 16:18:32	walexander	hQEMAwhBhl0cNAvzAQgAi6J6c1n3+pwv4Sz76xEpvlVCjHjjgOr5GZQFQYkn3lcR
+2015-05-13 16:18:32	walexander	MOpq3HlcfOlqP4uksksgIIMJ0LeUTuCjPGhv2SdngjdPN0HF7MG6O7Uxoo+aKIGT
+2015-05-13 16:18:32	walexander	076+SR3vnmqWMQCb8dfI0ufFqx9ahEx9KzCnOffA1S8SiSoKfvpvsFEWxwmviENK
+2015-05-13 16:18:32	walexander	eGum1q2FhAARZ9djjLtay7b//Onxry9SUZkjtjnkxiJQ+FL+wpv9FOxOK8LGMvx/
+2015-05-13 16:18:32	walexander	DjVwLunT/knF0TNe+rF2QY8FsqNEGjuSmTwzW4d8AgaIAGsJHgTaTe9q2HY1Hh1r
+2015-05-13 16:18:32	walexander	4fmuG/q/oDBmdAu2SZ6iSR66L8ZK1RdtQD4N2HQ0SNLpAV59iYWuVVmZVxv5WVI1
+2015-05-13 16:18:32	walexander	Ukn+eJ7aDNjpVEMmhXhOmJKOkb5pbzQ6T+aOg45M1v2yGt4ZJp4JnaWePuqO+dWE
+2015-05-13 16:18:32	walexander	mpjIWTGYVwNgd3SMaXAhnwJ5kLiUKht8PGtTKD6Ndwi6N7qk1tDYarJUXe1PVYbe
+2015-05-13 16:18:32	walexander	OjZWtYNt/XqKLnuoioZvIga5/QaZ+xEX9C3OBdmGdQ1+yROFWZKmZrQJqHY7thfA
+2015-05-13 16:18:32	walexander	ezMR8bBHAj/9zWF0f3AIuw9B3I9fHgTLUtg5zBW5Xrz+3pdw9fcVW4dXK/1gTRZY
+2015-05-13 16:18:32	walexander	ivT81zhn+3NhL756IGglG6iOWKVr6+TnXmdeH7IuM8rGKpZ3pgVt+v11gPfDT4jU
+2015-05-13 16:18:32	walexander	kQeqiFd3uH5954czQUQcLg0NkIhHUHlAbYQ6aUQgab9B5DwJjPpiagDsrX9tfAAP
+2015-05-13 16:18:32	walexander	d5SdlHJihoCfGN8Qtl0B0KcyGo40xwLZbOHcuIe3wNKjMshZUWtzUjOgpDs2e9tX
+2015-05-13 16:18:32	walexander	PH9gaqx95Prsxrc2R7SC+54Tj1rTWjRtwF2Y8h+EtWfWB4GzeFX9jbiiUWkfcOuo
+2015-05-13 16:18:32	walexander	DiRXNuHLj97XfCYAFaJjkviaAUngup8OK6tQTeYKR6XEoxL9Wg/7pBqLTyb/U3ga
+2015-05-13 16:18:32	walexander	JEnafq6fQmdGTjKfwftLb8M8mJxegycebdGpKowwaYOJo8LxI2SlBqyEayQSN18u
+2015-05-13 16:18:32	walexander	z5gSqqYiou0EQ3Dc+5jD+m+WSP4fOzWwNKhDK5yQjfJrGChVi/+ThLZxPuDJPAWs
+2015-05-13 16:49:38	pato	Thanks
+2015-05-13 16:56:31	pato	Mmhh I think it might be incomplete, It’s missing the ---END… part
+2015-05-13 16:56:45	pato	Also, can you send it as a snippet? It’s easier to copy/paste
+2015-05-13 17:11:44	walexander	damn , kk 
+2015-05-13 17:14:54	walexander	@walexander uploaded a file: https://beanstock.slack.com/files/walexander/F04RL2NKA/ci_beanstock_pgp.txt
+2015-05-13 17:29:22	pato	Thanks
+2015-06-10 15:36:26	walexander	Do you know what special fastly feature onswipe uses?
+2015-06-10 15:36:51	walexander	I remember there was some thing that fastly did that was unique but can't remember what
+2015-06-10 15:40:45	pato	No, Paul evaluated that, maybe Ben remembers
+2015-06-10 15:41:06	walexander	he around? not showing as online
+2015-06-10 15:41:42	pato	No, he’s in Europe so he probably already signed off
+2015-06-16 14:48:06	walexander	do you know what these ec2 nodes called `jenkins-vagrant-node` are? 
+2015-06-16 14:49:30	pato	I think those are boxes launched by the Jenkins job that generates the DataPipeline artifacts. It’s supposed to also bring them down but it probably failed because it could get to that.
+2015-06-16 14:49:34	pato	They can be deleted
+2015-06-16 14:49:46	walexander	ah, gotcha -- kk
+2015-06-16 15:01:06	walexander	youy able to join this call? 
+2015-06-16 15:02:38	pato	Yeah, one sec
+2015-06-18 12:58:47	pato	Hey, did you say you want to shrink the elastic search clusters to two nodes that are master, data and client? Because I think that we can do two larger data nodes and have a couple of smaller (like m3.medium) master and client nodes for stability. I’ve already done the work to manage them with a spot-instance auto-scaling group so it’ll be very low cost. I’m thinking less than $100 per month.
+2015-06-18 13:20:33	walexander	oh, great news
+2015-06-18 13:20:41	walexander	yeah, let's do that then
+2015-06-18 13:23:32	pato	Cool
+2015-06-10 15:36:26	walexander	Do you know what special fastly feature onswipe uses?
+2015-06-10 15:36:51	walexander	I remember there was some thing that fastly did that was unique but can't remember what
+2015-06-10 15:40:45	pato	No, Paul evaluated that, maybe Ben remembers
+2015-06-10 15:41:06	walexander	he around? not showing as online
+2015-06-10 15:41:42	pato	No, he’s in Europe so he probably already signed off
+2015-06-16 14:48:06	walexander	do you know what these ec2 nodes called `jenkins-vagrant-node` are? 
+2015-06-16 14:49:30	pato	I think those are boxes launched by the Jenkins job that generates the DataPipeline artifacts. It’s supposed to also bring them down but it probably failed because it could get to that.
+2015-06-16 14:49:34	pato	They can be deleted
+2015-06-16 14:49:46	walexander	ah, gotcha -- kk
+2015-06-16 15:01:06	walexander	youy able to join this call? 
+2015-06-16 15:02:38	pato	Yeah, one sec
+2015-06-18 12:58:47	pato	Hey, did you say you want to shrink the elastic search clusters to two nodes that are master, data and client? Because I think that we can do two larger data nodes and have a couple of smaller (like m3.medium) master and client nodes for stability. I’ve already done the work to manage them with a spot-instance auto-scaling group so it’ll be very low cost. I’m thinking less than $100 per month.
+2015-06-18 13:20:33	walexander	oh, great news
+2015-06-18 13:20:41	walexander	yeah, let's do that then
+2015-06-18 13:23:32	pato	Cool

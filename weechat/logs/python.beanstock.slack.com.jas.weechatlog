@@ -1,0 +1,870 @@
+2015-06-16 16:51:01	walexander	shit, sorry bro -- moved my meeting with Jason from yesterday to today
+2015-06-16 16:51:29	walexander	and, like most of the sub-task generation meetings, it ran waaay long
+2015-06-16 17:23:10	jas	thats fine
+2015-06-16 17:23:32	jas	not much to cover, but if you can look at green numbers that would be helpful
+2015-06-17 14:57:18	jas	hows the green env looking? Did you find any issues yet?
+2015-06-17 14:57:41	jas	i hope you saw my email from yesterday on the topic
+2015-06-17 15:04:31	walexander	i saw your email yes.   i'm still looking into the root cause though -- want to see if there are any discrepancies in teh event counts
+2015-06-17 15:05:31	jas	thanks
+2015-06-17 17:53:11	jas	is that warning ok?
+2015-06-17 17:53:12	jas	15/06/17 21:50:25 WARN mapreduce.Counters: Group org.apache.hadoop.mapred.Task$Counter is deprecated. Use org.apache.hadoop.mapreduce.TaskCounter instead
+2015-06-17 17:53:18	jas	coming from Hue
+2015-06-17 17:57:35	jas	the queries are not running at all on Hive, stuck on 0% map and 0% reduce
+2015-06-17 17:59:57	walexander	the warning is okay 
+2015-06-17 18:00:08	walexander	not sure what's up with the query -- lemme look 
+2015-06-17 18:00:35	jas	thanks
+2015-06-17 18:00:56	walexander	ah, i see 
+2015-06-17 18:01:13	walexander	if you delete the user name from the job browser list
+2015-06-17 18:01:29	walexander	you'll see there's another query running in the queue ahead of yours 
+2015-06-17 18:05:12	walexander	the query that's running is pulling the event counts for 06/04@00:00 which happens to be a really big one 
+2015-06-17 18:05:15	walexander	it'll finish soon though 
+2015-06-17 18:11:59	walexander	kk, your query is running now 
+2015-06-17 18:18:20	jas	thanks
+2015-06-18 13:45:55	walexander	@walexander uploaded a file: <https://beanstock.slack.com/files/walexander/F06H20RD5/event_counts_pivot_by_source.sql|event counts pivot by source>
+2015-06-18 13:47:13	jas	this table is on Hive?
+2015-06-18 13:47:20	walexander	```
+2015-06-18 13:47:20		┌────────────┬──────────────┬────────┬────────┬──────────┐
+2015-06-18 13:47:20		│ event_type │  import_ds   │ kafka  │  hive  │ redshift │
+2015-06-18 13:47:20		├────────────┼──────────────┼────────┼────────┼──────────┤
+2015-06-18 13:47:20		│ request    │ 201506040030 │ 128152 │ 128152 │   128152 │
+2015-06-18 13:47:20		│ request    │ 201506040100 │  26887 │  26887 │    26887 │
+2015-06-18 13:47:20		│ request    │ 201506040130 │  25875 │  25875 │    25875 │
+2015-06-18 13:47:20		│ request    │ 201506040200 │  27496 │  27496 │    27496 │
+2015-06-18 13:47:20		│ request    │ 201506040230 │  29428 │  29428 │    29428 │
+2015-06-18 13:47:20		```
+2015-06-18 13:47:28	walexander	that is in redshift, work.import_counts
+2015-06-18 13:47:33	jas	ok cool
+2015-06-18 13:48:43	walexander	kafka counts are from the report file the even processor writes out 
+2015-06-18 13:48:43		``` aws s3 cp s3://databus-production/green.prod/working/for_redshift/ready/SUCCESS_201506082030 /dev/fd/1
+2015-06-18 13:48:43		C_all,799813
+2015-06-18 13:48:43		C_error,6465
+2015-06-18 13:48:43		C_filled,322420
+2015-06-18 13:48:43		C_impression,337798
+2015-06-18 13:48:43		C_passback,1
+2015-06-18 13:48:43		C_request,133109
+2015-06-18 13:48:43		C_revoke,20
+2015-06-18 13:48:43		C_TS,201506081630```
+2015-06-18 13:49:28	walexander	the hive and redshift counts are generated via `select count(*)` and `select sum(*_cnt)` queries from the respective systems
+2015-06-18 14:07:29	walexander	FYI -- should get an invite from https://www.opsgenie.com/alert
+2015-06-18 14:07:53	jas	ok
+2015-06-19 12:01:35	walexander	Hey just saw the looker call on my calendar. 
+2015-06-19 12:02:00	walexander	Today is last day of school and I am at this lunch thing right now. 
+2015-06-19 12:02:59	walexander	I can join in half and hour
+2015-06-19 12:31:09	jas	we are all good
+2015-06-19 12:31:15	jas	the call just ended
+2015-06-23 14:38:34	jas	what time are you arriving?
+2015-06-23 14:43:52	walexander	not until midnight 
+2015-06-23 14:44:38	jas	wow! so you have not left yet
+2015-06-23 14:44:53	walexander	no, not yet
+2015-06-23 14:45:19	walexander	but will be in like an hour 
+2015-06-23 14:45:33	jas	ok, have a safe flight
+2015-06-23 14:45:42	jas	i hope no middle seats this time :simple_smile:
+2015-06-23 14:45:58	walexander	hehe, not holding out hope 
+2015-06-23 14:46:08	walexander	given all the lead time we got ... 
+2015-06-23 14:46:13	jas	hehe
+2015-06-23 15:57:16	jas	are we doing our 1:1?
+2015-06-23 15:57:33	jas	or you have a flight to catch?
+2015-06-23 15:58:34	walexander	sorry, yeah -- i'm about to leave for airport
+2015-06-23 16:00:04	jas	np
+2015-06-23 16:00:37	walexander	have you logged into the opsgenie.com service yet? 
+2015-06-23 16:33:32	jas	i never got a login?
+2015-06-24 16:23:54	jas	are you around?
+2015-06-24 16:24:00	jas	somewhere in the cloud?
+2015-06-24 16:24:03	walexander	yes
+2015-06-24 16:24:08	walexander	hehe, no, i'm here
+2015-06-24 16:24:19	jas	so quick question
+2015-06-24 16:24:29	jas	The new Media Buy stuff
+2015-06-24 16:24:44	jas	Ops team is buying Mobile inventory from APN exchange
+2015-06-24 16:24:54	jas	and they have all the related managed demand in DFP
+2015-06-24 16:25:20	jas	they are trying to use the DFP Ad Tag as a creative in APN
+2015-06-24 16:25:30	jas	but the discrepancies are huge
+2015-06-24 16:25:41	walexander	they should use the DFP passback tag
+2015-06-24 16:25:43	jas	how can we use DFP ad tag as a demand source
+2015-06-24 16:25:47	walexander	instead of the standard GPT tags
+2015-06-24 16:25:47	jas	i see
+2015-06-24 16:25:53	walexander	it's just a simple script 
+2015-06-24 16:26:02	jas	you are the man
+2015-06-24 16:29:08	walexander	hopefully that works -- have a feeling it will 
+2015-06-24 16:29:20	walexander	otherwise, your tag will get tangled with the existing GPT calls
+2015-06-24 16:30:54	jas	does that not get affected by the single request mode?
+2015-06-24 16:32:56	walexander	prboelm is, once you've made a GPT call to display() an ad, you cannot change the mode
+2015-06-24 16:33:08	jas	ok
+2015-06-24 16:34:54	walexander	we'd want synchronous, multi-request-mode
+2015-06-24 16:38:02	jas	sounds good
+2015-06-24 16:41:49	walexander	FYI, sent you an email invite to opsgenie.com 
+2015-06-24 16:42:02	walexander	won't put you in the oncall rotation though :-) 
+2015-06-24 16:42:08	jas	thanks
+2015-06-24 16:42:35	walexander	it's pretty cool -- it pages and then calls you with a phone tree: "press 2 to acknowledge, 3 to close, etc" 
+2015-06-24 16:42:49	jas	mailto:jas@beanstockmedia.com
+2015-06-24 16:43:00	jas	that's why it is not coming through
+2015-06-24 16:43:08	walexander	oh, why don't you have that 
+2015-06-24 16:43:09	jas	mailto:jsingh@beanstockmedia.com
+2015-06-24 16:43:38	walexander	on its way 
+2015-06-24 16:44:15	walexander	i have the cloud watch alarms going to it as well as the pipeline sentry alerts
+2015-06-24 16:44:52	walexander	unfortunately, the sentry alerts every day for the 10:00 am run -- adx import causes the event counts to get screwy 
+2015-06-24 16:46:08	jas	ok no worries
+2015-06-24 16:46:13	jas	I am having a look now
+2015-06-24 16:46:46	walexander	those 10:00am runs also show in the dashboard as bad  http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard#1
+2015-06-24 16:50:37	jas	i see that
+2015-06-24 16:51:22	walexander	but, you can see that we indeed had a bad run at 1800 yesterday 
+2015-06-24 16:52:05	walexander	the sentry is supposed to send email to genie on both success *and* faiulure --- failure followed by a subsequent success messages supposed to auto-close the ticket
+2015-06-24 16:52:14	walexander	but not working right now -- trying to degug
+2015-06-24 16:52:42	jas	ok
+2015-06-24 16:53:00	walexander	oh, hey nice
+2015-06-24 16:53:04	walexander	got it working :-)
+2015-06-24 16:53:56	walexander	if you open ticket #112 ([HelixDataPipeline] HelixDataPipeline:FAIL[databus:201506231800]) then click Activity Log tab
+2015-06-24 16:54:31	walexander	it's show "Alert created via AmaazonSns[Helix...]" then "Alert closed via AmazonSns[Helix...]"
+2015-06-24 16:55:58	jas	yep, looks good so far
+2015-06-24 16:56:29	walexander	@rdm is working on monitors for remaining items in DATABUS-755
+2015-06-24 16:58:12	jas	that would be great to have
+2015-06-24 16:58:21	jas	but what does high/large mean?
+2015-06-24 16:58:30	jas	can we put some actual numbers?
+2015-06-24 16:59:12	walexander	in the ticket?
+2015-06-24 16:59:15	jas	yes
+2015-06-24 16:59:29	jas	High delta between last processed and current Kafka offset.
+2015-06-24 16:59:29		Large number of "unparsable" or "invalid" events (events which do not have or do not conform to their avro schema)
+2015-06-24 16:59:39	walexander	unfortunately no, data pipeline doesn't allow us to inject non-pipeline related data into the ticket
+2015-06-24 16:59:53	jas	not on the ticket
+2015-06-24 17:00:04	jas	but can we decide on what numbers to monitor on
+2015-06-24 17:00:22	jas	what does high delta mean? 10%?20%?
+2015-06-24 17:00:36	walexander	high delta means the offset totals from one run to the next do *not* match the total number of arrays processed
+2015-06-24 17:01:14	walexander	the kafka processing job will tell us it procesed 7800 arrays for the  1600 run 
+2015-06-24 17:01:22	jas	i see
+2015-06-24 17:01:33	jas	so no delta at all is desired
+2015-06-24 17:01:47	walexander	the delta for kafka offsets file for the 1600 and 1630 runs should equal 7800
+2015-06-24 17:02:03	jas	got it
+2015-06-24 17:02:10	walexander	(after it's finished, the 1600 run will spit out an offset file for the 1630 run) 
+2015-06-24 17:02:30	walexander	large number of unparsable / invalid events == any unparsable or invalid events right now 
+2015-06-24 17:03:29	walexander	the total number of them will be shown in the dashboard
+2015-06-24 17:04:08	walexander	https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-24 17:04:41	walexander	line 16 -- if we see any we'll alert
+2015-06-24 17:05:24	jas	ok cool
+2015-06-24 17:05:48	jas	while I have you, whats the status on the green env in terms of data accuracy?
+2015-06-24 17:06:07	walexander	the problem was with this caching we were doing of `f_measures_h`
+2015-06-24 17:06:24	walexander	that wasn't picking up on the last few hours of each day 
+2015-06-24 17:06:43	walexander	i manually updated it so you should see accurate data now
+2015-06-24 17:06:49	jas	caching of f_measures_h?
+2015-06-24 17:06:54	jas	why do we do that?
+2015-06-24 17:06:57	walexander	f_measures_h is the legacy fact table
+2015-06-24 17:07:14	walexander	and so its what tableau is querying
+2015-06-24 17:07:24	jas	correct
+2015-06-24 17:07:40	walexander	rather than update all those tableau queries, as part of 1.1 we made f_measures_h a `view` of the other f_* tables
+2015-06-24 17:07:56	walexander	unfortunately, that was causing all of our post-1.1 performance issues
+2015-06-24 17:08:05	jas	i remember that
+2015-06-24 17:08:26	walexander	so, we made f_measures_h a real table and populated it througout the day 
+2015-06-24 17:08:45	jas	and that was not getting populated for the last few hours of the day?
+2015-06-24 17:08:58	walexander	right -- the legacy pipeline only ran every hour
+2015-06-24 17:09:12	walexander	and the query to update f_measures takes around 45-90 minutes to finish
+2015-06-24 17:09:37	jas	whats the frequency on the new one? 30 mins?
+2015-06-24 17:09:39	walexander	yy
+2015-06-24 17:10:00	jas	and how long does it take to finish?
+2015-06-24 17:10:05	walexander	45-90 minutes 
+2015-06-24 17:10:12	jas	still?
+2015-06-24 17:10:18	walexander	it does the same thing 
+2015-06-24 17:10:27	jas	why run it more often then?
+2015-06-24 17:10:28	walexander	it has to delete and recreate the entire day's worth of data
+2015-06-24 17:10:53	walexander	in order to determine what days to update, it has to look at the staging tables
+2015-06-24 17:11:30	walexander	so running it every 2 hours like prod does meant we weren't updating the last two hours of each day 
+2015-06-24 17:11:53	walexander	it would start at 00:30 and the only data in teh staging table would be today's 
+2015-06-24 17:12:08	walexander	and it wouldn't update the data for the last two hours of the previous day 
+2015-06-24 17:12:21	jas	so how come prod was still updating and green was under reporting?
+2015-06-24 17:12:28	jas	on the same schedule
+2015-06-24 17:12:36	walexander	because prod only runs every hour
+2015-06-24 17:12:57	walexander	so when the job runs at 00:30 in prod, it sees that yesterrday has to be updated 
+2015-06-24 17:13:06	walexander	but, tbh, the prod data is wrong too 
+2015-06-24 17:13:09	jas	ah I see now
+2015-06-24 17:13:16	jas	so what is the fix?
+2015-06-24 17:13:34	walexander	if you compare sum(impression_cnt) from f_impression vs from f_measures_h day-over-day, you'll likely see deltas
+2015-06-24 17:13:42	jas	ok
+2015-06-24 17:13:42	walexander	the fix is to make it a view again
+2015-06-24 17:13:53	walexander	so that's what I'm implementing now 
+2015-06-24 17:14:06	walexander	and increasing the timeout
+2015-06-24 17:14:09	jas	ok, I am not going to test again till all that is ready
+2015-06-24 17:14:20	jas	i hope no performance issues this time
+2015-06-24 17:14:52	walexander	well, the real fix is to update the v_revenue view that tableau uses to use the real fact tables 
+2015-06-24 17:15:38	jas	ok, so why do we need so many views?
+2015-06-24 17:15:56	walexander	b/c that's where we do the pub_revenue calculation 
+2015-06-24 17:16:12	walexander	we only really need a view for that -- v_revenue_h 
+2015-06-24 17:16:18	walexander	but that view queries f_measures_h 
+2015-06-24 17:16:37	walexander	v_rev should instead query the real f_* tables 
+2015-06-24 17:17:14	walexander	then, if tableau could only do the fucking time zone conversion for us, we would not need to use extracts for the workbooks -- it could just query redshift directly like looker does
+2015-06-24 17:18:30	jas	i see
+2015-06-24 17:18:32	walexander	problem with all of these views is
+2015-06-24 17:18:47	walexander	redshift doesn't always `pushdown` the WHERE clauses to all the views
+2015-06-24 17:19:23	walexander	since the data is stored sorted by event_dttm, if you do a where clause with event_dttm, redshift knows exactly which rows it ahs to scan 
+2015-06-24 17:19:51	walexander	but, if you have a view that queries a view, they don't `pushdown the predicate` to the second view
+2015-06-24 17:20:14	walexander	so when we `select * from v_rev WHERE event_dttm = '2015-06-20'` 
+2015-06-24 17:21:05	walexander	when f_measures_h is a view, redshift doesn't pushdown the where clause to f_measures
+2015-06-24 17:21:22	walexander	so every single query of v_rev triggers a scan of all 4 billion rows 
+2015-06-24 17:21:31	jas	great
+2015-06-24 17:21:55	walexander	still faster than hive -- but hive makes a better demo ;-) 
+2015-06-24 17:22:23	jas	cool, thanks for the explanation
+2015-06-24 19:06:07	walexander	the tableau.prod.beanstock.net is ready for validation
+2015-06-24 19:07:01	jas	great, thanks!
+2015-06-24 19:09:21	walexander	hrmm ... wait one second :-) 
+2015-06-24 19:11:54	jas	np, let me know
+2015-06-24 19:12:30	jas	since you are not her today, I have to go out and drink on your behalf now
+2015-06-24 19:12:36	jas	with Jason and John
+2015-06-24 19:12:41	jas	see you tomorrow
+2015-06-24 19:13:07	walexander	what a trooper!
+2015-06-25 13:45:59	walexander	hold off on that green validatiojn for a minute -- need to look into some issues with the workbook itself
+2015-06-25 13:46:14	jas	ok
+2015-06-26 16:31:41	jas	are you joining the call?
+2015-07-02 14:03:49	jas	are you joining the Looker call?
+2015-07-02 14:04:28	walexander	hrmm ... i thought i was on 
+2015-07-02 14:04:30	walexander	lemme try again
+2015-07-02 16:15:45	walexander	we are soo lucky Jim was not on that call 
+2015-07-06 13:02:14	jas	are you joining the Looker call?
+2015-06-16 16:51:01	walexander	shit, sorry bro -- moved my meeting with Jason from yesterday to today
+2015-06-16 16:51:29	walexander	and, like most of the sub-task generation meetings, it ran waaay long
+2015-06-16 17:23:10	jas	thats fine
+2015-06-16 17:23:32	jas	not much to cover, but if you can look at green numbers that would be helpful
+2015-06-17 14:57:18	jas	hows the green env looking? Did you find any issues yet?
+2015-06-17 14:57:41	jas	i hope you saw my email from yesterday on the topic
+2015-06-17 15:04:31	walexander	i saw your email yes.   i'm still looking into the root cause though -- want to see if there are any discrepancies in teh event counts
+2015-06-17 15:05:31	jas	thanks
+2015-06-17 17:53:11	jas	is that warning ok?
+2015-06-17 17:53:12	jas	15/06/17 21:50:25 WARN mapreduce.Counters: Group org.apache.hadoop.mapred.Task$Counter is deprecated. Use org.apache.hadoop.mapreduce.TaskCounter instead
+2015-06-17 17:53:18	jas	coming from Hue
+2015-06-17 17:57:35	jas	the queries are not running at all on Hive, stuck on 0% map and 0% reduce
+2015-06-17 17:59:57	walexander	the warning is okay 
+2015-06-17 18:00:08	walexander	not sure what's up with the query -- lemme look 
+2015-06-17 18:00:35	jas	thanks
+2015-06-17 18:00:56	walexander	ah, i see 
+2015-06-17 18:01:13	walexander	if you delete the user name from the job browser list
+2015-06-17 18:01:29	walexander	you'll see there's another query running in the queue ahead of yours 
+2015-06-17 18:05:12	walexander	the query that's running is pulling the event counts for 06/04@00:00 which happens to be a really big one 
+2015-06-17 18:05:15	walexander	it'll finish soon though 
+2015-06-17 18:11:59	walexander	kk, your query is running now 
+2015-06-17 18:18:20	jas	thanks
+2015-06-18 13:45:55	walexander	@walexander uploaded a file: <https://beanstock.slack.com/files/walexander/F06H20RD5/event_counts_pivot_by_source.sql|event counts pivot by source>
+2015-06-18 13:47:13	jas	this table is on Hive?
+2015-06-18 13:47:20	walexander	```
+2015-06-18 13:47:20		┌────────────┬──────────────┬────────┬────────┬──────────┐
+2015-06-18 13:47:20		│ event_type │  import_ds   │ kafka  │  hive  │ redshift │
+2015-06-18 13:47:20		├────────────┼──────────────┼────────┼────────┼──────────┤
+2015-06-18 13:47:20		│ request    │ 201506040030 │ 128152 │ 128152 │   128152 │
+2015-06-18 13:47:20		│ request    │ 201506040100 │  26887 │  26887 │    26887 │
+2015-06-18 13:47:20		│ request    │ 201506040130 │  25875 │  25875 │    25875 │
+2015-06-18 13:47:20		│ request    │ 201506040200 │  27496 │  27496 │    27496 │
+2015-06-18 13:47:20		│ request    │ 201506040230 │  29428 │  29428 │    29428 │
+2015-06-18 13:47:20		```
+2015-06-18 13:47:28	walexander	that is in redshift, work.import_counts
+2015-06-18 13:47:33	jas	ok cool
+2015-06-18 13:48:43	walexander	kafka counts are from the report file the even processor writes out 
+2015-06-18 13:48:43		``` aws s3 cp s3://databus-production/green.prod/working/for_redshift/ready/SUCCESS_201506082030 /dev/fd/1
+2015-06-18 13:48:43		C_all,799813
+2015-06-18 13:48:43		C_error,6465
+2015-06-18 13:48:43		C_filled,322420
+2015-06-18 13:48:43		C_impression,337798
+2015-06-18 13:48:43		C_passback,1
+2015-06-18 13:48:43		C_request,133109
+2015-06-18 13:48:43		C_revoke,20
+2015-06-18 13:48:43		C_TS,201506081630```
+2015-06-18 13:49:28	walexander	the hive and redshift counts are generated via `select count(*)` and `select sum(*_cnt)` queries from the respective systems
+2015-06-18 14:07:29	walexander	FYI -- should get an invite from https://www.opsgenie.com/alert
+2015-06-18 14:07:53	jas	ok
+2015-06-19 12:01:35	walexander	Hey just saw the looker call on my calendar. 
+2015-06-19 12:02:00	walexander	Today is last day of school and I am at this lunch thing right now. 
+2015-06-19 12:02:59	walexander	I can join in half and hour
+2015-06-19 12:31:09	jas	we are all good
+2015-06-19 12:31:15	jas	the call just ended
+2015-06-23 14:38:34	jas	what time are you arriving?
+2015-06-23 14:43:52	walexander	not until midnight 
+2015-06-23 14:44:38	jas	wow! so you have not left yet
+2015-06-23 14:44:53	walexander	no, not yet
+2015-06-23 14:45:19	walexander	but will be in like an hour 
+2015-06-23 14:45:33	jas	ok, have a safe flight
+2015-06-23 14:45:42	jas	i hope no middle seats this time :simple_smile:
+2015-06-23 14:45:58	walexander	hehe, not holding out hope 
+2015-06-23 14:46:08	walexander	given all the lead time we got ... 
+2015-06-23 14:46:13	jas	hehe
+2015-06-23 15:57:16	jas	are we doing our 1:1?
+2015-06-23 15:57:33	jas	or you have a flight to catch?
+2015-06-23 15:58:34	walexander	sorry, yeah -- i'm about to leave for airport
+2015-06-23 16:00:04	jas	np
+2015-06-23 16:00:37	walexander	have you logged into the opsgenie.com service yet? 
+2015-06-23 16:33:32	jas	i never got a login?
+2015-06-24 16:23:54	jas	are you around?
+2015-06-24 16:24:00	jas	somewhere in the cloud?
+2015-06-24 16:24:03	walexander	yes
+2015-06-24 16:24:08	walexander	hehe, no, i'm here
+2015-06-24 16:24:19	jas	so quick question
+2015-06-24 16:24:29	jas	The new Media Buy stuff
+2015-06-24 16:24:44	jas	Ops team is buying Mobile inventory from APN exchange
+2015-06-24 16:24:54	jas	and they have all the related managed demand in DFP
+2015-06-24 16:25:20	jas	they are trying to use the DFP Ad Tag as a creative in APN
+2015-06-24 16:25:30	jas	but the discrepancies are huge
+2015-06-24 16:25:41	walexander	they should use the DFP passback tag
+2015-06-24 16:25:43	jas	how can we use DFP ad tag as a demand source
+2015-06-24 16:25:47	walexander	instead of the standard GPT tags
+2015-06-24 16:25:47	jas	i see
+2015-06-24 16:25:53	walexander	it's just a simple script 
+2015-06-24 16:26:02	jas	you are the man
+2015-06-24 16:29:08	walexander	hopefully that works -- have a feeling it will 
+2015-06-24 16:29:20	walexander	otherwise, your tag will get tangled with the existing GPT calls
+2015-06-24 16:30:54	jas	does that not get affected by the single request mode?
+2015-06-24 16:32:56	walexander	prboelm is, once you've made a GPT call to display() an ad, you cannot change the mode
+2015-06-24 16:33:08	jas	ok
+2015-06-24 16:34:54	walexander	we'd want synchronous, multi-request-mode
+2015-06-24 16:38:02	jas	sounds good
+2015-06-24 16:41:49	walexander	FYI, sent you an email invite to opsgenie.com 
+2015-06-24 16:42:02	walexander	won't put you in the oncall rotation though :-) 
+2015-06-24 16:42:08	jas	thanks
+2015-06-24 16:42:35	walexander	it's pretty cool -- it pages and then calls you with a phone tree: "press 2 to acknowledge, 3 to close, etc" 
+2015-06-24 16:42:49	jas	mailto:jas@beanstockmedia.com
+2015-06-24 16:43:00	jas	that's why it is not coming through
+2015-06-24 16:43:08	walexander	oh, why don't you have that 
+2015-06-24 16:43:09	jas	mailto:jsingh@beanstockmedia.com
+2015-06-24 16:43:38	walexander	on its way 
+2015-06-24 16:44:15	walexander	i have the cloud watch alarms going to it as well as the pipeline sentry alerts
+2015-06-24 16:44:52	walexander	unfortunately, the sentry alerts every day for the 10:00 am run -- adx import causes the event counts to get screwy 
+2015-06-24 16:46:08	jas	ok no worries
+2015-06-24 16:46:13	jas	I am having a look now
+2015-06-24 16:46:46	walexander	those 10:00am runs also show in the dashboard as bad  http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard#1
+2015-06-24 16:50:37	jas	i see that
+2015-06-24 16:51:22	walexander	but, you can see that we indeed had a bad run at 1800 yesterday 
+2015-06-24 16:52:05	walexander	the sentry is supposed to send email to genie on both success *and* faiulure --- failure followed by a subsequent success messages supposed to auto-close the ticket
+2015-06-24 16:52:14	walexander	but not working right now -- trying to degug
+2015-06-24 16:52:42	jas	ok
+2015-06-24 16:53:00	walexander	oh, hey nice
+2015-06-24 16:53:04	walexander	got it working :-)
+2015-06-24 16:53:56	walexander	if you open ticket #112 ([HelixDataPipeline] HelixDataPipeline:FAIL[databus:201506231800]) then click Activity Log tab
+2015-06-24 16:54:31	walexander	it's show "Alert created via AmaazonSns[Helix...]" then "Alert closed via AmazonSns[Helix...]"
+2015-06-24 16:55:58	jas	yep, looks good so far
+2015-06-24 16:56:29	walexander	@rdm is working on monitors for remaining items in DATABUS-755
+2015-06-24 16:58:12	jas	that would be great to have
+2015-06-24 16:58:21	jas	but what does high/large mean?
+2015-06-24 16:58:30	jas	can we put some actual numbers?
+2015-06-24 16:59:12	walexander	in the ticket?
+2015-06-24 16:59:15	jas	yes
+2015-06-24 16:59:29	jas	High delta between last processed and current Kafka offset.
+2015-06-24 16:59:29		Large number of "unparsable" or "invalid" events (events which do not have or do not conform to their avro schema)
+2015-06-24 16:59:39	walexander	unfortunately no, data pipeline doesn't allow us to inject non-pipeline related data into the ticket
+2015-06-24 16:59:53	jas	not on the ticket
+2015-06-24 17:00:04	jas	but can we decide on what numbers to monitor on
+2015-06-24 17:00:22	jas	what does high delta mean? 10%?20%?
+2015-06-24 17:00:36	walexander	high delta means the offset totals from one run to the next do *not* match the total number of arrays processed
+2015-06-24 17:01:14	walexander	the kafka processing job will tell us it procesed 7800 arrays for the  1600 run 
+2015-06-24 17:01:22	jas	i see
+2015-06-24 17:01:33	jas	so no delta at all is desired
+2015-06-24 17:01:47	walexander	the delta for kafka offsets file for the 1600 and 1630 runs should equal 7800
+2015-06-24 17:02:03	jas	got it
+2015-06-24 17:02:10	walexander	(after it's finished, the 1600 run will spit out an offset file for the 1630 run) 
+2015-06-24 17:02:30	walexander	large number of unparsable / invalid events == any unparsable or invalid events right now 
+2015-06-24 17:03:29	walexander	the total number of them will be shown in the dashboard
+2015-06-24 17:04:08	walexander	https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-24 17:04:41	walexander	line 16 -- if we see any we'll alert
+2015-06-24 17:05:24	jas	ok cool
+2015-06-24 17:05:48	jas	while I have you, whats the status on the green env in terms of data accuracy?
+2015-06-24 17:06:07	walexander	the problem was with this caching we were doing of `f_measures_h`
+2015-06-24 17:06:24	walexander	that wasn't picking up on the last few hours of each day 
+2015-06-24 17:06:43	walexander	i manually updated it so you should see accurate data now
+2015-06-24 17:06:49	jas	caching of f_measures_h?
+2015-06-24 17:06:54	jas	why do we do that?
+2015-06-24 17:06:57	walexander	f_measures_h is the legacy fact table
+2015-06-24 17:07:14	walexander	and so its what tableau is querying
+2015-06-24 17:07:24	jas	correct
+2015-06-24 17:07:40	walexander	rather than update all those tableau queries, as part of 1.1 we made f_measures_h a `view` of the other f_* tables
+2015-06-24 17:07:56	walexander	unfortunately, that was causing all of our post-1.1 performance issues
+2015-06-24 17:08:05	jas	i remember that
+2015-06-24 17:08:26	walexander	so, we made f_measures_h a real table and populated it througout the day 
+2015-06-24 17:08:45	jas	and that was not getting populated for the last few hours of the day?
+2015-06-24 17:08:58	walexander	right -- the legacy pipeline only ran every hour
+2015-06-24 17:09:12	walexander	and the query to update f_measures takes around 45-90 minutes to finish
+2015-06-24 17:09:37	jas	whats the frequency on the new one? 30 mins?
+2015-06-24 17:09:39	walexander	yy
+2015-06-24 17:10:00	jas	and how long does it take to finish?
+2015-06-24 17:10:05	walexander	45-90 minutes 
+2015-06-24 17:10:12	jas	still?
+2015-06-24 17:10:18	walexander	it does the same thing 
+2015-06-24 17:10:27	jas	why run it more often then?
+2015-06-24 17:10:28	walexander	it has to delete and recreate the entire day's worth of data
+2015-06-24 17:10:53	walexander	in order to determine what days to update, it has to look at the staging tables
+2015-06-24 17:11:30	walexander	so running it every 2 hours like prod does meant we weren't updating the last two hours of each day 
+2015-06-24 17:11:53	walexander	it would start at 00:30 and the only data in teh staging table would be today's 
+2015-06-24 17:12:08	walexander	and it wouldn't update the data for the last two hours of the previous day 
+2015-06-24 17:12:21	jas	so how come prod was still updating and green was under reporting?
+2015-06-24 17:12:28	jas	on the same schedule
+2015-06-24 17:12:36	walexander	because prod only runs every hour
+2015-06-24 17:12:57	walexander	so when the job runs at 00:30 in prod, it sees that yesterrday has to be updated 
+2015-06-24 17:13:06	walexander	but, tbh, the prod data is wrong too 
+2015-06-24 17:13:09	jas	ah I see now
+2015-06-24 17:13:16	jas	so what is the fix?
+2015-06-24 17:13:34	walexander	if you compare sum(impression_cnt) from f_impression vs from f_measures_h day-over-day, you'll likely see deltas
+2015-06-24 17:13:42	jas	ok
+2015-06-24 17:13:42	walexander	the fix is to make it a view again
+2015-06-24 17:13:53	walexander	so that's what I'm implementing now 
+2015-06-24 17:14:06	walexander	and increasing the timeout
+2015-06-24 17:14:09	jas	ok, I am not going to test again till all that is ready
+2015-06-24 17:14:20	jas	i hope no performance issues this time
+2015-06-24 17:14:52	walexander	well, the real fix is to update the v_revenue view that tableau uses to use the real fact tables 
+2015-06-24 17:15:38	jas	ok, so why do we need so many views?
+2015-06-24 17:15:56	walexander	b/c that's where we do the pub_revenue calculation 
+2015-06-24 17:16:12	walexander	we only really need a view for that -- v_revenue_h 
+2015-06-24 17:16:18	walexander	but that view queries f_measures_h 
+2015-06-24 17:16:37	walexander	v_rev should instead query the real f_* tables 
+2015-06-24 17:17:14	walexander	then, if tableau could only do the fucking time zone conversion for us, we would not need to use extracts for the workbooks -- it could just query redshift directly like looker does
+2015-06-24 17:18:30	jas	i see
+2015-06-24 17:18:32	walexander	problem with all of these views is
+2015-06-24 17:18:47	walexander	redshift doesn't always `pushdown` the WHERE clauses to all the views
+2015-06-24 17:19:23	walexander	since the data is stored sorted by event_dttm, if you do a where clause with event_dttm, redshift knows exactly which rows it ahs to scan 
+2015-06-24 17:19:51	walexander	but, if you have a view that queries a view, they don't `pushdown the predicate` to the second view
+2015-06-24 17:20:14	walexander	so when we `select * from v_rev WHERE event_dttm = '2015-06-20'` 
+2015-06-24 17:21:05	walexander	when f_measures_h is a view, redshift doesn't pushdown the where clause to f_measures
+2015-06-24 17:21:22	walexander	so every single query of v_rev triggers a scan of all 4 billion rows 
+2015-06-24 17:21:31	jas	great
+2015-06-24 17:21:55	walexander	still faster than hive -- but hive makes a better demo ;-) 
+2015-06-24 17:22:23	jas	cool, thanks for the explanation
+2015-06-24 19:06:07	walexander	the tableau.prod.beanstock.net is ready for validation
+2015-06-24 19:07:01	jas	great, thanks!
+2015-06-24 19:09:21	walexander	hrmm ... wait one second :-) 
+2015-06-24 19:11:54	jas	np, let me know
+2015-06-24 19:12:30	jas	since you are not her today, I have to go out and drink on your behalf now
+2015-06-24 19:12:36	jas	with Jason and John
+2015-06-24 19:12:41	jas	see you tomorrow
+2015-06-24 19:13:07	walexander	what a trooper!
+2015-06-25 13:45:59	walexander	hold off on that green validatiojn for a minute -- need to look into some issues with the workbook itself
+2015-06-25 13:46:14	jas	ok
+2015-06-26 16:31:41	jas	are you joining the call?
+2015-07-02 14:03:49	jas	are you joining the Looker call?
+2015-07-02 14:04:28	walexander	hrmm ... i thought i was on 
+2015-07-02 14:04:30	walexander	lemme try again
+2015-07-02 16:15:45	walexander	we are soo lucky Jim was not on that call 
+2015-07-06 13:02:14	jas	are you joining the Looker call?
+2015-06-16 16:51:01	walexander	shit, sorry bro -- moved my meeting with Jason from yesterday to today
+2015-06-16 16:51:29	walexander	and, like most of the sub-task generation meetings, it ran waaay long
+2015-06-16 17:23:10	jas	thats fine
+2015-06-16 17:23:32	jas	not much to cover, but if you can look at green numbers that would be helpful
+2015-06-17 14:57:18	jas	hows the green env looking? Did you find any issues yet?
+2015-06-17 14:57:41	jas	i hope you saw my email from yesterday on the topic
+2015-06-17 15:04:31	walexander	i saw your email yes.   i'm still looking into the root cause though -- want to see if there are any discrepancies in teh event counts
+2015-06-17 15:05:31	jas	thanks
+2015-06-17 17:53:11	jas	is that warning ok?
+2015-06-17 17:53:12	jas	15/06/17 21:50:25 WARN mapreduce.Counters: Group org.apache.hadoop.mapred.Task$Counter is deprecated. Use org.apache.hadoop.mapreduce.TaskCounter instead
+2015-06-17 17:53:18	jas	coming from Hue
+2015-06-17 17:57:35	jas	the queries are not running at all on Hive, stuck on 0% map and 0% reduce
+2015-06-17 17:59:57	walexander	the warning is okay 
+2015-06-17 18:00:08	walexander	not sure what's up with the query -- lemme look 
+2015-06-17 18:00:35	jas	thanks
+2015-06-17 18:00:56	walexander	ah, i see 
+2015-06-17 18:01:13	walexander	if you delete the user name from the job browser list
+2015-06-17 18:01:29	walexander	you'll see there's another query running in the queue ahead of yours 
+2015-06-17 18:05:12	walexander	the query that's running is pulling the event counts for 06/04@00:00 which happens to be a really big one 
+2015-06-17 18:05:15	walexander	it'll finish soon though 
+2015-06-17 18:11:59	walexander	kk, your query is running now 
+2015-06-17 18:18:20	jas	thanks
+2015-06-18 13:45:55	walexander	@walexander uploaded a file: <https://beanstock.slack.com/files/walexander/F06H20RD5/event_counts_pivot_by_source.sql|event counts pivot by source>
+2015-06-18 13:47:13	jas	this table is on Hive?
+2015-06-18 13:47:20	walexander	```
+2015-06-18 13:47:20		┌────────────┬──────────────┬────────┬────────┬──────────┐
+2015-06-18 13:47:20		│ event_type │  import_ds   │ kafka  │  hive  │ redshift │
+2015-06-18 13:47:20		├────────────┼──────────────┼────────┼────────┼──────────┤
+2015-06-18 13:47:20		│ request    │ 201506040030 │ 128152 │ 128152 │   128152 │
+2015-06-18 13:47:20		│ request    │ 201506040100 │  26887 │  26887 │    26887 │
+2015-06-18 13:47:20		│ request    │ 201506040130 │  25875 │  25875 │    25875 │
+2015-06-18 13:47:20		│ request    │ 201506040200 │  27496 │  27496 │    27496 │
+2015-06-18 13:47:20		│ request    │ 201506040230 │  29428 │  29428 │    29428 │
+2015-06-18 13:47:20		```
+2015-06-18 13:47:28	walexander	that is in redshift, work.import_counts
+2015-06-18 13:47:33	jas	ok cool
+2015-06-18 13:48:43	walexander	kafka counts are from the report file the even processor writes out 
+2015-06-18 13:48:43		``` aws s3 cp s3://databus-production/green.prod/working/for_redshift/ready/SUCCESS_201506082030 /dev/fd/1
+2015-06-18 13:48:43		C_all,799813
+2015-06-18 13:48:43		C_error,6465
+2015-06-18 13:48:43		C_filled,322420
+2015-06-18 13:48:43		C_impression,337798
+2015-06-18 13:48:43		C_passback,1
+2015-06-18 13:48:43		C_request,133109
+2015-06-18 13:48:43		C_revoke,20
+2015-06-18 13:48:43		C_TS,201506081630```
+2015-06-18 13:49:28	walexander	the hive and redshift counts are generated via `select count(*)` and `select sum(*_cnt)` queries from the respective systems
+2015-06-18 14:07:29	walexander	FYI -- should get an invite from https://www.opsgenie.com/alert
+2015-06-18 14:07:53	jas	ok
+2015-06-19 12:01:35	walexander	Hey just saw the looker call on my calendar. 
+2015-06-19 12:02:00	walexander	Today is last day of school and I am at this lunch thing right now. 
+2015-06-19 12:02:59	walexander	I can join in half and hour
+2015-06-19 12:31:09	jas	we are all good
+2015-06-19 12:31:15	jas	the call just ended
+2015-06-23 14:38:34	jas	what time are you arriving?
+2015-06-23 14:43:52	walexander	not until midnight 
+2015-06-23 14:44:38	jas	wow! so you have not left yet
+2015-06-23 14:44:53	walexander	no, not yet
+2015-06-23 14:45:19	walexander	but will be in like an hour 
+2015-06-23 14:45:33	jas	ok, have a safe flight
+2015-06-23 14:45:42	jas	i hope no middle seats this time :simple_smile:
+2015-06-23 14:45:58	walexander	hehe, not holding out hope 
+2015-06-23 14:46:08	walexander	given all the lead time we got ... 
+2015-06-23 14:46:13	jas	hehe
+2015-06-23 15:57:16	jas	are we doing our 1:1?
+2015-06-23 15:57:33	jas	or you have a flight to catch?
+2015-06-23 15:58:34	walexander	sorry, yeah -- i'm about to leave for airport
+2015-06-23 16:00:04	jas	np
+2015-06-23 16:00:37	walexander	have you logged into the opsgenie.com service yet? 
+2015-06-23 16:33:32	jas	i never got a login?
+2015-06-24 16:23:54	jas	are you around?
+2015-06-24 16:24:00	jas	somewhere in the cloud?
+2015-06-24 16:24:03	walexander	yes
+2015-06-24 16:24:08	walexander	hehe, no, i'm here
+2015-06-24 16:24:19	jas	so quick question
+2015-06-24 16:24:29	jas	The new Media Buy stuff
+2015-06-24 16:24:44	jas	Ops team is buying Mobile inventory from APN exchange
+2015-06-24 16:24:54	jas	and they have all the related managed demand in DFP
+2015-06-24 16:25:20	jas	they are trying to use the DFP Ad Tag as a creative in APN
+2015-06-24 16:25:30	jas	but the discrepancies are huge
+2015-06-24 16:25:41	walexander	they should use the DFP passback tag
+2015-06-24 16:25:43	jas	how can we use DFP ad tag as a demand source
+2015-06-24 16:25:47	walexander	instead of the standard GPT tags
+2015-06-24 16:25:47	jas	i see
+2015-06-24 16:25:53	walexander	it's just a simple script 
+2015-06-24 16:26:02	jas	you are the man
+2015-06-24 16:29:08	walexander	hopefully that works -- have a feeling it will 
+2015-06-24 16:29:20	walexander	otherwise, your tag will get tangled with the existing GPT calls
+2015-06-24 16:30:54	jas	does that not get affected by the single request mode?
+2015-06-24 16:32:56	walexander	prboelm is, once you've made a GPT call to display() an ad, you cannot change the mode
+2015-06-24 16:33:08	jas	ok
+2015-06-24 16:34:54	walexander	we'd want synchronous, multi-request-mode
+2015-06-24 16:38:02	jas	sounds good
+2015-06-24 16:41:49	walexander	FYI, sent you an email invite to opsgenie.com 
+2015-06-24 16:42:02	walexander	won't put you in the oncall rotation though :-) 
+2015-06-24 16:42:08	jas	thanks
+2015-06-24 16:42:35	walexander	it's pretty cool -- it pages and then calls you with a phone tree: "press 2 to acknowledge, 3 to close, etc" 
+2015-06-24 16:42:49	jas	mailto:jas@beanstockmedia.com
+2015-06-24 16:43:00	jas	that's why it is not coming through
+2015-06-24 16:43:08	walexander	oh, why don't you have that 
+2015-06-24 16:43:09	jas	mailto:jsingh@beanstockmedia.com
+2015-06-24 16:43:38	walexander	on its way 
+2015-06-24 16:44:15	walexander	i have the cloud watch alarms going to it as well as the pipeline sentry alerts
+2015-06-24 16:44:52	walexander	unfortunately, the sentry alerts every day for the 10:00 am run -- adx import causes the event counts to get screwy 
+2015-06-24 16:46:08	jas	ok no worries
+2015-06-24 16:46:13	jas	I am having a look now
+2015-06-24 16:46:46	walexander	those 10:00am runs also show in the dashboard as bad  http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard#1
+2015-06-24 16:50:37	jas	i see that
+2015-06-24 16:51:22	walexander	but, you can see that we indeed had a bad run at 1800 yesterday 
+2015-06-24 16:52:05	walexander	the sentry is supposed to send email to genie on both success *and* faiulure --- failure followed by a subsequent success messages supposed to auto-close the ticket
+2015-06-24 16:52:14	walexander	but not working right now -- trying to degug
+2015-06-24 16:52:42	jas	ok
+2015-06-24 16:53:00	walexander	oh, hey nice
+2015-06-24 16:53:04	walexander	got it working :-)
+2015-06-24 16:53:56	walexander	if you open ticket #112 ([HelixDataPipeline] HelixDataPipeline:FAIL[databus:201506231800]) then click Activity Log tab
+2015-06-24 16:54:31	walexander	it's show "Alert created via AmaazonSns[Helix...]" then "Alert closed via AmazonSns[Helix...]"
+2015-06-24 16:55:58	jas	yep, looks good so far
+2015-06-24 16:56:29	walexander	@rdm is working on monitors for remaining items in DATABUS-755
+2015-06-24 16:58:12	jas	that would be great to have
+2015-06-24 16:58:21	jas	but what does high/large mean?
+2015-06-24 16:58:30	jas	can we put some actual numbers?
+2015-06-24 16:59:12	walexander	in the ticket?
+2015-06-24 16:59:15	jas	yes
+2015-06-24 16:59:29	jas	High delta between last processed and current Kafka offset.
+2015-06-24 16:59:29		Large number of "unparsable" or "invalid" events (events which do not have or do not conform to their avro schema)
+2015-06-24 16:59:39	walexander	unfortunately no, data pipeline doesn't allow us to inject non-pipeline related data into the ticket
+2015-06-24 16:59:53	jas	not on the ticket
+2015-06-24 17:00:04	jas	but can we decide on what numbers to monitor on
+2015-06-24 17:00:22	jas	what does high delta mean? 10%?20%?
+2015-06-24 17:00:36	walexander	high delta means the offset totals from one run to the next do *not* match the total number of arrays processed
+2015-06-24 17:01:14	walexander	the kafka processing job will tell us it procesed 7800 arrays for the  1600 run 
+2015-06-24 17:01:22	jas	i see
+2015-06-24 17:01:33	jas	so no delta at all is desired
+2015-06-24 17:01:47	walexander	the delta for kafka offsets file for the 1600 and 1630 runs should equal 7800
+2015-06-24 17:02:03	jas	got it
+2015-06-24 17:02:10	walexander	(after it's finished, the 1600 run will spit out an offset file for the 1630 run) 
+2015-06-24 17:02:30	walexander	large number of unparsable / invalid events == any unparsable or invalid events right now 
+2015-06-24 17:03:29	walexander	the total number of them will be shown in the dashboard
+2015-06-24 17:04:08	walexander	https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-24 17:04:41	walexander	line 16 -- if we see any we'll alert
+2015-06-24 17:05:24	jas	ok cool
+2015-06-24 17:05:48	jas	while I have you, whats the status on the green env in terms of data accuracy?
+2015-06-24 17:06:07	walexander	the problem was with this caching we were doing of `f_measures_h`
+2015-06-24 17:06:24	walexander	that wasn't picking up on the last few hours of each day 
+2015-06-24 17:06:43	walexander	i manually updated it so you should see accurate data now
+2015-06-24 17:06:49	jas	caching of f_measures_h?
+2015-06-24 17:06:54	jas	why do we do that?
+2015-06-24 17:06:57	walexander	f_measures_h is the legacy fact table
+2015-06-24 17:07:14	walexander	and so its what tableau is querying
+2015-06-24 17:07:24	jas	correct
+2015-06-24 17:07:40	walexander	rather than update all those tableau queries, as part of 1.1 we made f_measures_h a `view` of the other f_* tables
+2015-06-24 17:07:56	walexander	unfortunately, that was causing all of our post-1.1 performance issues
+2015-06-24 17:08:05	jas	i remember that
+2015-06-24 17:08:26	walexander	so, we made f_measures_h a real table and populated it througout the day 
+2015-06-24 17:08:45	jas	and that was not getting populated for the last few hours of the day?
+2015-06-24 17:08:58	walexander	right -- the legacy pipeline only ran every hour
+2015-06-24 17:09:12	walexander	and the query to update f_measures takes around 45-90 minutes to finish
+2015-06-24 17:09:37	jas	whats the frequency on the new one? 30 mins?
+2015-06-24 17:09:39	walexander	yy
+2015-06-24 17:10:00	jas	and how long does it take to finish?
+2015-06-24 17:10:05	walexander	45-90 minutes 
+2015-06-24 17:10:12	jas	still?
+2015-06-24 17:10:18	walexander	it does the same thing 
+2015-06-24 17:10:27	jas	why run it more often then?
+2015-06-24 17:10:28	walexander	it has to delete and recreate the entire day's worth of data
+2015-06-24 17:10:53	walexander	in order to determine what days to update, it has to look at the staging tables
+2015-06-24 17:11:30	walexander	so running it every 2 hours like prod does meant we weren't updating the last two hours of each day 
+2015-06-24 17:11:53	walexander	it would start at 00:30 and the only data in teh staging table would be today's 
+2015-06-24 17:12:08	walexander	and it wouldn't update the data for the last two hours of the previous day 
+2015-06-24 17:12:21	jas	so how come prod was still updating and green was under reporting?
+2015-06-24 17:12:28	jas	on the same schedule
+2015-06-24 17:12:36	walexander	because prod only runs every hour
+2015-06-24 17:12:57	walexander	so when the job runs at 00:30 in prod, it sees that yesterrday has to be updated 
+2015-06-24 17:13:06	walexander	but, tbh, the prod data is wrong too 
+2015-06-24 17:13:09	jas	ah I see now
+2015-06-24 17:13:16	jas	so what is the fix?
+2015-06-24 17:13:34	walexander	if you compare sum(impression_cnt) from f_impression vs from f_measures_h day-over-day, you'll likely see deltas
+2015-06-24 17:13:42	jas	ok
+2015-06-24 17:13:42	walexander	the fix is to make it a view again
+2015-06-24 17:13:53	walexander	so that's what I'm implementing now 
+2015-06-24 17:14:06	walexander	and increasing the timeout
+2015-06-24 17:14:09	jas	ok, I am not going to test again till all that is ready
+2015-06-24 17:14:20	jas	i hope no performance issues this time
+2015-06-24 17:14:52	walexander	well, the real fix is to update the v_revenue view that tableau uses to use the real fact tables 
+2015-06-24 17:15:38	jas	ok, so why do we need so many views?
+2015-06-24 17:15:56	walexander	b/c that's where we do the pub_revenue calculation 
+2015-06-24 17:16:12	walexander	we only really need a view for that -- v_revenue_h 
+2015-06-24 17:16:18	walexander	but that view queries f_measures_h 
+2015-06-24 17:16:37	walexander	v_rev should instead query the real f_* tables 
+2015-06-24 17:17:14	walexander	then, if tableau could only do the fucking time zone conversion for us, we would not need to use extracts for the workbooks -- it could just query redshift directly like looker does
+2015-06-24 17:18:30	jas	i see
+2015-06-24 17:18:32	walexander	problem with all of these views is
+2015-06-24 17:18:47	walexander	redshift doesn't always `pushdown` the WHERE clauses to all the views
+2015-06-24 17:19:23	walexander	since the data is stored sorted by event_dttm, if you do a where clause with event_dttm, redshift knows exactly which rows it ahs to scan 
+2015-06-24 17:19:51	walexander	but, if you have a view that queries a view, they don't `pushdown the predicate` to the second view
+2015-06-24 17:20:14	walexander	so when we `select * from v_rev WHERE event_dttm = '2015-06-20'` 
+2015-06-24 17:21:05	walexander	when f_measures_h is a view, redshift doesn't pushdown the where clause to f_measures
+2015-06-24 17:21:22	walexander	so every single query of v_rev triggers a scan of all 4 billion rows 
+2015-06-24 17:21:31	jas	great
+2015-06-24 17:21:55	walexander	still faster than hive -- but hive makes a better demo ;-) 
+2015-06-24 17:22:23	jas	cool, thanks for the explanation
+2015-06-24 19:06:07	walexander	the tableau.prod.beanstock.net is ready for validation
+2015-06-24 19:07:01	jas	great, thanks!
+2015-06-24 19:09:21	walexander	hrmm ... wait one second :-) 
+2015-06-24 19:11:54	jas	np, let me know
+2015-06-24 19:12:30	jas	since you are not her today, I have to go out and drink on your behalf now
+2015-06-24 19:12:36	jas	with Jason and John
+2015-06-24 19:12:41	jas	see you tomorrow
+2015-06-24 19:13:07	walexander	what a trooper!
+2015-06-25 13:45:59	walexander	hold off on that green validatiojn for a minute -- need to look into some issues with the workbook itself
+2015-06-25 13:46:14	jas	ok
+2015-06-26 16:31:41	jas	are you joining the call?
+2015-07-02 14:03:49	jas	are you joining the Looker call?
+2015-07-02 14:04:28	walexander	hrmm ... i thought i was on 
+2015-07-02 14:04:30	walexander	lemme try again
+2015-07-02 16:15:45	walexander	we are soo lucky Jim was not on that call 
+2015-07-06 13:02:14	jas	are you joining the Looker call?
+2015-06-16 16:06:59	jas	1:1
+2015-06-16 16:12:57	jas	ping me when you are available
+2015-06-16 16:51:01	walexander	shit, sorry bro -- moved my meeting with Jason from yesterday to today
+2015-06-16 16:51:29	walexander	and, like most of the sub-task generation meetings, it ran waaay long
+2015-06-16 17:23:10	jas	thats fine
+2015-06-16 17:23:32	jas	not much to cover, but if you can look at green numbers that would be helpful
+2015-06-17 14:57:18	jas	hows the green env looking? Did you find any issues yet?
+2015-06-17 14:57:41	jas	i hope you saw my email from yesterday on the topic
+2015-06-17 15:04:31	walexander	i saw your email yes.   i'm still looking into the root cause though -- want to see if there are any discrepancies in teh event counts
+2015-06-17 15:05:31	jas	thanks
+2015-06-17 17:53:11	jas	is that warning ok?
+2015-06-17 17:53:12	jas	15/06/17 21:50:25 WARN mapreduce.Counters: Group org.apache.hadoop.mapred.Task$Counter is deprecated. Use org.apache.hadoop.mapreduce.TaskCounter instead
+2015-06-17 17:53:18	jas	coming from Hue
+2015-06-17 17:57:35	jas	the queries are not running at all on Hive, stuck on 0% map and 0% reduce
+2015-06-17 17:59:57	walexander	the warning is okay 
+2015-06-17 18:00:08	walexander	not sure what's up with the query -- lemme look 
+2015-06-17 18:00:35	jas	thanks
+2015-06-17 18:00:56	walexander	ah, i see 
+2015-06-17 18:01:13	walexander	if you delete the user name from the job browser list
+2015-06-17 18:01:29	walexander	you'll see there's another query running in the queue ahead of yours 
+2015-06-17 18:05:12	walexander	the query that's running is pulling the event counts for 06/04@00:00 which happens to be a really big one 
+2015-06-17 18:05:15	walexander	it'll finish soon though 
+2015-06-17 18:11:59	walexander	kk, your query is running now 
+2015-06-17 18:18:20	jas	thanks
+2015-06-18 13:45:55	walexander	@walexander uploaded a file: <https://beanstock.slack.com/files/walexander/F06H20RD5/event_counts_pivot_by_source.sql|event counts pivot by source>
+2015-06-18 13:47:13	jas	this table is on Hive?
+2015-06-18 13:47:20	walexander	```
+2015-06-18 13:47:20		┌────────────┬──────────────┬────────┬────────┬──────────┐
+2015-06-18 13:47:20		│ event_type │  import_ds   │ kafka  │  hive  │ redshift │
+2015-06-18 13:47:20		├────────────┼──────────────┼────────┼────────┼──────────┤
+2015-06-18 13:47:20		│ request    │ 201506040030 │ 128152 │ 128152 │   128152 │
+2015-06-18 13:47:20		│ request    │ 201506040100 │  26887 │  26887 │    26887 │
+2015-06-18 13:47:20		│ request    │ 201506040130 │  25875 │  25875 │    25875 │
+2015-06-18 13:47:20		│ request    │ 201506040200 │  27496 │  27496 │    27496 │
+2015-06-18 13:47:20		│ request    │ 201506040230 │  29428 │  29428 │    29428 │
+2015-06-18 13:47:20		```
+2015-06-18 13:47:28	walexander	that is in redshift, work.import_counts
+2015-06-18 13:47:33	jas	ok cool
+2015-06-18 13:48:43	walexander	kafka counts are from the report file the even processor writes out 
+2015-06-18 13:48:43		``` aws s3 cp s3://databus-production/green.prod/working/for_redshift/ready/SUCCESS_201506082030 /dev/fd/1
+2015-06-18 13:48:43		C_all,799813
+2015-06-18 13:48:43		C_error,6465
+2015-06-18 13:48:43		C_filled,322420
+2015-06-18 13:48:43		C_impression,337798
+2015-06-18 13:48:43		C_passback,1
+2015-06-18 13:48:43		C_request,133109
+2015-06-18 13:48:43		C_revoke,20
+2015-06-18 13:48:43		C_TS,201506081630```
+2015-06-18 13:49:28	walexander	the hive and redshift counts are generated via `select count(*)` and `select sum(*_cnt)` queries from the respective systems
+2015-06-18 14:07:29	walexander	FYI -- should get an invite from https://www.opsgenie.com/alert
+2015-06-18 14:07:53	jas	ok
+2015-06-19 12:01:35	walexander	Hey just saw the looker call on my calendar. 
+2015-06-19 12:02:00	walexander	Today is last day of school and I am at this lunch thing right now. 
+2015-06-19 12:02:59	walexander	I can join in half and hour
+2015-06-19 12:31:09	jas	we are all good
+2015-06-19 12:31:15	jas	the call just ended
+2015-06-23 14:38:34	jas	what time are you arriving?
+2015-06-23 14:43:52	walexander	not until midnight 
+2015-06-23 14:44:38	jas	wow! so you have not left yet
+2015-06-23 14:44:53	walexander	no, not yet
+2015-06-23 14:45:19	walexander	but will be in like an hour 
+2015-06-23 14:45:33	jas	ok, have a safe flight
+2015-06-23 14:45:42	jas	i hope no middle seats this time :simple_smile:
+2015-06-23 14:45:58	walexander	hehe, not holding out hope 
+2015-06-23 14:46:08	walexander	given all the lead time we got ... 
+2015-06-23 14:46:13	jas	hehe
+2015-06-23 15:57:16	jas	are we doing our 1:1?
+2015-06-23 15:57:33	jas	or you have a flight to catch?
+2015-06-23 15:58:34	walexander	sorry, yeah -- i'm about to leave for airport
+2015-06-23 16:00:04	jas	np
+2015-06-23 16:00:37	walexander	have you logged into the http://opsgenie.com service yet? 
+2015-06-23 16:33:32	jas	i never got a login?
+2015-06-24 16:23:54	jas	are you around?
+2015-06-24 16:24:00	jas	somewhere in the cloud?
+2015-06-24 16:24:03	walexander	yes
+2015-06-24 16:24:08	walexander	hehe, no, i'm here
+2015-06-24 16:24:19	jas	so quick question
+2015-06-24 16:24:29	jas	The new Media Buy stuff
+2015-06-24 16:24:44	jas	Ops team is buying Mobile inventory from APN exchange
+2015-06-24 16:24:54	jas	and they have all the related managed demand in DFP
+2015-06-24 16:25:20	jas	they are trying to use the DFP Ad Tag as a creative in APN
+2015-06-24 16:25:30	jas	but the discrepancies are huge
+2015-06-24 16:25:41	walexander	they should use the DFP passback tag
+2015-06-24 16:25:43	jas	how can we use DFP ad tag as a demand source
+2015-06-24 16:25:47	walexander	instead of the standard GPT tags
+2015-06-24 16:25:47	jas	i see
+2015-06-24 16:25:53	walexander	it's just a simple <script> 
+2015-06-24 16:26:02	jas	you are the man
+2015-06-24 16:29:08	walexander	hopefully that works -- have a feeling it will 
+2015-06-24 16:29:20	walexander	otherwise, your tag will get tangled with the existing GPT calls
+2015-06-24 16:30:54	jas	does that not get affected by the single request mode?
+2015-06-24 16:32:56	walexander	prboelm is, once you've made a GPT call to display() an ad, you cannot change the mode
+2015-06-24 16:33:08	jas	ok
+2015-06-24 16:34:54	walexander	we'd want synchronous, multi-request-mode
+2015-06-24 16:38:02	jas	sounds good
+2015-06-24 16:41:49	walexander	FYI, sent you an email invite to http://opsgenie.com 
+2015-06-24 16:42:02	walexander	won't put you in the oncall rotation though :-) 
+2015-06-24 16:42:08	jas	thanks
+2015-06-24 16:42:35	walexander	it's pretty cool -- it pages and then calls you with a phone tree: "press 2 to acknowledge, 3 to close, etc" 
+2015-06-24 16:42:49	jas	mailto:jas@beanstockmedia.com
+2015-06-24 16:43:00	jas	that's why it is not coming through
+2015-06-24 16:43:08	walexander	oh, why don't you have that 
+2015-06-24 16:43:09	jas	mailto:jsingh@beanstockmedia.com
+2015-06-24 16:43:38	walexander	on its way 
+2015-06-24 16:44:15	walexander	i have the cloud watch alarms going to it as well as the pipeline sentry alerts
+2015-06-24 16:44:52	walexander	unfortunately, the sentry alerts every day for the 10:00 am run -- adx import causes the event counts to get screwy 
+2015-06-24 16:46:08	jas	ok no worries
+2015-06-24 16:46:13	jas	I am having a look now
+2015-06-24 16:46:46	walexander	those 10:00am runs also show in the dashboard as bad  http://tableau.prod.beanstock.net/t/Beanstock/views/DatabusDashboard_0/DatabusDashboard#1
+2015-06-24 16:50:37	jas	i see that
+2015-06-24 16:51:22	walexander	but, you can see that we indeed had a bad run at 1800 yesterday 
+2015-06-24 16:52:05	walexander	the sentry is supposed to send email to genie on both success *and* faiulure --- failure followed by a subsequent success messages supposed to auto-close the ticket
+2015-06-24 16:52:14	walexander	but not working right now -- trying to debug
+2015-06-24 16:52:42	jas	ok
+2015-06-24 16:53:00	walexander	oh, hey nice
+2015-06-24 16:53:04	walexander	got it working :-)
+2015-06-24 16:53:56	walexander	if you open ticket #112 ([HelixDataPipeline] HelixDataPipeline:FAIL[databus:201506231800]) then click Activity Log tab
+2015-06-24 16:54:31	walexander	it's show "Alert created via AmaazonSns[Helix...]" then "Alert closed via AmazonSns[Helix...]"
+2015-06-24 16:55:58	jas	yep, looks good so far
+2015-06-24 16:56:29	walexander	@rdm is working on monitors for remaining items in DATABUS-755
+2015-06-24 16:58:12	jas	that would be great to have
+2015-06-24 16:58:21	jas	but what does high/large mean?
+2015-06-24 16:58:30	jas	can we put some actual numbers?
+2015-06-24 16:59:12	walexander	in the ticket?
+2015-06-24 16:59:15	jas	yes
+2015-06-24 16:59:29	jas	High delta between last processed and current Kafka offset.
+2015-06-24 16:59:29		Large number of "unparsable" or "invalid" events (events which do not have or do not conform to their avro schema)
+2015-06-24 16:59:39	walexander	unfortunately no, data pipeline doesn't allow us to inject non-pipeline related data into the ticket
+2015-06-24 16:59:53	jas	not on the ticket
+2015-06-24 17:00:04	jas	but can we decide on what numbers to monitor on
+2015-06-24 17:00:22	jas	what does high delta mean? 10%? 20%?
+2015-06-24 17:00:36	walexander	high delta means the offset totals from one run to the next do *not* match the total number of arrays processed
+2015-06-24 17:01:14	walexander	the kafka processing job will tell us it procesed 7800 arrays for the  1600 run 
+2015-06-24 17:01:22	jas	i see
+2015-06-24 17:01:33	jas	so no delta at all is desired
+2015-06-24 17:01:47	walexander	the delta for kafka offsets file for the 1600 and 1630 runs should equal 7800
+2015-06-24 17:02:03	jas	got it
+2015-06-24 17:02:10	walexander	(after it's finished, the 1600 run will spit out an offset file for the 1630 run) 
+2015-06-24 17:02:30	walexander	large number of unparsable / invalid events == any unparsable or invalid events right now 
+2015-06-24 17:03:29	walexander	the total number of them will be shown in the dashboard
+2015-06-24 17:04:08	walexander	https://github.com/beanstock/data-pipeline/blob/master/adp/utils/check_event_counts.sh
+2015-06-24 17:04:41	walexander	line 16 -- if we see any we'll alert
+2015-06-24 17:05:24	jas	ok cool
+2015-06-24 17:05:48	jas	while I have you, whats the status on the green env in terms of data accuracy?
+2015-06-24 17:06:07	walexander	the problem was with this caching we were doing of `f_measures_h`
+2015-06-24 17:06:24	walexander	that wasn't picking up on the last few hours of each day 
+2015-06-24 17:06:43	walexander	i manually updated it so you should see accurate data now
+2015-06-24 17:06:49	jas	caching of f_measures_h?
+2015-06-24 17:06:54	jas	why do we do that?
+2015-06-24 17:06:57	walexander	f_measures_h is the legacy fact table
+2015-06-24 17:07:14	walexander	and so its what tableau is querying
+2015-06-24 17:07:24	jas	correct
+2015-06-24 17:07:40	walexander	rather than update all those tableau queries, as part of 1.1 we made f_measures_h a `view` of the other f_* tables
+2015-06-24 17:07:56	walexander	unfortunately, that was causing all of our post-1.1 performance issues
+2015-06-24 17:08:05	jas	i remember that
+2015-06-24 17:08:26	walexander	so, we made f_measures_h a real table and populated it througout the day 
+2015-06-24 17:08:45	jas	and that was not getting populated for the last few hours of the day?
+2015-06-24 17:08:58	walexander	right -- the legacy pipeline only ran every hour
+2015-06-24 17:09:12	walexander	and the query to update f_measures takes around 45-90 minutes to finish
+2015-06-24 17:09:37	jas	whats the frequency on the new one? 30 mins?
+2015-06-24 17:09:39	walexander	yy
+2015-06-24 17:10:00	jas	and how long does it take to finish?
+2015-06-24 17:10:05	walexander	45-90 minutes 
+2015-06-24 17:10:12	jas	still?
+2015-06-24 17:10:18	walexander	it does the same thing 
+2015-06-24 17:10:27	jas	why run it more often then?
+2015-06-24 17:10:28	walexander	it has to delete and recreate the entire day's worth of data
+2015-06-24 17:10:53	walexander	in order to determine what days to update, it has to look at the staging tables
+2015-06-24 17:11:30	walexander	so running it every 2 hours like prod does meant we weren't updating the last two hours of each day 
+2015-06-24 17:11:53	walexander	it would start at 00:30 and the only data in teh staging table would be today's 
+2015-06-24 17:12:08	walexander	and it wouldn't update the data for the last two hours of the previous day 
+2015-06-24 17:12:21	jas	so how come prod was still updating and green was under reporting?
+2015-06-24 17:12:28	jas	on the same schedule
+2015-06-24 17:12:36	walexander	because prod only runs every hour
+2015-06-24 17:12:57	walexander	so when the job runs at 00:30 in prod, it sees that yesterrday has to be updated 
+2015-06-24 17:13:06	walexander	but, tbh, the prod data is wrong too 
+2015-06-24 17:13:09	jas	ah I see now
+2015-06-24 17:13:16	jas	so what is the fix?
+2015-06-24 17:13:34	walexander	if you compare sum(impression_cnt) from f_impression vs from f_measures_h day-over-day, you'll likely see deltas
+2015-06-24 17:13:42	jas	ok
+2015-06-24 17:13:42	walexander	the fix is to make it a view again
+2015-06-24 17:13:53	walexander	so that's what I'm implementing now 
+2015-06-24 17:14:06	walexander	and increasing the timeout
+2015-06-24 17:14:09	jas	ok, I am not going to test again till all that is ready
+2015-06-24 17:14:20	jas	i hope no performance issues this time
+2015-06-24 17:14:52	walexander	well, the real fix is to update the v_revenue view that tableau uses to use the real fact tables 
+2015-06-24 17:15:38	jas	ok, so why do we need so many views?
+2015-06-24 17:15:56	walexander	b/c that's where we do the pub_revenue calculation 
+2015-06-24 17:16:12	walexander	we only really need a view for that -- v_revenue_h 
+2015-06-24 17:16:18	walexander	but that view queries f_measures_h 
+2015-06-24 17:16:37	walexander	v_rev should instead query the real f_* tables 
+2015-06-24 17:17:14	walexander	then, if tableau could only do the fucking time zone conversion for us, we would not need to use extracts for the workbooks -- it could just query redshift directly like looker does
+2015-06-24 17:18:30	jas	i see
+2015-06-24 17:18:32	walexander	problem with all of these views is
+2015-06-24 17:18:47	walexander	redshift doesn't always `pushdown` the WHERE clauses to all the views
+2015-06-24 17:19:23	walexander	since the data is stored sorted by event_dttm, if you do a where clause with event_dttm, redshift knows exactly which rows it ahs to scan 
+2015-06-24 17:19:51	walexander	but, if you have a view that queries a view, they don't `pushdown the predicate` to the second view
+2015-06-24 17:20:14	walexander	so when we `select * from v_rev WHERE event_dttm = '2015-06-20'` 
+2015-06-24 17:21:05	walexander	when f_measures_h is a view, redshift doesn't pushdown the where clause to f_measures
+2015-06-24 17:21:22	walexander	so every single query of v_rev triggers a scan of all 4 billion rows 
+2015-06-24 17:21:31	jas	great
+2015-06-24 17:21:55	walexander	still faster than hive -- but hive makes a better demo ;-) 
+2015-06-24 17:22:23	jas	cool, thanks for the explanation
+2015-06-24 19:06:07	walexander	the http://tableau.prod.beanstock.net is ready for validation
+2015-06-24 19:07:01	jas	great, thanks!
+2015-06-24 19:09:21	walexander	hrmm ... wait one second :-) 
+2015-06-24 19:11:54	jas	np, let me know
+2015-06-24 19:12:30	jas	since you are not her today, I have to go out and drink on your behalf now
+2015-06-24 19:12:36	jas	with Jason and John
+2015-06-24 19:12:41	jas	see you tomorrow
+2015-06-24 19:13:07	walexander	what a trooper!
+2015-06-25 13:45:59	walexander	hold off on that green validatiojn for a minute -- need to look into some issues with the workbook itself
+2015-06-25 13:46:14	jas	ok
+2015-06-26 16:31:41	jas	are you joining the call?
+2015-07-02 14:03:49	jas	are you joining the Looker call?
+2015-07-02 14:04:28	walexander	hrmm ... i thought i was on 
+2015-07-02 14:04:30	walexander	lemme try again
+2015-07-02 16:15:45	walexander	we are soo lucky Jim was not on that call 
+2015-07-06 13:02:14	jas	are you joining the Looker call?

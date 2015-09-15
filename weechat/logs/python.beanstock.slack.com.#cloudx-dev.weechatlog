@@ -1,0 +1,861 @@
+2015-07-01 19:05:33	jwong	:+1:
+2015-07-01 19:19:14	jwong	@jas  Thanks for the feedback. seems like the code we have to "unlock" the criteo load is stuck
+2015-07-01 19:19:46	jwong	so theres some scenario where the browser fails to clear the local storage entry on page unload
+2015-07-01 19:20:29	jwong	and leaves the browser in an inconsistent state.. if you can, try opening up dev tools and deleteing the entry `cx/criteo/load/4117` on a http://spanishdict.com visit
+2015-07-01 19:25:45	jas	so whats the right way to not get it stuck?
+2015-07-01 19:25:57	jas	clean it explicitly every page load?
+2015-07-01 19:26:16	jwong	thats what im trying to recreate
+2015-07-01 19:26:21	jas	ok great
+2015-07-01 19:26:49	jwong	we try that.. we listen for the page unload event
+2015-07-01 19:26:53	jwong	and we clear the cache
+2015-07-01 19:27:08	jwong	but something is not right
+2015-07-01 19:27:25	jwong	any remembered steps to recreate would help a lot
+2015-07-01 19:27:35	jwong	like if it was multi tab in the same browser
+2015-07-01 19:27:53	jas	i think it is two browsers at the same time
+2015-07-01 19:28:04	jas	i had FF opened initially and Chrome later
+2015-07-01 19:28:11	jas	Will had it the other way round
+2015-07-01 19:28:26	jas	both of us did not see the rta call in the second browser
+2015-07-01 19:28:43	jas	Will in FF and myself in Chrome
+2015-07-01 19:29:00	jas	or two tab on the same browser
+2015-07-01 19:29:08	jas	has the same effect I guess
+2015-07-01 19:31:45	jwong	ok
+2015-07-01 19:32:05	jwong	i'll have to check if cross browser is possible
+2015-07-01 19:32:10	jwong	but that seems a little far fetched
+2015-07-01 19:32:17	jwong	im able to recreate with two tabs
+2015-07-01 19:32:29	jwong	and its def. something about the inconsistent state of the cache
+2015-07-01 19:32:49	jwong	the only reason we have that inconsistency is cause we're designed to be in isolated frames
+2015-07-01 19:33:01	jwong	the for sure route to solving this issue is to just make a global variable
+2015-07-01 19:33:37	jwong	but that means we cant reliably detect Criteo through Helix
+2015-07-01 19:36:03	jas	let me know what you want to do, or discuss with @walexander
+2015-07-01 19:36:34	jwong	we must revisit the locking
+2015-07-01 19:44:08	jwong	i think for two component ad tags, we need to rethink the assumptions about where we have already preloaded the demand partner's header tag
+2015-07-01 19:44:33	jwong	and that we cant serve the ad serving piece without the header
+2015-07-01 19:44:42	jwong	meaning you can never run criteo without nucleus
+2015-07-01 19:45:09	jwong	or you can never run any two component ad partner without nucleus
+2015-07-01 19:46:41	jwong	if we can agree to that assumption, that makes this fix and CX-779 a little less complex
+2015-07-02 12:29:07	jas	it is fair to assume that we will not be able to run Criteo without Nucleus
+2015-07-02 12:29:16	jas	same for MediaMath or Amazon
+2015-07-02 12:29:24	jwong	cool
+2015-07-02 12:29:59	jwong	i mean, we've seen first hand the kind of feedback we got when run these partners in remanent  helix tags
+2015-07-02 12:30:16	jwong	its inconsistent with their expectations of always loading on the page
+2015-07-02 12:30:21	jas	yrs,
+2015-07-02 12:30:23	jwong	and not by chance their ad server seves us
+2015-07-02 12:30:42	jas	Is will around today?
+2015-07-02 12:30:48	jwong	he should be
+2015-07-02 12:31:24	jwong	header tags = pub must run nucleus
+2015-07-02 12:32:37	jwong	the only reason we're dealing with locking issues is cause we are supporting helix tags loading the header tags
+2015-07-02 12:32:39	jas	to be clear, we are only planning on running Nucleus for our tech
+2015-07-02 12:32:40	jwong	and we dont wanna double load
+2015-07-02 12:33:27	jwong	so to prevent one iframe from loading the rta tag ,ie, we need to set a lock in localstorage and hope other frames see it so they dont not load rta as well
+2015-07-02 12:33:49	jwong	if we assume rta is only loaded through nucleus, we can simplify this a bit
+2015-07-02 12:34:17	jas	can you join the backlog call?
+2015-07-02 12:34:21	jwong	sure
+2015-07-02 12:34:29	jas	thanks
+2015-07-02 12:58:24	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-782 --- 
+2015-07-02 12:58:26	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-791 --- 
+2015-07-02 13:18:10	jwong	@jas the work for CX-771 is complete but i will need time to implement the automated acceptance criteria
+2015-07-02 13:18:44	jwong	i also had to adjust some logic around when we fire a passback event
+2015-07-02 13:19:00	jwong	we had some assumptions that we only fire a passback event if we have a set floor
+2015-07-02 13:19:17	jwong	i took that check out in order to satisfies those scenarios
+2015-07-02 13:19:49	jwong	please lmk if the original usage of the passback event is even relevant ( APN default creative with CPM 0.0)
+2015-07-02 13:29:12	jas	so what is the change you made on the passbacks?
+2015-07-02 13:29:56	jwong	this is the logic we had in place to determine whether we are allowed to fire a passback event
+2015-07-02 13:30:26	jas	passback tags will have some kind of floor
+2015-07-02 13:30:30	jwong	1) the offer needs to have a creative
+2015-07-02 13:30:30		2) the helix tag must have a non-zero flooor value
+2015-07-02 13:30:30		3) the offer cannot be claimed
+2015-07-02 13:30:35	jwong	```
+2015-07-02 13:30:35		        if(!offer || !offer.canDisplay() || offer.isClaimed() || floor <= 0)
+2015-07-02 13:30:35		```
+2015-07-02 13:30:40	jas	and they will passback only if they cannot find any demand above that floor
+2015-07-02 13:30:58	jwong	ok so that means default tags need a floor , or
+2015-07-02 13:31:16	jwong	we can assume that logic is old and not having a floor set is acceptable
+2015-07-02 13:31:22	jwong	as long as the default has a creative to show
+2015-07-02 13:31:45	jwong	i did chose the latter
+2015-07-02 13:32:43	jwong	floor = the entire impression's floor
+2015-07-02 13:32:59	jwong	so the auction must clear above this amount
+2015-07-02 13:33:11	jas	where does default tag come into picture for passbacks
+2015-07-02 13:33:37	jwong	i think we need to name these different cause its kind confusing
+2015-07-02 13:34:11	jwong	a tag that passes back through our pixel, vs a tag that is the publisher default passback tag
+2015-07-02 13:35:08	jwong	do u see/agree with the difference there
+2015-07-02 13:54:49	jas	yes, the passback intent of the tag v/s the default tag
+2015-07-02 13:57:40	jwong	Right so the original logic was that we wont consider the default tag unless there is a floor set on the impression context
+2015-07-02 14:49:22	jwong	anyways... lmk if this change is permitted
+2015-07-02 14:49:29	jwong	for now im disabling this test
+2015-07-02 14:49:29		```
+2015-07-02 14:49:29		asyncTest('should ignore default bidder if no floor is set', function() {
+2015-07-02 14:49:29		```
+2015-07-02 15:21:23	jwong	wish i had a good way to demo time
+2015-07-02 15:21:39	jwong	showing the delivery cap period elapsing
+2015-07-02 15:59:28	jas	it was a good demo nevertheless
+2015-07-02 16:07:02	jas	can you join the Pulsepoint call if possible?
+2015-07-02 16:07:08	walexander	yeah
+2015-07-02 16:07:14	jwong	did u guys need me as well?
+2015-07-02 16:07:31	jas	one of you
+2015-07-02 16:07:41	jwong	u da winner @walexander
+2015-07-02 16:07:53	jwong	clear. close, fire('joined')
+2015-07-02 16:36:24	jwong	ive broken cloudx
+2015-07-02 16:37:13	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F075581EH/screen_shot_2015-07-02_at_1.36.46_pm.png|Screen Shot 2015-07-02 at 1.36.46 PM.png>
+2015-07-02 16:37:30	walexander	lol 
+2015-07-02 16:37:36	jwong	cx-771 has changed everything we know about the auction
+2015-07-02 16:38:14	jwong	j/k, its because we rely on the real implementation of the bidder in a lot of places
+2015-07-02 16:38:18	walexander	at least it's failing fast ;-)  shade under 20,000 seconds 
+2015-07-02 16:38:43	jwong	bidder -> bidder/manifest -> impressionContext
+2015-07-02 16:39:52	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX1QQG/screen_shot_2015-06-25_at_5.39.24_pm.png|This is chrome 36 Win7 on a cookied user:> to this channel.
+2015-07-02 16:39:54	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX46PN/screen_shot_2015-06-25_at_5.39.03_pm.png|This is chrome 36 Win7 on a *cookie-less* user:> to this channel.
+2015-07-02 16:40:07	jwong	@walexander  @jas  checkout that waterfall
+2015-07-02 16:40:26	jwong	async vs sync firing of the cleared event
+2015-07-02 16:41:19	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RTTAHH/screen_shot_2015-06-25_at_3.52.08_pm.png|Screen Shot 2015-06-25 at 3.52.08 PM.png> to this channel.
+2015-07-02 16:42:19	walexander	navigator.sendBeacon()
+2015-07-02 16:46:06	jwong	```
+2015-07-02 16:46:06		The Device APIs Working Group is currently not pursuing the approach outlined in this draft, so it should be considered historical. 
+2015-07-02 16:46:06		```
+2015-07-02 16:47:11	jwong	https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+2015-07-02 16:47:15	jwong	whoops wrong link
+2015-07-02 16:47:21	jwong	iiiiiiinteresting
+2015-07-02 16:47:44	jwong	so backwards compatibility on older browsers that dont support this...
+2015-07-02 16:47:53	jwong	worst-case; we are blocking on unload
+2015-07-02 16:48:27	jwong	but overall, unload is out best mechanism to determine an impression abandonment
+2015-07-02 16:49:55	jwong	maybe we revisit the idea of queuing databus events
+2015-07-02 16:50:25	jwong	so that the time from injection -> cleared -> filled we have these events persisted in cache
+2015-07-02 16:50:49	jwong	and on new page visits we flush the queue but instead of cleared, we mark them as abandoned
+2015-07-02 17:06:16	jwong	_wishes_ qunit recognizes the MUT and stubs everything for you _
+2015-07-02 17:48:50	jwong	this is new 
+2015-07-02 17:48:50		```
+2015-07-02 17:48:50		Failed to clear temp storage: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources. SecurityError
+2015-07-02 17:48:50		```
+2015-07-02 17:48:53	jwong	error in chrome
+2015-07-02 18:01:33	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F0758HGJY/screen_shot_2015-07-02_at_2.55.42_pm.png|Pure Network auction vs Network + Direct auction> and commented: if we can assume a pure network auction, we can get rid of (1) and (2) which shaves off a lot of the auction build time. ( ie. forking new configs in the impression context )
+2015-07-02 19:03:05	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-800 --- 
+2015-07-02 19:08:08	-jira-	Jasanjot Singh created Epic https://beanstockmedia.atlassian.net/browse/CX-801 --- 
+2015-07-02 19:36:24	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|31 new commits> by jwong-beanstock
+2015-07-02 19:41:40	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1631|#1631>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 19:41:40		 - bidder/update_manifest: added passback tracker and shouldFetch update (<https://github.com/Walexander/uberssp/commit/79396b90c5da37af523c71a54b465ab66e63adb7|79396b9> by jsnwng) and <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|30 more>
+2015-07-02 19:41:40		Failing tests: nucleus#collect()+PriceCache: should store targeted prices in UserCache[&quot;config:price_cache_prefix/cx$wx$h&quot;] - in ...
+2015-07-02 21:02:18	jwong	happy fourth everyone
+2015-07-02 21:03:04	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/commit/2696ba5|1 new commit> by jwong-beanstock
+2015-07-02 21:11:01	-B02QCRGB2-	--- Fixed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1632|#1632>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 21:11:01		 - test/unit/nucleus: update tests stub bidder/update_manifest (<https://github.com/Walexander/uberssp/commit/2696ba50264154019f167850c8fe6c0544298267|2696ba5> by jsnwng)
+2015-07-06 14:07:02	jwong	grunt karma:test
+2015-07-06 15:32:05	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/2696ba502641...0a50becb6729|3 new commits> by jwong-beanstock
+2015-07-06 15:32:55	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/compare/3e0b63824e1e...5917008ade51|38 new commits> by jwong-beanstock
+2015-07-06 15:35:52	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/commit/884990e|1 new commit> by jwong-beanstock
+2015-07-06 15:36:14	-B04DXCZ4W-	--- [uberssp] <https://github.com/Walexander/uberssp/tree/release%2F1.60|release/1.60> was branched from "develop" and pushed by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-737" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-747" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-763" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-765" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-771" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-776" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.58" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.56" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "bug/CX-361" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/sync" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-491" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-302" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [Walexander/uberssp] Pull request closed: <https://github.com/Walexander/uberssp/pull/224|#224 CX-49: Refactor Manifest to Composite pattern> by <https://github.com/jsnwng|jsnwng>
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-544" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-712" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-645" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/cucumber" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/fixing-mocks" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-687" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-736" was deleted by jsnwng
+2015-07-06 15:45:51	jwong	sorry.. that was the last batch
+2015-07-06 15:51:02	-B02QCRGB2-	--- Success:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1636|#1636>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/release%2F1.60|release/1.60>)
+2015-07-06 15:51:02		 -  (<https://github.com/Walexander/uberssp/commit/884990ed5d86a3253ed2bc7a4b2020b364f35de0|884990e> by )
+2015-07-06 15:58:11	jwong	RE: impression metrics
+2015-07-06 15:58:11		/request -> /cleared - /filled
+2015-07-06 15:58:13	jwong	```
+2015-07-06 15:58:13		Ad Impression – A measurement of responses from an ad delivery system to an ad request from
+2015-07-06 15:58:13		the user's browser, which is filtered from robotic activity and is recorded at a point as late as possible
+2015-07-06 15:58:13		in the process of delivery of the creative material to the user's browser — therefore closest to
+2015-07-06 15:58:13		actual opportunity to see by the user (see specifics below).
+2015-07-06 15:58:13		```
+2015-07-06 15:59:43	jwong	given our data that shows a majority of cookie-less visits and the way browsers prioritize the creative load over our /cleared
+2015-07-06 16:00:05	jwong	i think we can get more visibility as to why we are discrepant if we analyze /cleared -> /filled
+2015-07-06 16:00:58	jwong	but first we need to implement the filled to sync auctions and move the /cleared before the creative load
+2015-07-06 16:03:06	jwong	that will show us if its really on us and our code thats causing the discrepancy
+2015-07-06 16:03:20	jwong	or its load of the creative
+2015-07-06 16:05:29	jwong	/request to /cleared discrepancy means there is a problem with the auction process
+2015-07-06 16:05:29		/cleared to /filled discrepancy means there is user abandonment during creative load
+2015-07-06 16:08:54	jas	i agree with the above logic
+2015-07-06 16:09:14	jas	i did start some checks on it last week and the trends are all over the place
+2015-07-06 16:09:34	jas	it can vary widely depending upon the site especially for the filled events
+2015-07-06 16:10:42	jwong	yeah.. although all the patches that went out last week on 1.58.x were very much needed,  at least this distinction can help us get focused quicker on the source of the problem
+2015-07-06 16:10:53	jwong	and to prove what is out of our control
+2015-07-06 16:10:55	jas	yep
+2015-07-06 16:11:41	jwong	@jas if u see the screenshot of the js profile i took of the auction
+2015-07-06 16:12:06	jwong	u can see theres areas where we can shave a lot of time off our /request to /cleared
+2015-07-06 16:12:17	jas	yes, I saw the ones from Friday
+2015-07-06 16:12:22	jwong	if we dont assume network + direct bidders
+2015-07-06 16:12:41	jwong	brb.. must eat lunch before my call
+2015-07-06 16:18:07	jas	@jwong let me know how the Criteo bugs are coming along, I need to follow up with them
+2015-07-06 16:23:17	jwong	I should have an update
+2015-07-06 16:23:19	jwong	Eod
+2015-07-06 16:23:36	jwong	I wanted to clean the workspcae before starting
+2015-07-06 16:24:00	jwong	Ill dev off master so that this isnt blocked by reviewing 1.60
+2015-07-06 16:24:12	jwong	And we can release as a patch for 1.58
+2015-07-06 16:57:30	jas	sounds good to me
+2015-07-06 16:57:45	jas	is the auction still broken on 1.60?
+2015-07-06 17:54:13	jwong	what do u mean by broken?
+2015-07-06 17:57:29	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-802 --- 
+2015-07-06 18:06:26	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-803 --- 
+2015-07-06 18:59:09	jwong	it looks like we are never getting a chance to define `googletag` before the real library does
+2015-07-06 18:59:13	jwong	in firefox
+2015-07-06 20:02:25	jwong	in all browsers
+2015-07-07 12:38:52	jwong	@jas should the invalid penalty apply to criteo in nucleus ?
+2015-07-07 12:39:31	jwong	so if criteo says no to nucleus 3 times in a row
+2015-07-07 12:39:43	jas	yes, that's fine
+2015-07-07 12:39:56	jas	did you see their email in the morning
+2015-07-07 12:40:06	jas	let me know what we need to tell them
+2015-07-01 19:05:33	jwong	:+1:
+2015-07-01 19:19:14	jwong	@jas  Thanks for the feedback. seems like the code we have to "unlock" the criteo load is stuck
+2015-07-01 19:19:46	jwong	so theres some scenario where the browser fails to clear the local storage entry on page unload
+2015-07-01 19:20:29	jwong	and leaves the browser in an inconsistent state.. if you can, try opening up dev tools and deleteing the entry `cx/criteo/load/4117` on a http://spanishdict.com visit
+2015-07-01 19:25:45	jas	so whats the right way to not get it stuck?
+2015-07-01 19:25:57	jas	clean it explicitly every page load?
+2015-07-01 19:26:16	jwong	thats what im trying to recreate
+2015-07-01 19:26:21	jas	ok great
+2015-07-01 19:26:49	jwong	we try that.. we listen for the page unload event
+2015-07-01 19:26:53	jwong	and we clear the cache
+2015-07-01 19:27:08	jwong	but something is not right
+2015-07-01 19:27:25	jwong	any remembered steps to recreate would help a lot
+2015-07-01 19:27:35	jwong	like if it was multi tab in the same browser
+2015-07-01 19:27:53	jas	i think it is two browsers at the same time
+2015-07-01 19:28:04	jas	i had FF opened initially and Chrome later
+2015-07-01 19:28:11	jas	Will had it the other way round
+2015-07-01 19:28:26	jas	both of us did not see the rta call in the second browser
+2015-07-01 19:28:43	jas	Will in FF and myself in Chrome
+2015-07-01 19:29:00	jas	or two tab on the same browser
+2015-07-01 19:29:08	jas	has the same effect I guess
+2015-07-01 19:31:45	jwong	ok
+2015-07-01 19:32:05	jwong	i'll have to check if cross browser is possible
+2015-07-01 19:32:10	jwong	but that seems a little far fetched
+2015-07-01 19:32:17	jwong	im able to recreate with two tabs
+2015-07-01 19:32:29	jwong	and its def. something about the inconsistent state of the cache
+2015-07-01 19:32:49	jwong	the only reason we have that inconsistency is cause we're designed to be in isolated frames
+2015-07-01 19:33:01	jwong	the for sure route to solving this issue is to just make a global variable
+2015-07-01 19:33:37	jwong	but that means we cant reliably detect Criteo through Helix
+2015-07-01 19:36:03	jas	let me know what you want to do, or discuss with @walexander
+2015-07-01 19:36:34	jwong	we must revisit the locking
+2015-07-01 19:44:08	jwong	i think for two component ad tags, we need to rethink the assumptions about where we have already preloaded the demand partner's header tag
+2015-07-01 19:44:33	jwong	and that we cant serve the ad serving piece without the header
+2015-07-01 19:44:42	jwong	meaning you can never run criteo without nucleus
+2015-07-01 19:45:09	jwong	or you can never run any two component ad partner without nucleus
+2015-07-01 19:46:41	jwong	if we can agree to that assumption, that makes this fix and CX-779 a little less complex
+2015-07-02 12:29:07	jas	it is fair to assume that we will not be able to run Criteo without Nucleus
+2015-07-02 12:29:16	jas	same for MediaMath or Amazon
+2015-07-02 12:29:24	jwong	cool
+2015-07-02 12:29:59	jwong	i mean, we've seen first hand the kind of feedback we got when run these partners in remanent  helix tags
+2015-07-02 12:30:16	jwong	its inconsistent with their expectations of always loading on the page
+2015-07-02 12:30:21	jas	yrs,
+2015-07-02 12:30:23	jwong	and not by chance their ad server seves us
+2015-07-02 12:30:42	jas	Is will around today?
+2015-07-02 12:30:48	jwong	he should be
+2015-07-02 12:31:24	jwong	header tags = pub must run nucleus
+2015-07-02 12:32:37	jwong	the only reason we're dealing with locking issues is cause we are supporting helix tags loading the header tags
+2015-07-02 12:32:39	jas	to be clear, we are only planning on running Nucleus for our tech
+2015-07-02 12:32:40	jwong	and we dont wanna double load
+2015-07-02 12:33:27	jwong	so to prevent one iframe from loading the rta tag ,ie, we need to set a lock in localstorage and hope other frames see it so they dont not load rta as well
+2015-07-02 12:33:49	jwong	if we assume rta is only loaded through nucleus, we can simplify this a bit
+2015-07-02 12:34:17	jas	can you join the backlog call?
+2015-07-02 12:34:21	jwong	sure
+2015-07-02 12:34:29	jas	thanks
+2015-07-02 12:58:24	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-782 --- 
+2015-07-02 12:58:26	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-791 --- 
+2015-07-02 13:18:10	jwong	@jas the work for CX-771 is complete but i will need time to implement the automated acceptance criteria
+2015-07-02 13:18:44	jwong	i also had to adjust some logic around when we fire a passback event
+2015-07-02 13:19:00	jwong	we had some assumptions that we only fire a passback event if we have a set floor
+2015-07-02 13:19:17	jwong	i took that check out in order to satisfies those scenarios
+2015-07-02 13:19:49	jwong	please lmk if the original usage of the passback event is even relevant ( APN default creative with CPM 0.0)
+2015-07-02 13:29:12	jas	so what is the change you made on the passbacks?
+2015-07-02 13:29:56	jwong	this is the logic we had in place to determine whether we are allowed to fire a passback event
+2015-07-02 13:30:26	jas	passback tags will have some kind of floor
+2015-07-02 13:30:30	jwong	1) the offer needs to have a creative
+2015-07-02 13:30:30		2) the helix tag must have a non-zero flooor value
+2015-07-02 13:30:30		3) the offer cannot be claimed
+2015-07-02 13:30:35	jwong	```
+2015-07-02 13:30:35		        if(!offer || !offer.canDisplay() || offer.isClaimed() || floor <= 0)
+2015-07-02 13:30:35		```
+2015-07-02 13:30:40	jas	and they will passback only if they cannot find any demand above that floor
+2015-07-02 13:30:58	jwong	ok so that means default tags need a floor , or
+2015-07-02 13:31:16	jwong	we can assume that logic is old and not having a floor set is acceptable
+2015-07-02 13:31:22	jwong	as long as the default has a creative to show
+2015-07-02 13:31:45	jwong	i did chose the latter
+2015-07-02 13:32:43	jwong	floor = the entire impression's floor
+2015-07-02 13:32:59	jwong	so the auction must clear above this amount
+2015-07-02 13:33:11	jas	where does default tag come into picture for passbacks
+2015-07-02 13:33:37	jwong	i think we need to name these different cause its kind confusing
+2015-07-02 13:34:11	jwong	a tag that passes back through our pixel, vs a tag that is the publisher default passback tag
+2015-07-02 13:35:08	jwong	do u see/agree with the difference there
+2015-07-02 13:54:49	jas	yes, the passback intent of the tag v/s the default tag
+2015-07-02 13:57:40	jwong	Right so the original logic was that we wont consider the default tag unless there is a floor set on the impression context
+2015-07-02 14:49:22	jwong	anyways... lmk if this change is permitted
+2015-07-02 14:49:29	jwong	for now im disabling this test
+2015-07-02 14:49:29		```
+2015-07-02 14:49:29		asyncTest('should ignore default bidder if no floor is set', function() {
+2015-07-02 14:49:29		```
+2015-07-02 15:21:23	jwong	wish i had a good way to demo time
+2015-07-02 15:21:39	jwong	showing the delivery cap period elapsing
+2015-07-02 15:59:28	jas	it was a good demo nevertheless
+2015-07-02 16:07:02	jas	can you join the Pulsepoint call if possible?
+2015-07-02 16:07:08	walexander	yeah
+2015-07-02 16:07:14	jwong	did u guys need me as well?
+2015-07-02 16:07:31	jas	one of you
+2015-07-02 16:07:41	jwong	u da winner @walexander
+2015-07-02 16:07:53	jwong	clear. close, fire('joined')
+2015-07-02 16:36:24	jwong	ive broken cloudx
+2015-07-02 16:37:13	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F075581EH/screen_shot_2015-07-02_at_1.36.46_pm.png|Screen Shot 2015-07-02 at 1.36.46 PM.png>
+2015-07-02 16:37:30	walexander	lol 
+2015-07-02 16:37:36	jwong	cx-771 has changed everything we know about the auction
+2015-07-02 16:38:14	jwong	j/k, its because we rely on the real implementation of the bidder in a lot of places
+2015-07-02 16:38:18	walexander	at least it's failing fast ;-)  shade under 20,000 seconds 
+2015-07-02 16:38:43	jwong	bidder -> bidder/manifest -> impressionContext
+2015-07-02 16:39:52	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX1QQG/screen_shot_2015-06-25_at_5.39.24_pm.png|This is chrome 36 Win7 on a cookied user:> to this channel.
+2015-07-02 16:39:54	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX46PN/screen_shot_2015-06-25_at_5.39.03_pm.png|This is chrome 36 Win7 on a *cookie-less* user:> to this channel.
+2015-07-02 16:40:07	jwong	@walexander  @jas  checkout that waterfall
+2015-07-02 16:40:26	jwong	async vs sync firing of the cleared event
+2015-07-02 16:41:19	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RTTAHH/screen_shot_2015-06-25_at_3.52.08_pm.png|Screen Shot 2015-06-25 at 3.52.08 PM.png> to this channel.
+2015-07-02 16:42:19	walexander	navigator.sendBeacon()
+2015-07-02 16:46:06	jwong	```
+2015-07-02 16:46:06		The Device APIs Working Group is currently not pursuing the approach outlined in this draft, so it should be considered historical. 
+2015-07-02 16:46:06		```
+2015-07-02 16:47:11	jwong	https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+2015-07-02 16:47:15	jwong	whoops wrong link
+2015-07-02 16:47:21	jwong	iiiiiiinteresting
+2015-07-02 16:47:44	jwong	so backwards compatibility on older browsers that dont support this...
+2015-07-02 16:47:53	jwong	worst-case; we are blocking on unload
+2015-07-02 16:48:27	jwong	but overall, unload is out best mechanism to determine an impression abandonment
+2015-07-02 16:49:55	jwong	maybe we revisit the idea of queuing databus events
+2015-07-02 16:50:25	jwong	so that the time from injection -> cleared -> filled we have these events persisted in cache
+2015-07-02 16:50:49	jwong	and on new page visits we flush the queue but instead of cleared, we mark them as abandoned
+2015-07-02 17:06:16	jwong	_wishes_ qunit recognizes the MUT and stubs everything for you _
+2015-07-02 17:48:50	jwong	this is new 
+2015-07-02 17:48:50		```
+2015-07-02 17:48:50		Failed to clear temp storage: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources. SecurityError
+2015-07-02 17:48:50		```
+2015-07-02 17:48:53	jwong	error in chrome
+2015-07-02 18:01:33	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F0758HGJY/screen_shot_2015-07-02_at_2.55.42_pm.png|Pure Network auction vs Network + Direct auction> and commented: if we can assume a pure network auction, we can get rid of (1) and (2) which shaves off a lot of the auction build time. ( ie. forking new configs in the impression context )
+2015-07-02 19:03:05	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-800 --- 
+2015-07-02 19:08:08	-jira-	Jasanjot Singh created Epic https://beanstockmedia.atlassian.net/browse/CX-801 --- 
+2015-07-02 19:36:24	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|31 new commits> by jwong-beanstock
+2015-07-02 19:41:40	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1631|#1631>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 19:41:40		 - bidder/update_manifest: added passback tracker and shouldFetch update (<https://github.com/Walexander/uberssp/commit/79396b90c5da37af523c71a54b465ab66e63adb7|79396b9> by jsnwng) and <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|30 more>
+2015-07-02 19:41:40		Failing tests: nucleus#collect()+PriceCache: should store targeted prices in UserCache[&quot;config:price_cache_prefix/cx$wx$h&quot;] - in ...
+2015-07-02 21:02:18	jwong	happy fourth everyone
+2015-07-02 21:03:04	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/commit/2696ba5|1 new commit> by jwong-beanstock
+2015-07-02 21:11:01	-B02QCRGB2-	--- Fixed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1632|#1632>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 21:11:01		 - test/unit/nucleus: update tests stub bidder/update_manifest (<https://github.com/Walexander/uberssp/commit/2696ba50264154019f167850c8fe6c0544298267|2696ba5> by jsnwng)
+2015-07-06 14:07:02	jwong	grunt karma:test
+2015-07-06 15:32:05	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/2696ba502641...0a50becb6729|3 new commits> by jwong-beanstock
+2015-07-06 15:32:55	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/compare/3e0b63824e1e...5917008ade51|38 new commits> by jwong-beanstock
+2015-07-06 15:35:52	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/commit/884990e|1 new commit> by jwong-beanstock
+2015-07-06 15:36:14	-B04DXCZ4W-	--- [uberssp] <https://github.com/Walexander/uberssp/tree/release%2F1.60|release/1.60> was branched from "develop" and pushed by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-737" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-747" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-763" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-765" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-771" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-776" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.58" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.56" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "bug/CX-361" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/sync" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-491" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-302" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [Walexander/uberssp] Pull request closed: <https://github.com/Walexander/uberssp/pull/224|#224 CX-49: Refactor Manifest to Composite pattern> by <https://github.com/jsnwng|jsnwng>
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-544" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-712" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-645" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/cucumber" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/fixing-mocks" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-687" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-736" was deleted by jsnwng
+2015-07-06 15:45:51	jwong	sorry.. that was the last batch
+2015-07-06 15:51:02	-B02QCRGB2-	--- Success:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1636|#1636>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/release%2F1.60|release/1.60>)
+2015-07-06 15:51:02		 -  (<https://github.com/Walexander/uberssp/commit/884990ed5d86a3253ed2bc7a4b2020b364f35de0|884990e> by )
+2015-07-06 15:58:11	jwong	RE: impression metrics
+2015-07-06 15:58:11		/request -> /cleared - /filled
+2015-07-06 15:58:13	jwong	```
+2015-07-06 15:58:13		Ad Impression – A measurement of responses from an ad delivery system to an ad request from
+2015-07-06 15:58:13		the user's browser, which is filtered from robotic activity and is recorded at a point as late as possible
+2015-07-06 15:58:13		in the process of delivery of the creative material to the user's browser — therefore closest to
+2015-07-06 15:58:13		actual opportunity to see by the user (see specifics below).
+2015-07-06 15:58:13		```
+2015-07-06 15:59:43	jwong	given our data that shows a majority of cookie-less visits and the way browsers prioritize the creative load over our /cleared
+2015-07-06 16:00:05	jwong	i think we can get more visibility as to why we are discrepant if we analyze /cleared -> /filled
+2015-07-06 16:00:58	jwong	but first we need to implement the filled to sync auctions and move the /cleared before the creative load
+2015-07-06 16:03:06	jwong	that will show us if its really on us and our code thats causing the discrepancy
+2015-07-06 16:03:20	jwong	or its load of the creative
+2015-07-06 16:05:29	jwong	/request to /cleared discrepancy means there is a problem with the auction process
+2015-07-06 16:05:29		/cleared to /filled discrepancy means there is user abandonment during creative load
+2015-07-06 16:08:54	jas	i agree with the above logic
+2015-07-06 16:09:14	jas	i did start some checks on it last week and the trends are all over the place
+2015-07-06 16:09:34	jas	it can vary widely depending upon the site especially for the filled events
+2015-07-06 16:10:42	jwong	yeah.. although all the patches that went out last week on 1.58.x were very much needed,  at least this distinction can help us get focused quicker on the source of the problem
+2015-07-06 16:10:53	jwong	and to prove what is out of our control
+2015-07-06 16:10:55	jas	yep
+2015-07-06 16:11:41	jwong	@jas if u see the screenshot of the js profile i took of the auction
+2015-07-06 16:12:06	jwong	u can see theres areas where we can shave a lot of time off our /request to /cleared
+2015-07-06 16:12:17	jas	yes, I saw the ones from Friday
+2015-07-06 16:12:22	jwong	if we dont assume network + direct bidders
+2015-07-06 16:12:41	jwong	brb.. must eat lunch before my call
+2015-07-06 16:18:07	jas	@jwong let me know how the Criteo bugs are coming along, I need to follow up with them
+2015-07-06 16:23:17	jwong	I should have an update
+2015-07-06 16:23:19	jwong	Eod
+2015-07-06 16:23:36	jwong	I wanted to clean the workspcae before starting
+2015-07-06 16:24:00	jwong	Ill dev off master so that this isnt blocked by reviewing 1.60
+2015-07-06 16:24:12	jwong	And we can release as a patch for 1.58
+2015-07-06 16:57:30	jas	sounds good to me
+2015-07-06 16:57:45	jas	is the auction still broken on 1.60?
+2015-07-06 17:54:13	jwong	what do u mean by broken?
+2015-07-06 17:57:29	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-802 --- 
+2015-07-06 18:06:26	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-803 --- 
+2015-07-06 18:59:09	jwong	it looks like we are never getting a chance to define `googletag` before the real library does
+2015-07-06 18:59:13	jwong	in firefox
+2015-07-06 20:02:25	jwong	in all browsers
+2015-07-07 12:38:52	jwong	@jas should the invalid penalty apply to criteo in nucleus ?
+2015-07-07 12:39:31	jwong	so if criteo says no to nucleus 3 times in a row
+2015-07-07 12:39:43	jas	yes, that's fine
+2015-07-07 12:39:56	jas	did you see their email in the morning
+2015-07-07 12:40:06	jas	let me know what we need to tell them
+2015-07-01 19:05:33	jwong	:+1:
+2015-07-01 19:19:14	jwong	@jas  Thanks for the feedback. seems like the code we have to "unlock" the criteo load is stuck
+2015-07-01 19:19:46	jwong	so theres some scenario where the browser fails to clear the local storage entry on page unload
+2015-07-01 19:20:29	jwong	and leaves the browser in an inconsistent state.. if you can, try opening up dev tools and deleteing the entry `cx/criteo/load/4117` on a http://spanishdict.com visit
+2015-07-01 19:25:45	jas	so whats the right way to not get it stuck?
+2015-07-01 19:25:57	jas	clean it explicitly every page load?
+2015-07-01 19:26:16	jwong	thats what im trying to recreate
+2015-07-01 19:26:21	jas	ok great
+2015-07-01 19:26:49	jwong	we try that.. we listen for the page unload event
+2015-07-01 19:26:53	jwong	and we clear the cache
+2015-07-01 19:27:08	jwong	but something is not right
+2015-07-01 19:27:25	jwong	any remembered steps to recreate would help a lot
+2015-07-01 19:27:35	jwong	like if it was multi tab in the same browser
+2015-07-01 19:27:53	jas	i think it is two browsers at the same time
+2015-07-01 19:28:04	jas	i had FF opened initially and Chrome later
+2015-07-01 19:28:11	jas	Will had it the other way round
+2015-07-01 19:28:26	jas	both of us did not see the rta call in the second browser
+2015-07-01 19:28:43	jas	Will in FF and myself in Chrome
+2015-07-01 19:29:00	jas	or two tab on the same browser
+2015-07-01 19:29:08	jas	has the same effect I guess
+2015-07-01 19:31:45	jwong	ok
+2015-07-01 19:32:05	jwong	i'll have to check if cross browser is possible
+2015-07-01 19:32:10	jwong	but that seems a little far fetched
+2015-07-01 19:32:17	jwong	im able to recreate with two tabs
+2015-07-01 19:32:29	jwong	and its def. something about the inconsistent state of the cache
+2015-07-01 19:32:49	jwong	the only reason we have that inconsistency is cause we're designed to be in isolated frames
+2015-07-01 19:33:01	jwong	the for sure route to solving this issue is to just make a global variable
+2015-07-01 19:33:37	jwong	but that means we cant reliably detect Criteo through Helix
+2015-07-01 19:36:03	jas	let me know what you want to do, or discuss with @walexander
+2015-07-01 19:36:34	jwong	we must revisit the locking
+2015-07-01 19:44:08	jwong	i think for two component ad tags, we need to rethink the assumptions about where we have already preloaded the demand partner's header tag
+2015-07-01 19:44:33	jwong	and that we cant serve the ad serving piece without the header
+2015-07-01 19:44:42	jwong	meaning you can never run criteo without nucleus
+2015-07-01 19:45:09	jwong	or you can never run any two component ad partner without nucleus
+2015-07-01 19:46:41	jwong	if we can agree to that assumption, that makes this fix and CX-779 a little less complex
+2015-07-02 12:29:07	jas	it is fair to assume that we will not be able to run Criteo without Nucleus
+2015-07-02 12:29:16	jas	same for MediaMath or Amazon
+2015-07-02 12:29:24	jwong	cool
+2015-07-02 12:29:59	jwong	i mean, we've seen first hand the kind of feedback we got when run these partners in remanent  helix tags
+2015-07-02 12:30:16	jwong	its inconsistent with their expectations of always loading on the page
+2015-07-02 12:30:21	jas	yrs,
+2015-07-02 12:30:23	jwong	and not by chance their ad server seves us
+2015-07-02 12:30:42	jas	Is will around today?
+2015-07-02 12:30:48	jwong	he should be
+2015-07-02 12:31:24	jwong	header tags = pub must run nucleus
+2015-07-02 12:32:37	jwong	the only reason we're dealing with locking issues is cause we are supporting helix tags loading the header tags
+2015-07-02 12:32:39	jas	to be clear, we are only planning on running Nucleus for our tech
+2015-07-02 12:32:40	jwong	and we dont wanna double load
+2015-07-02 12:33:27	jwong	so to prevent one iframe from loading the rta tag ,ie, we need to set a lock in localstorage and hope other frames see it so they dont not load rta as well
+2015-07-02 12:33:49	jwong	if we assume rta is only loaded through nucleus, we can simplify this a bit
+2015-07-02 12:34:17	jas	can you join the backlog call?
+2015-07-02 12:34:21	jwong	sure
+2015-07-02 12:34:29	jas	thanks
+2015-07-02 12:58:24	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-782 --- 
+2015-07-02 12:58:26	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-791 --- 
+2015-07-02 13:18:10	jwong	@jas the work for CX-771 is complete but i will need time to implement the automated acceptance criteria
+2015-07-02 13:18:44	jwong	i also had to adjust some logic around when we fire a passback event
+2015-07-02 13:19:00	jwong	we had some assumptions that we only fire a passback event if we have a set floor
+2015-07-02 13:19:17	jwong	i took that check out in order to satisfies those scenarios
+2015-07-02 13:19:49	jwong	please lmk if the original usage of the passback event is even relevant ( APN default creative with CPM 0.0)
+2015-07-02 13:29:12	jas	so what is the change you made on the passbacks?
+2015-07-02 13:29:56	jwong	this is the logic we had in place to determine whether we are allowed to fire a passback event
+2015-07-02 13:30:26	jas	passback tags will have some kind of floor
+2015-07-02 13:30:30	jwong	1) the offer needs to have a creative
+2015-07-02 13:30:30		2) the helix tag must have a non-zero flooor value
+2015-07-02 13:30:30		3) the offer cannot be claimed
+2015-07-02 13:30:35	jwong	```
+2015-07-02 13:30:35		        if(!offer || !offer.canDisplay() || offer.isClaimed() || floor <= 0)
+2015-07-02 13:30:35		```
+2015-07-02 13:30:40	jas	and they will passback only if they cannot find any demand above that floor
+2015-07-02 13:30:58	jwong	ok so that means default tags need a floor , or
+2015-07-02 13:31:16	jwong	we can assume that logic is old and not having a floor set is acceptable
+2015-07-02 13:31:22	jwong	as long as the default has a creative to show
+2015-07-02 13:31:45	jwong	i did chose the latter
+2015-07-02 13:32:43	jwong	floor = the entire impression's floor
+2015-07-02 13:32:59	jwong	so the auction must clear above this amount
+2015-07-02 13:33:11	jas	where does default tag come into picture for passbacks
+2015-07-02 13:33:37	jwong	i think we need to name these different cause its kind confusing
+2015-07-02 13:34:11	jwong	a tag that passes back through our pixel, vs a tag that is the publisher default passback tag
+2015-07-02 13:35:08	jwong	do u see/agree with the difference there
+2015-07-02 13:54:49	jas	yes, the passback intent of the tag v/s the default tag
+2015-07-02 13:57:40	jwong	Right so the original logic was that we wont consider the default tag unless there is a floor set on the impression context
+2015-07-02 14:49:22	jwong	anyways... lmk if this change is permitted
+2015-07-02 14:49:29	jwong	for now im disabling this test
+2015-07-02 14:49:29		```
+2015-07-02 14:49:29		asyncTest('should ignore default bidder if no floor is set', function() {
+2015-07-02 14:49:29		```
+2015-07-02 15:21:23	jwong	wish i had a good way to demo time
+2015-07-02 15:21:39	jwong	showing the delivery cap period elapsing
+2015-07-02 15:59:28	jas	it was a good demo nevertheless
+2015-07-02 16:07:02	jas	can you join the Pulsepoint call if possible?
+2015-07-02 16:07:08	walexander	yeah
+2015-07-02 16:07:14	jwong	did u guys need me as well?
+2015-07-02 16:07:31	jas	one of you
+2015-07-02 16:07:41	jwong	u da winner @walexander
+2015-07-02 16:07:53	jwong	clear. close, fire('joined')
+2015-07-02 16:36:24	jwong	ive broken cloudx
+2015-07-02 16:37:13	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F075581EH/screen_shot_2015-07-02_at_1.36.46_pm.png|Screen Shot 2015-07-02 at 1.36.46 PM.png>
+2015-07-02 16:37:30	walexander	lol 
+2015-07-02 16:37:36	jwong	cx-771 has changed everything we know about the auction
+2015-07-02 16:38:14	jwong	j/k, its because we rely on the real implementation of the bidder in a lot of places
+2015-07-02 16:38:18	walexander	at least it's failing fast ;-)  shade under 20,000 seconds 
+2015-07-02 16:38:43	jwong	bidder -> bidder/manifest -> impressionContext
+2015-07-02 16:39:52	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX1QQG/screen_shot_2015-06-25_at_5.39.24_pm.png|This is chrome 36 Win7 on a cookied user:> to this channel.
+2015-07-02 16:39:54	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX46PN/screen_shot_2015-06-25_at_5.39.03_pm.png|This is chrome 36 Win7 on a *cookie-less* user:> to this channel.
+2015-07-02 16:40:07	jwong	@walexander  @jas  checkout that waterfall
+2015-07-02 16:40:26	jwong	async vs sync firing of the cleared event
+2015-07-02 16:41:19	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RTTAHH/screen_shot_2015-06-25_at_3.52.08_pm.png|Screen Shot 2015-06-25 at 3.52.08 PM.png> to this channel.
+2015-07-02 16:42:19	walexander	navigator.sendBeacon()
+2015-07-02 16:46:06	jwong	```
+2015-07-02 16:46:06		The Device APIs Working Group is currently not pursuing the approach outlined in this draft, so it should be considered historical. 
+2015-07-02 16:46:06		```
+2015-07-02 16:47:11	jwong	https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+2015-07-02 16:47:15	jwong	whoops wrong link
+2015-07-02 16:47:21	jwong	iiiiiiinteresting
+2015-07-02 16:47:44	jwong	so backwards compatibility on older browsers that dont support this...
+2015-07-02 16:47:53	jwong	worst-case; we are blocking on unload
+2015-07-02 16:48:27	jwong	but overall, unload is out best mechanism to determine an impression abandonment
+2015-07-02 16:49:55	jwong	maybe we revisit the idea of queuing databus events
+2015-07-02 16:50:25	jwong	so that the time from injection -> cleared -> filled we have these events persisted in cache
+2015-07-02 16:50:49	jwong	and on new page visits we flush the queue but instead of cleared, we mark them as abandoned
+2015-07-02 17:06:16	jwong	_wishes_ qunit recognizes the MUT and stubs everything for you _
+2015-07-02 17:48:50	jwong	this is new 
+2015-07-02 17:48:50		```
+2015-07-02 17:48:50		Failed to clear temp storage: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources. SecurityError
+2015-07-02 17:48:50		```
+2015-07-02 17:48:53	jwong	error in chrome
+2015-07-02 18:01:33	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F0758HGJY/screen_shot_2015-07-02_at_2.55.42_pm.png|Pure Network auction vs Network + Direct auction> and commented: if we can assume a pure network auction, we can get rid of (1) and (2) which shaves off a lot of the auction build time. ( ie. forking new configs in the impression context )
+2015-07-02 19:03:05	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-800 --- 
+2015-07-02 19:08:08	-jira-	Jasanjot Singh created Epic https://beanstockmedia.atlassian.net/browse/CX-801 --- 
+2015-07-02 19:36:24	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|31 new commits> by jwong-beanstock
+2015-07-02 19:41:40	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1631|#1631>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 19:41:40		 - bidder/update_manifest: added passback tracker and shouldFetch update (<https://github.com/Walexander/uberssp/commit/79396b90c5da37af523c71a54b465ab66e63adb7|79396b9> by jsnwng) and <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|30 more>
+2015-07-02 19:41:40		Failing tests: nucleus#collect()+PriceCache: should store targeted prices in UserCache[&quot;config:price_cache_prefix/cx$wx$h&quot;] - in ...
+2015-07-02 21:02:18	jwong	happy fourth everyone
+2015-07-02 21:03:04	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/commit/2696ba5|1 new commit> by jwong-beanstock
+2015-07-02 21:11:01	-B02QCRGB2-	--- Fixed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1632|#1632>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 21:11:01		 - test/unit/nucleus: update tests stub bidder/update_manifest (<https://github.com/Walexander/uberssp/commit/2696ba50264154019f167850c8fe6c0544298267|2696ba5> by jsnwng)
+2015-07-06 14:07:02	jwong	grunt karma:test
+2015-07-06 15:32:05	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/2696ba502641...0a50becb6729|3 new commits> by jwong-beanstock
+2015-07-06 15:32:55	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/compare/3e0b63824e1e...5917008ade51|38 new commits> by jwong-beanstock
+2015-07-06 15:35:52	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/commit/884990e|1 new commit> by jwong-beanstock
+2015-07-06 15:36:14	-B04DXCZ4W-	--- [uberssp] <https://github.com/Walexander/uberssp/tree/release%2F1.60|release/1.60> was branched from "develop" and pushed by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-737" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-747" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-763" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-765" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-771" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-776" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.58" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.56" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "bug/CX-361" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/sync" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-491" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-302" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [Walexander/uberssp] Pull request closed: <https://github.com/Walexander/uberssp/pull/224|#224 CX-49: Refactor Manifest to Composite pattern> by <https://github.com/jsnwng|jsnwng>
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-544" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-712" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-645" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/cucumber" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/fixing-mocks" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-687" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-736" was deleted by jsnwng
+2015-07-06 15:45:51	jwong	sorry.. that was the last batch
+2015-07-06 15:51:02	-B02QCRGB2-	--- Success:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1636|#1636>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/release%2F1.60|release/1.60>)
+2015-07-06 15:51:02		 -  (<https://github.com/Walexander/uberssp/commit/884990ed5d86a3253ed2bc7a4b2020b364f35de0|884990e> by )
+2015-07-06 15:58:11	jwong	RE: impression metrics
+2015-07-06 15:58:11		/request -> /cleared - /filled
+2015-07-06 15:58:13	jwong	```
+2015-07-06 15:58:13		Ad Impression – A measurement of responses from an ad delivery system to an ad request from
+2015-07-06 15:58:13		the user's browser, which is filtered from robotic activity and is recorded at a point as late as possible
+2015-07-06 15:58:13		in the process of delivery of the creative material to the user's browser — therefore closest to
+2015-07-06 15:58:13		actual opportunity to see by the user (see specifics below).
+2015-07-06 15:58:13		```
+2015-07-06 15:59:43	jwong	given our data that shows a majority of cookie-less visits and the way browsers prioritize the creative load over our /cleared
+2015-07-06 16:00:05	jwong	i think we can get more visibility as to why we are discrepant if we analyze /cleared -> /filled
+2015-07-06 16:00:58	jwong	but first we need to implement the filled to sync auctions and move the /cleared before the creative load
+2015-07-06 16:03:06	jwong	that will show us if its really on us and our code thats causing the discrepancy
+2015-07-06 16:03:20	jwong	or its load of the creative
+2015-07-06 16:05:29	jwong	/request to /cleared discrepancy means there is a problem with the auction process
+2015-07-06 16:05:29		/cleared to /filled discrepancy means there is user abandonment during creative load
+2015-07-06 16:08:54	jas	i agree with the above logic
+2015-07-06 16:09:14	jas	i did start some checks on it last week and the trends are all over the place
+2015-07-06 16:09:34	jas	it can vary widely depending upon the site especially for the filled events
+2015-07-06 16:10:42	jwong	yeah.. although all the patches that went out last week on 1.58.x were very much needed,  at least this distinction can help us get focused quicker on the source of the problem
+2015-07-06 16:10:53	jwong	and to prove what is out of our control
+2015-07-06 16:10:55	jas	yep
+2015-07-06 16:11:41	jwong	@jas if u see the screenshot of the js profile i took of the auction
+2015-07-06 16:12:06	jwong	u can see theres areas where we can shave a lot of time off our /request to /cleared
+2015-07-06 16:12:17	jas	yes, I saw the ones from Friday
+2015-07-06 16:12:22	jwong	if we dont assume network + direct bidders
+2015-07-06 16:12:41	jwong	brb.. must eat lunch before my call
+2015-07-06 16:18:07	jas	@jwong let me know how the Criteo bugs are coming along, I need to follow up with them
+2015-07-06 16:23:17	jwong	I should have an update
+2015-07-06 16:23:19	jwong	Eod
+2015-07-06 16:23:36	jwong	I wanted to clean the workspcae before starting
+2015-07-06 16:24:00	jwong	Ill dev off master so that this isnt blocked by reviewing 1.60
+2015-07-06 16:24:12	jwong	And we can release as a patch for 1.58
+2015-07-06 16:57:30	jas	sounds good to me
+2015-07-06 16:57:45	jas	is the auction still broken on 1.60?
+2015-07-06 17:54:13	jwong	what do u mean by broken?
+2015-07-06 17:57:29	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-802 --- 
+2015-07-06 18:06:26	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-803 --- 
+2015-07-06 18:59:09	jwong	it looks like we are never getting a chance to define `googletag` before the real library does
+2015-07-06 18:59:13	jwong	in firefox
+2015-07-06 20:02:25	jwong	in all browsers
+2015-07-07 12:38:52	jwong	@jas should the invalid penalty apply to criteo in nucleus ?
+2015-07-07 12:39:31	jwong	so if criteo says no to nucleus 3 times in a row
+2015-07-07 12:39:43	jas	yes, that's fine
+2015-07-07 12:39:56	jas	did you see their email in the morning
+2015-07-07 12:40:06	jas	let me know what we need to tell them
+2015-06-30 16:50:57	-B04DXCZ4W-	--- [uberssp] New tag <https://github.com/Walexander/uberssp/compare/v1.58.4|v1.58.4> was pushed by jsnwng
+2015-06-30 17:15:46	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1628|#1628>; retry by jsnwng in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/master|master>)
+2015-06-30 17:15:46		 - Bump 1.58.4 (<https://github.com/Walexander/uberssp/commit/78e87b633639e40e59cb0a00d2843e5e567a26a5|78e87b6> by jsnwng) and <https://github.com/Walexander/uberssp/compare/a4ac0dd50dbb...78e87b633639|1 more>
+2015-06-30 17:15:46		Failing tests: auction#display(): should reclear when Offer#display() rejects - in ie 10
+2015-06-30 17:38:44	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1629|#1629>; retry by jsnwng in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/master|master>)
+2015-06-30 17:38:44		 - Bump 1.58.4 (<https://github.com/Walexander/uberssp/commit/78e87b633639e40e59cb0a00d2843e5e567a26a5|78e87b6> by jsnwng) and <https://github.com/Walexander/uberssp/compare/a4ac0dd50dbb...78e87b633639|1 more>
+2015-06-30 17:38:44		Failing tests: auction#display(): should reclear when Offer#display() rejects - in ie 10
+2015-06-30 17:48:05	-B02QCRGB2-	--- Fixed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1630|#1630>; retry by jsnwng in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/master|master>)
+2015-06-30 17:48:05		 - Bump 1.58.4 (<https://github.com/Walexander/uberssp/commit/78e87b633639e40e59cb0a00d2843e5e567a26a5|78e87b6> by jsnwng) and <https://github.com/Walexander/uberssp/compare/a4ac0dd50dbb...78e87b633639|1 more>
+2015-07-01 13:32:31	jas	@jwong would you have a chance to look at the Criteo issues today?
+2015-07-01 13:34:50	jwong	its on my list todo after lunch
+2015-07-01 14:51:46	jas	also, when can we close sprint 29?
+2015-07-01 14:51:58	jwong	ill do it later today
+2015-07-01 14:52:07	jas	thanks
+2015-07-01 19:05:04	jas	@jwong looks like the boosters showing up as load impressions is fixed now
+2015-07-01 19:05:07	jas	great work!
+2015-07-01 19:05:19	jas	:thumbsup:
+2015-07-01 19:05:33	jwong	:+1:
+2015-07-01 19:19:14	jwong	@jas  Thanks for the feedback. seems like the code we have to "unlock" the criteo load is stuck
+2015-07-01 19:19:46	jwong	so theres some scenario where the browser fails to clear the local storage entry on page unload
+2015-07-01 19:20:29	jwong	and leaves the browser in an inconsistent state.. if you can, try opening up dev tools and deleteing the entry `cx/criteo/load/4117` on a http://spanishdict.com visit
+2015-07-01 19:25:45	jas	so whats the right way to not get it stuck?
+2015-07-01 19:25:57	jas	clean it explicitly every page load?
+2015-07-01 19:26:16	jwong	thats what im trying to recreate
+2015-07-01 19:26:21	jas	ok great
+2015-07-01 19:26:49	jwong	we try that.. we listen for the page unload event
+2015-07-01 19:26:53	jwong	and we clear the cache
+2015-07-01 19:27:08	jwong	but something is not right
+2015-07-01 19:27:25	jwong	any remembered steps to recreate would help a lot
+2015-07-01 19:27:35	jwong	like if it was multi tab in the same browser
+2015-07-01 19:27:53	jas	i think it is two browsers at the same time
+2015-07-01 19:28:04	jas	i had FF opened initially and Chrome later
+2015-07-01 19:28:11	jas	Will had it the other way round
+2015-07-01 19:28:26	jas	both of us did not see the rta call in the second browser
+2015-07-01 19:28:43	jas	Will in FF and myself in Chrome
+2015-07-01 19:29:00	jas	or two tab on the same browser
+2015-07-01 19:29:08	jas	has the same effect I guess
+2015-07-01 19:31:45	jwong	ok
+2015-07-01 19:32:05	jwong	i'll have to check if cross browser is possible
+2015-07-01 19:32:10	jwong	but that seems a little far fetched
+2015-07-01 19:32:17	jwong	im able to recreate with two tabs
+2015-07-01 19:32:29	jwong	and its def. something about the inconsistent state of the cache
+2015-07-01 19:32:49	jwong	the only reason we have that inconsistency is cause we're designed to be in isolated frames
+2015-07-01 19:33:01	jwong	the for sure route to solving this issue is to just make a global variable
+2015-07-01 19:33:37	jwong	but that means we cant reliably detect Criteo already loaded through a remnant Helix
+2015-07-01 19:36:03	jas	let me know what you want to do, or discuss with @walexander
+2015-07-01 19:36:34	jwong	we must revisit the locking
+2015-07-01 19:44:08	jwong	i think for two component ad tags, we need to rethink the assumptions about where we have already preloaded the demand partner's header tag
+2015-07-01 19:44:33	jwong	and that we cant serve the ad serving piece without the header
+2015-07-01 19:44:42	jwong	meaning you can never run criteo without nucleus
+2015-07-01 19:45:09	jwong	or you can never run any two component ad partner without nucleus
+2015-07-01 19:46:41	jwong	if we can agree to that assumption, that makes this fix and CX-779 a little less complex
+2015-07-02 12:29:07	jas	it is fair to assume that we will not be able to run Criteo without Nucleus
+2015-07-02 12:29:16	jas	same for MediaMath or Amazon
+2015-07-02 12:29:24	jwong	cool
+2015-07-02 12:29:59	jwong	i mean, we've seen first hand the kind of feedback we got when run these partners in remanent  helix tags
+2015-07-02 12:30:16	jwong	its inconsistent with their expectations of always loading on the page
+2015-07-02 12:30:21	jas	yes
+2015-07-02 12:30:23	jwong	and not by chance that their ad server serves us
+2015-07-02 12:30:42	jas	Is will around today?
+2015-07-02 12:30:48	jwong	he should be
+2015-07-02 12:31:24	jwong	header tags = pub must run nucleus
+2015-07-02 12:32:37	jwong	the only reason we're dealing with locking issues is cause we are supporting helix tags loading the header tags
+2015-07-02 12:32:39	jas	to be clear, we are only planning on running Nucleus for our tech
+2015-07-02 12:32:40	jwong	and we dont wanna double load
+2015-07-02 12:33:27	jwong	so to prevent one iframe from loading the rta tag ,ie, we need to set a lock in localstorage and hope other frames see it so they dont not load rta as well
+2015-07-02 12:33:49	jwong	if we assume rta is only loaded through nucleus, we can simplify this a bit
+2015-07-02 12:34:17	jas	can you join the backlog call?
+2015-07-02 12:34:21	jwong	sure
+2015-07-02 12:34:29	jas	thanks
+2015-07-02 12:58:24	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-782 --- 
+2015-07-02 12:58:26	-jira-	Jason Wong completed User Story Task https://beanstockmedia.atlassian.net/browse/CX-791 --- 
+2015-07-02 13:18:10	jwong	@jas the work for CX-771 is complete but i will need time to implement the automated acceptance criteria
+2015-07-02 13:18:44	jwong	i also had to adjust some logic around when we fire a passback event
+2015-07-02 13:19:00	jwong	we had some assumptions that we only fire a passback event if we have a set floor
+2015-07-02 13:19:17	jwong	i took that check out in order to satisfy those scenarios
+2015-07-02 13:19:49	jwong	please lmk if the original usage of the passback event is even relevant ( Non-exclusive APNonly; default creative with CPM 0.0 + `floor` set to non-zero )
+2015-07-02 13:29:12	jas	so what is the change you made on the passbacks?
+2015-07-02 13:29:56	jwong	this is the logic we had in place to determine whether we are allowed to fire a passback event
+2015-07-02 13:30:26	jas	passback tags will have some kind of floor
+2015-07-02 13:30:30	jwong	1) the offer needs to have a creative
+2015-07-02 13:30:30		2) the helix tag must have a non-zero flooor value
+2015-07-02 13:30:30		3) the offer cannot be claimed
+2015-07-02 13:30:35	jwong	```
+2015-07-02 13:30:35		        if(!offer || !offer.canDisplay() || offer.isClaimed() || floor <= 0)
+2015-07-02 13:30:35		```
+2015-07-02 13:30:40	jas	and they will passback only if they cannot find any demand above that floor
+2015-07-02 13:30:58	jwong	ok so that means default tags need a floor , or
+2015-07-02 13:31:16	jwong	we can assume that logic is old and not having a floor set is acceptable
+2015-07-02 13:31:22	jwong	as long as the default has a creative to show
+2015-07-02 13:31:45	jwong	i chose the latter
+2015-07-02 13:32:43	jwong	floor = the entire impression's floor
+2015-07-02 13:32:59	jwong	so the auction must clear above this amount
+2015-07-02 13:33:11	jas	where does default tag come into picture for passbacks
+2015-07-02 13:33:37	jwong	i think we need to name these different cause its kind confusing
+2015-07-02 13:34:11	jwong	a tag that passes back through our pixel, vs a tag that is the publisher default passback tag
+2015-07-02 13:35:08	jwong	do u see/agree with the difference there
+2015-07-02 13:54:49	jas	yes, the passback intent of the tag v/s the default tag
+2015-07-02 13:57:40	jwong	Right so the original logic was that we wont consider the default tag unless there is a floor set on the impression context
+2015-07-02 14:49:22	jwong	anyways... lmk if this change is permitted
+2015-07-02 14:49:29	jwong	for now im disabling this test
+2015-07-02 14:49:29		```
+2015-07-02 14:49:29		asyncTest('should ignore default bidder if no floor is set', function() {
+2015-07-02 14:49:29		```
+2015-07-02 15:21:23	jwong	wish i had a good way to demo time
+2015-07-02 15:21:39	jwong	showing the delivery cap period elapsing
+2015-07-02 15:59:28	jas	it was a good demo nevertheless
+2015-07-02 16:07:02	jas	can you join the Pulsepoint call if possible?
+2015-07-02 16:07:08	walexander	yeah
+2015-07-02 16:07:14	jwong	did u guys need me as well?
+2015-07-02 16:07:31	jas	one of you
+2015-07-02 16:07:41	jwong	u da winner @walexander
+2015-07-02 16:07:53	jwong	clear. close, fire('joined')
+2015-07-02 16:36:24	jwong	ive broken cloudx
+2015-07-02 16:37:13	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F075581EH/screen_shot_2015-07-02_at_1.36.46_pm.png|Screen Shot 2015-07-02 at 1.36.46 PM.png>
+2015-07-02 16:37:30	walexander	lol 
+2015-07-02 16:37:36	jwong	cx-771 has changed everything we know about the auction
+2015-07-02 16:38:14	jwong	j/k, its because we rely on the real implementation of the bidder in a lot of places
+2015-07-02 16:38:18	walexander	at least it's failing fast ;-)  shade under 20,000 seconds 
+2015-07-02 16:38:43	jwong	bidder -> bidder/manifest -> impressionContext
+2015-07-02 16:39:52	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX1QQG/screen_shot_2015-06-25_at_5.39.24_pm.png|This is chrome 36 Win7 on a cookied user:> to this channel.
+2015-07-02 16:39:54	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RX46PN/screen_shot_2015-06-25_at_5.39.03_pm.png|This is chrome 36 Win7 on a *cookie-less* user:> to this channel.
+2015-07-02 16:40:07	jwong	@walexander  @jas  checkout that waterfall
+2015-07-02 16:40:26	jwong	async vs sync firing of the cleared event
+2015-07-02 16:41:19	jwong	@jwong pinned their Image <https://beanstock.slack.com/files/jwong/F06RTTAHH/screen_shot_2015-06-25_at_3.52.08_pm.png|Screen Shot 2015-06-25 at 3.52.08 PM.png> to this channel.
+2015-07-02 16:42:19	walexander	navigator.sendBeacon()
+2015-07-02 16:46:06	jwong	```
+2015-07-02 16:46:06		The Device APIs Working Group is currently not pursuing the approach outlined in this draft, so it should be considered historical. 
+2015-07-02 16:46:06		```
+2015-07-02 16:47:11	jwong	https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon --- Mozilla Developer Network: Navigator.sendBeacon()
+2015-07-02 16:47:15	jwong	whoops wrong link
+2015-07-02 16:47:21	jwong	iiiiiiinteresting
+2015-07-02 16:47:44	jwong	so backwards compatibility on older browsers that dont support this...
+2015-07-02 16:47:53	jwong	worst-case; we are blocking on unload
+2015-07-02 16:48:27	jwong	but overall, unload is our best mechanism to determine an impression abandonment
+2015-07-02 16:49:55	jwong	maybe we revisit the idea of queuing databus events
+2015-07-02 16:50:25	jwong	so that the time from injection -> cleared -> filled we have these events persisted in cache
+2015-07-02 16:50:49	jwong	and on new page visits we flush the queue but instead of cleared, we mark them as abandoned
+2015-07-02 17:06:16	jwong	_wishes_ qunit recognizes the MUT and stubs everything for you _
+2015-07-02 17:48:50	jwong	this is new 
+2015-07-02 17:48:50		```
+2015-07-02 17:48:50		Failed to clear temp storage: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources. SecurityError
+2015-07-02 17:48:50		```
+2015-07-02 17:48:53	jwong	error in chrome
+2015-07-02 18:01:33	jwong	@jwong uploaded a file: <https://beanstock.slack.com/files/jwong/F0758HGJY/screen_shot_2015-07-02_at_2.55.42_pm.png|Pure Network auction vs Network + Direct auction> and commented: if we can assume a pure network auction, we can get rid of (1) and (2) which shaves off a lot of the auction build time. ( ie. forking new configs in the impression context )
+2015-07-02 19:03:05	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-800 --- 
+2015-07-02 19:08:08	-jira-	Jasanjot Singh created Epic https://beanstockmedia.atlassian.net/browse/CX-801 --- 
+2015-07-02 19:36:24	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|31 new commits> by jwong-beanstock
+2015-07-02 19:41:40	-B02QCRGB2-	--- Failed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1631|#1631>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 19:41:40		 - bidder/update_manifest: added passback tracker and shouldFetch update (<https://github.com/Walexander/uberssp/commit/79396b90c5da37af523c71a54b465ab66e63adb7|79396b9> by jsnwng) and <https://github.com/Walexander/uberssp/compare/b1e613e4a6ad...79396b90c5da|30 more>
+2015-07-02 19:41:40		Failing tests: nucleus#collect()+PriceCache: should store targeted prices in UserCache[&quot;config:price_cache_prefix/cx$wx$h&quot;] - in ...
+2015-07-02 21:02:18	jwong	happy fourth everyone
+2015-07-02 21:03:04	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/commit/2696ba5|1 new commit> by jwong-beanstock
+2015-07-02 21:11:01	-B02QCRGB2-	--- Fixed:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1632|#1632>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/wip%2FCX-771|wip/CX-771>)
+2015-07-02 21:11:01		 - test/unit/nucleus: update tests stub bidder/update_manifest (<https://github.com/Walexander/uberssp/commit/2696ba50264154019f167850c8fe6c0544298267|2696ba5> by jsnwng)
+2015-07-06 14:07:02	jwong	grunt karma:test
+2015-07-06 15:32:05	-B04DXCZ4W-	--- [uberssp:wip/CX-771] <https://github.com/Walexander/uberssp/compare/2696ba502641...0a50becb6729|3 new commits> by jwong-beanstock
+2015-07-06 15:32:55	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/compare/3e0b63824e1e...5917008ade51|38 new commits> by jwong-beanstock
+2015-07-06 15:35:52	-B04DXCZ4W-	--- [uberssp:develop] <https://github.com/Walexander/uberssp/commit/884990e|1 new commit> by jwong-beanstock
+2015-07-06 15:36:14	-B04DXCZ4W-	--- [uberssp] <https://github.com/Walexander/uberssp/tree/release%2F1.60|release/1.60> was branched from "develop" and pushed by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-737" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-747" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-763" was deleted by jsnwng
+2015-07-06 15:38:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/CX-765" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-771" was deleted by jsnwng
+2015-07-06 15:38:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-776" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.58" was deleted by jsnwng
+2015-07-06 15:39:29	-B04DXCZ4W-	--- [uberssp] The branch "release/1.56" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "bug/CX-361" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "hotfix/sync" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-491" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-302" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [Walexander/uberssp] Pull request closed: <https://github.com/Walexander/uberssp/pull/224|#224 CX-49: Refactor Manifest to Composite pattern> by <https://github.com/jsnwng|jsnwng>
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-544" was deleted by jsnwng
+2015-07-06 15:45:41	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-712" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-645" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/cucumber" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/fixing-mocks" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-687" was deleted by jsnwng
+2015-07-06 15:45:42	-B04DXCZ4W-	--- [uberssp] The branch "wip/CX-736" was deleted by jsnwng
+2015-07-06 15:45:51	jwong	sorry.. that was the last batch
+2015-07-06 15:51:02	-B02QCRGB2-	--- Success:  jsnwng's build (<https://circleci.com/gh/Walexander/uberssp/1636|#1636>; push in <https://circleci.com/gh/Walexander/uberssp|Walexander/uberssp> (<https://circleci.com/gh/Walexander/uberssp/tree/release%2F1.60|release/1.60>)
+2015-07-06 15:51:02		 -  (<https://github.com/Walexander/uberssp/commit/884990ed5d86a3253ed2bc7a4b2020b364f35de0|884990e> by )
+2015-07-06 15:58:11	jwong	RE: impression metrics
+2015-07-06 15:58:11		/request -> /cleared - /filled
+2015-07-06 15:58:13	jwong	```
+2015-07-06 15:58:13		Ad Impression – A measurement of responses from an ad delivery system to an ad request from
+2015-07-06 15:58:13		the user's browser, which is filtered from robotic activity and is recorded at a point as late as possible
+2015-07-06 15:58:13		in the process of delivery of the creative material to the user's browser — therefore closest to
+2015-07-06 15:58:13		actual opportunity to see by the user (see specifics below).
+2015-07-06 15:58:13		```
+2015-07-06 15:59:43	jwong	given our data that shows a majority of cookie-less visits and the way browsers prioritize the creative load over our /cleared for sync auctions
+2015-07-06 16:00:05	jwong	i think we can get more visibility as to why we are discrepant if we analyze /cleared -> /filled
+2015-07-06 16:00:58	jwong	but first we need to implement the filled to sync auctions and move the /cleared before the creative load but after we determine a winner
+2015-07-06 16:03:06	jwong	that will show us if its really on us and our code thats causing the discrepancy
+2015-07-06 16:03:20	jwong	or its load of the creative
+2015-07-06 16:05:29	jwong	/request to /cleared discrepancy means there is a problem with the auction process
+2015-07-06 16:05:29		/cleared to /filled discrepancy means there is user abandonment during creative load
+2015-07-06 16:08:54	jas	i agree with the above logic
+2015-07-06 16:09:14	jas	i did start some checks on it last week and the trends are all over the place
+2015-07-06 16:09:34	jas	it can vary widely depending upon the site especially for the filled events
+2015-07-06 16:10:42	jwong	yeah.. although all the patches that went out last week on 1.58.x were very much needed,  at least this distinction can help us get focused quicker on the source of the problem
+2015-07-06 16:10:53	jwong	and to prove what is out of our control
+2015-07-06 16:10:55	jas	yep
+2015-07-06 16:11:41	jwong	@jas if u see the screenshot of the js profile i took of the auction
+2015-07-06 16:12:06	jwong	u can see theres areas where we can shave a lot of time off our /request to /cleared
+2015-07-06 16:12:17	jas	yes, I saw the ones from Friday
+2015-07-06 16:12:22	jwong	if we dont assume network + direct bidders
+2015-07-06 16:12:41	jwong	brb.. must eat lunch before my call
+2015-07-06 16:18:07	jas	@jwong let me know how the Criteo bugs are coming along, I need to follow up with them
+2015-07-06 16:23:17	jwong	I should have an update
+2015-07-06 16:23:19	jwong	Eod
+2015-07-06 16:23:36	jwong	I wanted to clean the workspcae before starting
+2015-07-06 16:24:00	jwong	Ill dev off master so that this isnt blocked by reviewing 1.60
+2015-07-06 16:24:12	jwong	And we can release as a patch for 1.58
+2015-07-06 16:57:30	jas	sounds good to me
+2015-07-06 16:57:45	jas	is the auction still broken on 1.60?
+2015-07-06 17:54:13	jwong	what do u mean by broken?
+2015-07-06 17:57:29	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-802 --- 
+2015-07-06 18:06:26	-jira-	Jasanjot Singh created Story https://beanstockmedia.atlassian.net/browse/CX-803 --- 
+2015-07-06 18:59:09	jwong	it looks like we are never getting a chance to define `googletag` before the real library does
+2015-07-06 18:59:13	jwong	in firefox
+2015-07-06 20:02:25	jwong	in all browsers
+2015-07-07 12:38:52	jwong	@jas should the invalid penalty apply to criteo in nucleus ?
+2015-07-07 12:39:31	jwong	so if criteo says no to nucleus 3 times in a row
+2015-07-07 12:39:43	jas	yes, that's fine
+2015-07-07 12:39:56	jas	did you see their email in the morning
+2015-07-07 12:40:06	jas	let me know what we need to tell them
