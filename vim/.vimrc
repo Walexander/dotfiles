@@ -45,6 +45,8 @@ Plugin 'itchyny/calendar.vim'
 Plugin 'xmledit'
 Plugin 'localvimrc'
 Plugin 'editorconfig-vim'
+Plugin 'repeat.vim'
+Plugin 'ntpeters/vim-better-whitespace'
 
 let g:calendar_google_calendar = 1
 
@@ -208,16 +210,22 @@ endif
 let g:slime_target="tmux"
 set noswapfile
 
-let g:vdebug_options = {}
-let g:vdebug_options['watch_window_style'] = 'compact'
-let g:vdebug_keymap  = {}
-let g:vdebug_keymap['run'] = '<Leader>r'
-let g:vdebug_keymap['break_on_open'] = 0 
-let g:vdebug_keymap['run_to_cursor'] = "<Leader>h"
-let g:vdebug_keymap['step_over'] = "<Leader>o"
-let g:vdebug_keymap['step_into'] = "<Leader>i"
-let g:vdebug_keymap['step_out'] = "<Leader>t"
-let g:vdebug_keymap['set_breakpoint'] = "<Leader>b"
+"let g:vdebug_options = {
+"	\	"port" : 9000,
+"	\	"server" : "localhost",
+"	\	"timeout" : 20,
+"	\	"watch_window_style" : 'compact',
+"	\	"ide_key" : '1',
+"	\	"on_close" : 'detach',
+"	\	}
+"let g:vdebug_keymap  = {}
+"let g:vdebug_keymap['run'] = '<Leader>r'
+"let g:vdebug_keymap['break_on_open'] = 0 
+"let g:vdebug_keymap['run_to_cursor'] = "<Leader>h"
+"let g:vdebug_keymap['step_over'] = "<Leader>o"
+"let g:vdebug_keymap['step_into'] = "<Leader>i"
+"let g:vdebug_keymap['step_out'] = "<Leader>t"
+"let g:vdebug_keymap['set_breakpoint'] = "<Leader>b"
 
 
 let g:localvimrc_ask=0
