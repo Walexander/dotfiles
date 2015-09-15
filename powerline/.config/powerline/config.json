@@ -6,6 +6,9 @@
 		},
 		"vim": {
 			"colorscheme": "default"
+		},
+		"tmux": {
+			"colorscheme": "default"
 		}
 	}
 }
