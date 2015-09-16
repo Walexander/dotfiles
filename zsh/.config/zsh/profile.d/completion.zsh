@@ -5,3 +5,6 @@ compinit
 zstyle ':completion:*' menu select=2
 
 complete -C '/usr/local/bin/aws_completer' aws
+zmodload zsh/complist
+bindkey -M menuselect '^M' .accept-line
+
