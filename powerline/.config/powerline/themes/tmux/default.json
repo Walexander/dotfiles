@@ -1,63 +1,36 @@
 {
         "segment_data": {
+                "time": {
+                  "before": " " ,
+                  "after": " 📆"  ,
+	          "args": { "format": "%m/%d %H:%M", "istime": true }
+                },
                 "cpu_load_percent" : {
-                    "before": "💻  "
+                    "after": " 💻  ",
+                    "align": "right",
+                    "display": false
                 },
                 "external_ip": {
-                  "before": "ⓦ  "
+                  "before": "📡  "
                 },
                 "weather": {
+                  "before" : " ",
                   "args": {
                     "unit": "F",
-                    "icons": {
-	                  "tornado":                 "☔",
-	                  "tropical_storm":          "☔",
-	                  "hurricane":               "☔",
-	                  "severe_thunderstorms":    "☔",
-	                  "thunderstorms":           "☔",
-	                  "mixed_rain_and_snow":     "⚡" ,
-	                  "mixed_rain_and_sleet":    "⚡" ,
-	                  "mixed_snow_and_sleet":    "❅" ,
-	                  "freezing_drizzle":        "⚡" ,
-	                  "drizzle":              "⚡r",
-	                  "freezing_rain":           "⚡" ,
-	                  "showers":                 "⚡" ,
-	                  "showers":                 "⚡" ,
-	                  "snow_flurries":           "❅" ,
-	                  "light_snow_showers":      "❅" ,
-	                  "blowing_snow":            "❅" ,
-	                  "snow":                    "❅" ,
-	                  "hail":                    "❅" ,
-	                  "sleet":                   "❅" ,
-	                  "dust":                    "♨" ,
-	                  "fog":                     "♨" ,
-	                  "haze":                    "♨" ,
-	                  "smoky":                   "♨" ,
-	                  "blustery":                "⚑" ,
-	                  "windy":                    "⚑" ,
-	                  "cold":                    "〇",
-	                  "clouds":                  "☁",
-	                  "mostly_cloudy_night":     "☁",
-	                  "mostly_cloudy_day":       "☁",
-	                  "partly_cloudy_night":     "☁",
-	                  "partly_cloudy_day":       "☁",
-	                  "clear_night":             "night" ,
-	                  "sun":                     "☾" ,
-	                  "fair_night":              "night" ,
-	                  "fair_day":                "☀️"   ,
-	                  "mixed_rain_and_hail":     "rainy" ,
-	                  "hot":                     "☀️" ,
-	                  "isolated_thunderstorms":  "☔",
-	                  "scattered_thunderstorms": "☔",
-	                  "scattered_thunderstorms": "☔",
-	                  "scattered_showers":       "rainy" ,
-	                  "heavy_snow":              "❅" ,
-	                  "scattered_snow_showers":  "❅" ,
-	                  "heavy_snow":              "❅" ,
-	                  "partly_cloudy":           "☁",
-	                  "thundershowers":          "☔ ",
-	                  "snow_showers":            "❅" ,
-	                  "isolated_thundershowers":"☔ "
+                    "location_query": "virginia beach, virginia",
+                    "icons":  {
+	              "day":           "🌞",
+	              "blustery":      "💨",
+	              "rainy":         "💧" ,
+	              "cloudy":        "☁️",
+	              "snowy":         "❄️",
+	              "stormy":        "☔️",
+	              "foggy":         "💨",
+	              "sunny":         "☀️" ,
+	              "night":         "🌝,",
+	              "windy":         "💨",
+	              "not_available": "NA",
+	              "unknown":       "UKN"
                     }
                   }
                 }
@@ -65,15 +38,20 @@
 	"segments": {
 	        "left": [
 	          {
-	            "function": "powerline.segments.common.wthr.weather",
-	            "name": "weather"
-	          },
-	          {
 	            "function": "powerline.segments.common.net.external_ip",
 	            "name": "external_ip"
 	          }
 	        ],
 		"right": [
+
+	            {
+	              "function": "powerline.segments.common.wthr.weather",
+	              "name": "weather"
+	            },
+	            {
+	              "function": "powerline.segments.common.sys.system_load",
+	              "name": "sys_load"
+	            },
 	            {
 	              "function": "powerline.segments.common.sys.cpu_load_percent",
 	              "name": "cpu_load_percent"
@@ -84,8 +62,7 @@
 		    },
 	            {
 	              "function": "powerline.segments.common.time.date",
-	              "name": "time",
-	              "args": { "format": "%m/%d %H:%M", "istime": true }
+	              "name": "time"
 	            }
 		]
 	}
