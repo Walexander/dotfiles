@@ -47,6 +47,7 @@ Plugin 'localvimrc'
 Plugin 'editorconfig-vim'
 Plugin 'repeat.vim'
 Plugin 'ntpeters/vim-better-whitespace'
+Plugin 'tejr/vim-tmux'
 
 let g:calendar_google_calendar = 1
 
