@@ -36,34 +36,36 @@
                 }
         },
 	"segments": {
-	        "left": [
-	          {
-	            "function": "powerline.segments.common.net.external_ip",
-	            "name": "external_ip"
-	          }
-	        ],
-		"right": [
+	  "left": [
+	  ],
+	  "right": [
 
-	            {
-	              "function": "powerline.segments.common.wthr.weather",
-	              "name": "weather"
-	            },
-	            {
-	              "function": "powerline.segments.common.sys.system_load",
-	              "name": "sys_load"
-	            },
-	            {
-	              "function": "powerline.segments.common.sys.cpu_load_percent",
-	              "name": "cpu_load_percent"
-	            },
-		    {
-		      "function": "powerline.segments.common.bat.battery",
-		      "args": { "format":"🔋  {capacity:3.0%}" }
-		    },
-	            {
-	              "function": "powerline.segments.common.time.date",
-	              "name": "time"
-	            }
-		]
+	    {
+	      "function": "powerline.segments.common.net.network_load",
+	      "display": false,
+	      "name": "net_load"
+	    },
+	    {
+	      "function": "powerline.segments.common.wthr.weather",
+	      "name": "weather",
+	      "display": false
+	    },
+	    {
+	      "function": "powerline.segments.common.sys.system_load",
+	      "name": "sys_load"
+	    },
+	    {
+	      "function": "powerline.segments.common.sys.cpu_load_percent",
+	      "name": "cpu_load_percent"
+	    },
+	    {
+	      "function": "powerline.segments.common.bat.battery",
+	      "args": { "format":"🔋  {capacity:3.0%}" }
+	    },
+	    {
+	      "function": "powerline.segments.common.time.date",
+	      "name": "time"
+	    }
+	  ]
 	}
 }

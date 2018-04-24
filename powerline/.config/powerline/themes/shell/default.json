@@ -19,12 +19,14 @@
         "left": [
           {
 	    "function": "powerline.segments.common.time.date",
-	    "args": { "format": "%H:%M:%S.%f" }
+	    "args": { "format": "%H:%M:%S.%f%Z", "istime": true }
           },
           {
             "name": "cwd",
 	    "function": "powerline.segments.shell.cwd"
           }
+        ],
+        "right" : [
         ]
       }
     ],
