@@ -14,11 +14,15 @@
 	"mocha", "chai", "it", "beforeEach", "before",
 	"after", "afterEach", "flog", "global", "QUnit"
   ],
-  "unused": false,
   "indent": false,
+  "esversion": 6,
   "-W087": true,
   "multistr": true,
   "-W099": true,
   "-W030": true,
-  "-W058": true
+  "-W058": true,
+  "-W085" : true,
+  "-W107": true ,
+  "-W003": true,
+  "-W014": true
 }
