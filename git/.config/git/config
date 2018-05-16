@@ -15,4 +15,4 @@
 	smudge = git media smudge %f
 	required = true
 [branch]
-	autosetupmerge = always
+    autosetuprebase = always
