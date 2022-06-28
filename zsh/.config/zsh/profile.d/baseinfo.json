@@ -1,0 +1,31 @@
+[
+  {
+    "base-name-ig": "ABERDEEN PROVING GROUND",
+    "service-ig": "Army",
+    "overseas-ig": "Sample Data",
+    "statecountry-ig": "MARYLAND",
+    "description-ig": "Aberdeen Proving Ground is located 23 miles northeast of Baltimore, just off of the Chesapeake Bay. It is one of the world’s most important research, development, testing and evaluation facilities for military weapons and equipment.",
+    "population-ig": "903 active, 1,935 dependents",
+    "zip-ig": "21005 ",
+    "citymetro-ig": "Harford County ",
+    "main-ig": "(410) 278-2464, (410) 278-7572 DSN 312-298-7572",
+    "information-and-referral-services-ig": "",
+    "appointments-ig": "",
+    "housing-ig": "(410) 306-2002/2011/2003, DSN 312-458-2011",
+    "child-care-ig": "(410) 278-7479/7571, DSN 312-298-7479",
+    "schools-ig": "(410) 278-2857, DSN 312-298-2857",
+    "youth-services-ig": "",
+    "family-ig": "",
+    "temporary-lodging-ig": "(410) 278-5148/5149/4374, DSN 312-298-5148",
+    "health-care-ig": "(410) 278-5475, DSN 312-298-5475",
+    "air-terminal-ig": "",
+    "commissary-number-ig": "(410) 278-3101, DSN 312-298-3101",
+    "exchange-number-ig": "(410) 272-6828, DSN 312-298-0264",
+    "exchange-ig": "(410) 272-6828, DSN 312-298-0264",
+    "recreation-ig": "$base_recreation",
+    "museum-ig": "",
+    "campground-ig": "Skipper’s Point Recreation Area: RV sites, tent sites (410) 671-4732",
+    "other-services-ig": "$base_other",
+    "chaplain-ig": ""
+  }
+]

@@ -20,13 +20,11 @@ fu! CustomFoldText()
     let expansionString = repeat(".", w - strwidth(lineLen . foldLine))
 	return lineLen . expansionString . foldLine
 endf
-setlocal foldenable
-setlocal foldmethod=syntax
-set foldtext=CustomFoldText()
-set fillchars="fold: " 
+"setlocal foldenable
+"setlocal foldmethod=syntax
+"set foldtext=CustomFoldText()
+" set fillchars="fold: " 
 
-hi Folded term=NONE cterm=NONE gui=NONE 
-let g:indent_guides_start_level=1
-let g:indent_guides_guide_size=1
-
-
+" hi Folded term=NONE cterm=NONE gui=NONE 
+" let g:indent_guides_start_level=1
+" let g:indent_guides_guide_size=1

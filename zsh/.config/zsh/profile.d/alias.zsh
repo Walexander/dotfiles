@@ -20,3 +20,4 @@ alias greentunnel='ssh -L 5441:dwh.mbid.io:5439 jump.mbid.io -l ubuntu -N &'
 alias bluetunnel="ssh -L 5440:helixdwh.blue.prod.beanstock.net:5439 ec2-54-85-158-4.compute-1.amazonaws.com -l will -N &"
 alias less='less -r'
 alias more=less
+alias icat='/Applications/kitty.app/Contents/MacOS/kitty  +kitten icat'
