@@ -5,7 +5,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-PROFILE_STARTUP=true
+PROFILE_STARTUP=false
 if [[ "$PROFILE_STARTUP" == true ]]; then
     # http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html
     PS4=$'%D{%M%S%.} %N:%i> '
@@ -35,17 +35,18 @@ if [ -f '/private/var/folders/xr/xgxjjj5123xdmn7pr821vv9h0000gn/T/tmp.TZR25O79RL
 
 # tabtab source for packages
 # uninstall by removing these lines
-[[ -f ~/.config/tabtab/__tabtab.zsh ]] && . ~/.config/tabtab/__tabtab.zsh || true
+# [[ -f ~/.config/tabtab/__tabtab.zsh ]] && . ~/.config/tabtab/__tabtab.zsh || true
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
-[[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/serverless.zsh
+# [[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/serverless.zsh
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
-[[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/sls.zsh
+# [[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/sls.zsh
 # tabtab source for slss package
 # uninstall by removing these lines or running `tabtab uninstall slss`
-[[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/slss.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/slss.zsh
+# [[ -f /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/slss.zsh ]] && . /Users/walexander/git/bestforvets-employers-2021/node_modules/tabtab/.completions/slss.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+alias ls='exa' > /dev/null 2>&1
