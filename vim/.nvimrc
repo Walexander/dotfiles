@@ -41,10 +41,8 @@ Plugin 'unite.vim'
 Plugin 'surround.vim'
 Plugin 'elzr/vim-json'
 
-Plugin 'vim-airline'
 
-
-
+python import sys; sys.path.append("/usr/local/lib/python2.7/site-packages")
 
 filetype plugin indent on     " required!
 set hidden
@@ -153,7 +151,6 @@ let g:syntastic_loc_list_height = 5
 "python from powerline.vim import setup as powerline_setup
 "python powerline_setup()
 "python del powerline_setup
-let  g:airline_powerline_fonts = 1
 set timeout
 set timeoutlen=500
 set timeoutlen=200
@@ -189,10 +186,8 @@ let g:jiracomplete_username = 'walexander'
 
 
 autocmd InsertEnter * let w:last_fdm=&foldmethod | setlocal foldmethod=manual
-autocmd InsertEnter * AirlineRefresh 
 
 autocmd InsertLeave * let &l:foldmethod=w:last_fdm
-autocmd InsertLeave * AirlineRefresh 
 
 set foldlevelstart=2
 
