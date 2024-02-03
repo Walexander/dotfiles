@@ -1,1 +1,0 @@
-/Users/walexander/.config/nvim/init.vim.backup.221017
