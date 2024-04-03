@@ -45,11 +45,7 @@ return require('packer').startup(function(use)
     after = "nvim-treesitter",
     requires = "nvim-treesitter/nvim-treesitter"
   })
-  use('nvim-treesitter/nvim-treesitter-textobjects', {
-  })
 
-
-  -- use("nvim-treesitter/nvim-treesitter-context");
 
   use {
     'VonHeikemen/lsp-zero.nvim',
@@ -72,15 +68,13 @@ return require('packer').startup(function(use)
       { 'rafamadriz/friendly-snippets' },
     }
   }
+  use({
+    "stevearc/oil.nvim",
+    config = function()
+      require("oil").setup()
+    end,
+  })
 
-  use("folke/zen-mode.nvim")
-
-  use {
-    'nvim-tree/nvim-tree.lua',
-    requires = {
-      'nvim-tree/nvim-web-devicons', -- optional
-    },
-  }
   use({
     'nvim-lualine/lualine.nvim',
     requires = {

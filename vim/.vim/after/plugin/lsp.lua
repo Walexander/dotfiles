@@ -24,16 +24,19 @@ cmp.setup({
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ['<C-y>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
   }),
 
 })
--- cmp_mappings['<Tab>'] = nil
--- cmp_mappings['<S-Tab>'] = nil
-
--- lsp.setup_nvim_cmp({
---   mapping = cmp_mappings
--- })
+lsp.configure('lua_ls', {
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { 'vim' }
+      }
+    }
+  }
+})
 
 lsp.set_preferences({
   suggest_lsp_servers = false,
@@ -61,6 +64,7 @@ lsp.on_attach(function(_, bufnr)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end)
 
+
 lsp.setup()
 
 vim.diagnostic.config({
@@ -82,5 +86,4 @@ require('mason-lspconfig').setup({
 local nullls = require('null-ls')
 local formatting = nullls.builtins.formatting
 nullls.setup({ sources = { formatting.prettierd } })
--- require('lspconfig')['lua_ls'].setup { }
 -- require('lspconfig')['cssls'].setup({})
