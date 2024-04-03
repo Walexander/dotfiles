@@ -1,2 +1,1 @@
-export MYVIMRC=$HOME/.config/vim/vimrc
-export EDITOR=vim
+export EDITOR=nvim

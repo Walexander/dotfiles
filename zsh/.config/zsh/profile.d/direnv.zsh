@@ -1,2 +1,2 @@
-export LESS="-XFR"
-eval "$(direnv hook zsh)"
+# export LESS="-XFR"
+# eval "$(direnv hook zsh)"
