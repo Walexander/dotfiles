@@ -1,2 +1,1 @@
-# export PATH="$HOME/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/bin:/usr/local/sbin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/MacGPG2/bin:/home/walexander/perl5/bin:$HOME/Library/Python/3.7/bin:/Applications/kitty.app/Contents/MacOS"
-
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$HOME/bin/roc:$PATH:$HOME/.zigup:$HOME/go/bin:/Applications/Docker.app/Contents/Resources/bin"

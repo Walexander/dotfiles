@@ -24,6 +24,24 @@ if [[ "$PROFILE_STARTUP" == true ]]; then
     exec 2>&3 3>&-
 fi
 
+type starship_zle-keymap-select >/dev/null || \
+  {
+    echo "Load starship"
+    eval "$(starship init zsh)"
+  }
 # The next line updates PATH for the Google Cloud SDK.
 # The next line enables shell command completion for gcloud.
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+alias j=z
+
+# sst
+export PATH=/Users/walexander/.sst/bin:$PATH
+
+# pnpm
+export PNPM_HOME="/Users/walexander/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
