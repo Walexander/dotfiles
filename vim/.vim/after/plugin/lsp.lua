@@ -88,38 +88,6 @@ lsp.configure("lua_ls", {
 		},
 	},
 })
--- lsp.configure('intelephense', {
--- 	setings = {
--- 		intelephense = {
---       environment = {
---         includePaths = {
---           '/Users/walexander/.composer/vendor/php-stubs'
---         }
---       },
---       diagnostics = { enable = true },
---       files = {
---         maxSize = 50000000,
--- 			},
-
--- 			-- stubs = {
--- 			-- 	"bcmath",
--- 			-- 	"bz2",
--- 			-- 	"calendar",
--- 			-- 	"Core",
--- 			-- 	"curl",
--- 			-- 	"zip",
--- 			-- 	"zlib",
--- 			-- 	"wordpress",
--- 			-- 	"woocommerce",
--- 			-- 	"acf-pro",
--- 			-- 	"wordpress-globals",
--- 			-- 	"wp-cli",
--- 			-- 	"genesis",
--- 			-- 	"polylang",
--- 			-- },
--- 		},
--- 	},
--- })
 
 lsp.set_preferences({
 	suggest_lsp_servers = false,
@@ -144,7 +112,7 @@ lsp.on_attach(function(_, bufnr)
 		vim.lsp.buf.definition()
 	end, opts)
 	vim.keymap.set("n", "K", function()
-		vim.lsp.buf.hover()
+		vim.lsp.buf.hover({ border = "single", max_height = 25, max_width = 120 })
 	end, opts)
 	vim.keymap.set("n", "D", function()
 		vim.diagnostic.open_float()
@@ -161,7 +129,12 @@ lsp.on_attach(function(_, bufnr)
 	vim.keymap.set("n", "<leader>qf", function()
 		vim.lsp.buf.code_action()
 	end, opts)
-	vim.keymap.set("n", "<leader>rr", function()
+
+	vim.keymap.set("n", "<leader>gI", function()
+		vim.lsp.buf.implementation()
+	end, opts)
+
+	vim.keymap.set("n", "<leader>gr", function()
 		vim.lsp.buf.references()
 	end, opts)
 	vim.keymap.set("n", "<leader>rn", function()
@@ -173,7 +146,7 @@ lsp.on_attach(function(_, bufnr)
 end)
 
 vim.diagnostic.config({
-	virtual_text = false,
+	virtual_text = { current_line = true },
 })
 
 require("mason").setup({})
@@ -195,15 +168,23 @@ require("lspconfig")["gopls"].setup({})
 require("lspconfig")["cssls"].setup({})
 require("lspconfig")["zls"].setup({})
 require("lspconfig")["helm_ls"].setup({})
-require("lspconfig")["cucumber_language_server"].setup({
-  settings = {
-    Cucumber = {
-      glue = {
-        "**/e2e/**/*.js",
-      }
 
-    }
-  }
+require("lspconfig").jsonls.setup({
+	settings = {
+		json = {
+			schemas = require("schemastore").json.schemas(),
+			validate = { enable = true },
+		},
+	},
+})
+require("lspconfig")["cucumber_language_server"].setup({
+	settings = {
+		cucumber = {
+			glue = {
+				"cypress/e2e/**/*.js",
+			},
+		},
+	},
 })
 require("lspconfig")["intelephense"].setup({
 	settings = {
@@ -215,75 +196,75 @@ require("lspconfig")["intelephense"].setup({
 				},
 			},
 			stubs = {
-        "apache",
-        "bcmath",
-        "bz2",
-        "calendar",
-        "com_dotnet",
-        "Core",
-        "ctype",
-        "curl",
-        "date",
-        "dba",
-        "dom",
-        "enchant",
-        "exif",
-        "FFI",
-        "fileinfo",
-        "filter",
-        "fpm",
-        "ftp",
-        "gd",
-        "gettext",
-        "gmp",
-        "hash",
-        "iconv",
-        "imap",
-        "intl",
-        "json",
-        "ldap",
-        "libxml",
-        "mbstring",
-        "meta",
-        "mysqli",
-        "oci8",
-        "odbc",
-        "openssl",
-        "pcntl",
-        "pcre",
-        "PDO",
-        "pgsql",
-        "Phar",
-        "posix",
-        "pspell",
-        "random",
-        "readline",
-        "Reflection",
-        "session",
-        "shmop",
-        "SimpleXML",
-        "snmp",
-        "soap",
-        "sockets",
-        "sodium",
-        "SPL",
-        "sqlite3",
-        "standard",
-        "superglobals",
-        "sysvmsg",
-        "sysvsem",
-        "sysvshm",
-        "tidy",
-        "tokenizer",
-        "wordpress",
-        "xml",
-        "xmlreader",
-        "xmlrpc",
-        "xmlwriter",
-        "xsl",
-        "Zend OPcache",
-        "zip",
-        "zlib"
+				"apache",
+				"bcmath",
+				"bz2",
+				"calendar",
+				"com_dotnet",
+				"Core",
+				"ctype",
+				"curl",
+				"date",
+				"dba",
+				"dom",
+				"enchant",
+				"exif",
+				"FFI",
+				"fileinfo",
+				"filter",
+				"fpm",
+				"ftp",
+				"gd",
+				"gettext",
+				"gmp",
+				"hash",
+				"iconv",
+				"imap",
+				"intl",
+				"json",
+				"ldap",
+				"libxml",
+				"mbstring",
+				"meta",
+				"mysqli",
+				"oci8",
+				"odbc",
+				"openssl",
+				"pcntl",
+				"pcre",
+				"PDO",
+				"pgsql",
+				"Phar",
+				"posix",
+				"pspell",
+				"random",
+				"readline",
+				"Reflection",
+				"session",
+				"shmop",
+				"SimpleXML",
+				"snmp",
+				"soap",
+				"sockets",
+				"sodium",
+				"SPL",
+				"sqlite3",
+				"standard",
+				"superglobals",
+				"sysvmsg",
+				"sysvsem",
+				"sysvshm",
+				"tidy",
+				"tokenizer",
+				"wordpress",
+				"xml",
+				"xmlreader",
+				"xmlrpc",
+				"xmlwriter",
+				"xsl",
+				"Zend OPcache",
+				"zip",
+				"zlib",
 			},
 			files = {
 				maxSize = 50000000,
