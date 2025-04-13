@@ -37,3 +37,4 @@ vim.o.splitright = true
 vim.opt.previewheight = 8
 
 vim.opt.diffopt:append('vertical')
+vim.o.winborder = 'rounded'
