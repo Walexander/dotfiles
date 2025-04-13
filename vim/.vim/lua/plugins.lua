@@ -51,6 +51,8 @@ return require("packer").startup(function(use)
 			{ "neovim/nvim-lspconfig" },
 			{ "williamboman/mason.nvim" },
 			{ "williamboman/mason-lspconfig.nvim" },
+
+			{ "b0o/schemastore.nvim" },
 			-- { 'jose-elias-alvarez/null-ls.nvim' },
 			-- Autocompletion
 			{ "hrsh7th/nvim-cmp" },
@@ -71,8 +73,8 @@ return require("packer").startup(function(use)
 		"stevearc/oil.nvim",
 		config = function()
 			require("oil").setup({
-        cleanup_delay_ms = false
-      })
+				cleanup_delay_ms = false,
+			})
 		end,
 	})
 
@@ -101,28 +103,16 @@ return require("packer").startup(function(use)
 	})
 	-- use("laytan/cloak.nvim")
 	use("rcarriga/nvim-notify")
-	-- use("nomnivore/ollama.nvim", {
-	-- 	requires = {
-	-- 		"nvim-lua/plenary.nvim",
-	-- 	},
-	-- 	config = function()
-	-- 		require("ollama").setup({
-	-- 			cmd = { "Ollama", "OllamaServe", "OllamaStop" },
-	-- 			keys = {
-	-- 				-- Sample keybind for prompt menu. Note that the <c-u> is important for selections to work properly.
 
-	-- 				{
-	-- 					"<leader>oo",
-	-- 					":<c-u>lua require('ollama').prompt()<cr>",
+	use({
+		"yetone/avante.nvim",
+		branch = "main",
+		run = "make",
+		requires = {
+			{ "stevearc/dressing.nvim" },
+			{ "MunifTanjim/nui.nvim" },
+			{ "MeanderingProgrammer/render-markdown.nvim" },
+		},
+	})
 
-	-- 					desc = "ollama prompt",
-	-- 					mode = { "n", "v" },
-	-- 				},
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- })
-	-- use({
-	-- 	"jacob411/Ollama-Copilot",
-	-- })
 end)
